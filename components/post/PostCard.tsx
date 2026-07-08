@@ -1,4 +1,9 @@
-import { LikeButton } from "./LikeButton";
+import { CommentForm } from "@/components/comment/CommentForm";
+import { CommentList } from "@/components/comment/CommentList";
+import { PostBody } from "@/components/post/PostBody";
+import { PostFooter } from "@/components/post/PostFooter";
+import { PostHeader } from "@/components/post/PostHeader";
+import { Comment } from "@/types/comment";
 import { Post } from "@/types/post";
 
 type PostCardProps = {
@@ -6,6 +11,7 @@ type PostCardProps = {
   userId: string;
   initialLiked: boolean;
   initialLikeCount: number;
+  comments: Comment[];
 };
 
 export function PostCard({
@@ -13,36 +19,26 @@ export function PostCard({
   userId,
   initialLiked,
   initialLikeCount,
+  comments,
 }: PostCardProps) {
   return (
     <article className="rounded-2xl bg-white p-6 shadow transition hover:shadow-lg">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">♨️ {post.sauna_name}</h2>
-        <span className="text-sm text-gray-500">{post.visit_date}</span>
-      </div>
+      <PostHeader post={post} />
 
-      <div className="mt-4 text-2xl text-yellow-500">
-        {"★".repeat(post.rating)}
-        <span className="text-gray-300">{"★".repeat(5 - post.rating)}</span>
-      </div>
+      <PostBody post={post} />
 
-      <p className="mt-4 whitespace-pre-wrap text-gray-700">
-        {post.comment || "コメントなし"}
-      </p>
+      <PostFooter
+        postId={post.id}
+        userId={userId}
+        setCount={post.set_count}
+        initialLiked={initialLiked}
+        initialLikeCount={initialLikeCount}
+        commentCount={comments.length}
+      />
 
-      <div className="mt-6 flex items-center justify-between border-t pt-4 text-sm text-gray-500">
-        <span>🔥 {post.set_count}セット</span>
+      <CommentList comments={comments} />
 
-        <div className="flex gap-6">
-          <LikeButton
-            postId={post.id}
-            userId={userId}
-            initialLiked={initialLiked}
-            initialCount={initialLikeCount}
-          />
-          <span>💬 0</span>
-        </div>
-      </div>
+      <CommentForm postId={post.id} userId={userId} />
     </article>
   );
 }

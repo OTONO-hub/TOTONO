@@ -6,6 +6,7 @@ export type Post = {
   set_count: number;
   rating: number;
   comment: string | null;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -17,4 +18,5 @@ export type CreatePostInput = {
   set_count: number;
   rating: number;
   comment: string;
+  image_url?: string;
 };
