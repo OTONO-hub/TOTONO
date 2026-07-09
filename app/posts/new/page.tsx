@@ -1,8 +1,10 @@
 "use client";
-import { createPost } from "@/services/posts";
+
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { createPost } from "@/services/posts";
+import { uploadPostImage } from "@/services/storage";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -12,6 +14,7 @@ export default function NewPostPage() {
   const [visitDate, setVisitDate] = useState("");
   const [setCount, setSetCount] = useState(3);
   const [rating, setRating] = useState(5);
+  const [image, setImage] = useState<File | null>(null);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,25 +23,24 @@ export default function NewPostPage() {
     setLoading(true);
 
     const {
-  data: { user },
-  error: userError,
-} = await supabase.auth.getUser();
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-if (userError || !user) {
-  setLoading(false);
-  alert("ログインしてください。");
-  router.push("/login");
-  return;
-}
-
-    if (!user) {
+    if (userError || !user) {
       setLoading(false);
       alert("ログインしてください。");
       router.push("/login");
       return;
     }
 
-        try {
+    try {
+      let imageUrl: string | undefined;
+
+      if (image) {
+        imageUrl = await uploadPostImage(supabase, user.id, image);
+      }
+
       await createPost(supabase, {
         user_id: user.id,
         sauna_name: saunaName,
@@ -46,6 +48,7 @@ if (userError || !user) {
         set_count: setCount,
         rating,
         comment,
+        image_url: imageUrl,
       });
 
       alert("投稿しました。");
@@ -108,6 +111,16 @@ if (userError || !user) {
               onChange={(e) => setRating(Number(e.target.value))}
               className="w-full rounded-lg border p-3"
               required
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block font-medium">写真</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+              className="w-full rounded-lg border p-3"
             />
           </div>
 
