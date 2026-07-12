@@ -32,7 +32,10 @@ export function PostCard({
   return (
     <article className="rounded-2xl border bg-card p-6 shadow-sm transition hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
-        <PostHeader post={post} author={author} />
+        <PostHeader
+          post={post}
+          author={author}
+        />
 
         {isOwner && (
           <div className="flex shrink-0 gap-2">
@@ -62,7 +65,10 @@ export function PostCard({
         commentCount={comments.length}
       />
 
-      <CommentList comments={comments} />
+      <CommentList
+        comments={comments}
+        currentUserId={userId}
+      />
 
       <CommentForm
         postId={post.id}

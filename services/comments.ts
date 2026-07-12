@@ -57,3 +57,19 @@ export async function getCommentsByPostIds(
 
   return data ?? [];
 }
+
+export async function deleteComment(
+  supabase: SupabaseClient,
+  commentId: string,
+  userId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from("comments")
+    .delete()
+    .eq("id", commentId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
