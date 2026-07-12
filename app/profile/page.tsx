@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
 import { getCommentsByPostId } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
@@ -23,7 +24,7 @@ export default async function ProfilePage() {
         <main className="mx-auto max-w-2xl p-6">
           <p>ログインしてください。</p>
 
-          <Link href="/login" className="text-blue-600">
+          <Link href="/login" className="text-primary">
             ログインへ
           </Link>
         </main>
@@ -49,27 +50,40 @@ export default async function ProfilePage() {
     <>
       <Header />
 
-      <main className="mx-auto min-h-screen max-w-3xl space-y-6 bg-muted/40 p-6">
+      <main className="mx-auto min-h-screen max-w-3xl space-y-8 bg-muted/40 px-4 py-8 sm:px-6">
         <section className="rounded-2xl border bg-card p-6 shadow-sm">
-          <h1 className="text-3xl font-bold">
-            @{profile.username}
-          </h1>
+          <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
+            <ProfileAvatar
+              avatarUrl={profile.avatar_url}
+              username={profile.username}
+              size="xl"
+            />
 
-          <p className="mt-4 text-muted-foreground">
-            {profile.bio || "自己紹介はまだありません。"}
-          </p>
+            <div className="min-w-0 flex-1">
+              <h1 className="break-words text-3xl font-bold tracking-tight">
+                @{profile.username || "ユーザー"}
+              </h1>
 
-          <div className="mt-4 text-sm text-muted-foreground">
-            投稿数：{myPosts.length}
-          </div>
+              <p className="mt-3 whitespace-pre-wrap text-muted-foreground">
+                {profile.bio || "自己紹介はまだありません。"}
+              </p>
 
-          <div className="mt-6">
-            <Link
-              href="/profile/edit"
-              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-            >
-              プロフィール編集
-            </Link>
+              <div className="mt-4 flex justify-center gap-6 text-sm sm:justify-start">
+                <div>
+                  <span className="font-bold">{myPosts.length}</span>
+                  <span className="ml-1 text-muted-foreground">投稿</span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Link
+                  href="/profile/edit"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+                >
+                  プロフィール編集
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -95,6 +109,7 @@ export default async function ProfilePage() {
                 <PostCard
                   key={post.id}
                   post={post}
+                  author={profile}
                   userId={user.id}
                   initialLiked={liked}
                   initialLikeCount={likeCount}

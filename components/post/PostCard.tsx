@@ -8,9 +8,11 @@ import { PostFooter } from "@/components/post/PostFooter";
 import { PostHeader } from "@/components/post/PostHeader";
 import { Comment } from "@/types/comment";
 import { Post } from "@/types/post";
+import { Profile } from "@/types/profile";
 
 type PostCardProps = {
   post: Post;
+  author: Profile | null;
   userId: string;
   initialLiked: boolean;
   initialLikeCount: number;
@@ -19,6 +21,7 @@ type PostCardProps = {
 
 export function PostCard({
   post,
+  author,
   userId,
   initialLiked,
   initialLikeCount,
@@ -27,15 +30,15 @@ export function PostCard({
   const isOwner = post.user_id === userId;
 
   return (
-    <article className="rounded-2xl bg-white p-6 shadow transition hover:shadow-lg">
+    <article className="rounded-2xl border bg-card p-6 shadow-sm transition hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
-        <PostHeader post={post} />
+        <PostHeader post={post} author={author} />
 
         {isOwner && (
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <Link
               href={`/posts/${post.id}/edit`}
-              className="rounded-lg border px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              className="inline-flex h-9 items-center justify-center rounded-md border px-3 text-sm font-medium transition hover:bg-muted"
             >
               編集
             </Link>
