@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { CommentForm } from "@/components/comment/CommentForm";
 import { CommentList } from "@/components/comment/CommentList";
 import { DeletePostButton } from "@/components/post/DeletePostButton";
@@ -39,7 +40,10 @@ export function PostCard({
               編集
             </Link>
 
-            <DeletePostButton postId={post.id} />
+            <DeletePostButton
+              postId={post.id}
+              imageUrl={post.image_url}
+            />
           </div>
         )}
       </div>
@@ -57,7 +61,10 @@ export function PostCard({
 
       <CommentList comments={comments} />
 
-      <CommentForm postId={post.id} userId={userId} />
+      <CommentForm
+        postId={post.id}
+        userId={userId}
+      />
     </article>
   );
 }
