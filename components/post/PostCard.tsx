@@ -16,6 +16,7 @@ type PostCardProps = {
   userId: string;
   initialLiked: boolean;
   initialLikeCount: number;
+  initialBookmarked: boolean;
   comments: CommentWithAuthor[];
 };
 
@@ -25,6 +26,7 @@ export function PostCard({
   userId,
   initialLiked,
   initialLikeCount,
+  initialBookmarked,
   comments,
 }: PostCardProps) {
   const isOwner = post.user_id === userId;
@@ -62,6 +64,7 @@ export function PostCard({
         setCount={post.set_count}
         initialLiked={initialLiked}
         initialLikeCount={initialLikeCount}
+        initialBookmarked={initialBookmarked}
         commentCount={comments.length}
       />
 

@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { Search, SquarePen, UserRound } from "lucide-react";
+import {
+  Bookmark,
+  Search,
+  SquarePen,
+  UserRound,
+} from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,6 +46,18 @@ export async function Header() {
 
               <span className="hidden sm:inline">
                 検索
+              </span>
+            </Link>
+
+            <Link
+              href="/bookmarks"
+              className="inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground sm:w-auto sm:gap-2 sm:px-3"
+              aria-label="保存済み投稿"
+            >
+              <Bookmark className="size-4" />
+
+              <span className="hidden sm:inline">
+                保存済み
               </span>
             </Link>
 

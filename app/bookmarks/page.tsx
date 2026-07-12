@@ -1,51 +1,57 @@
+import Link from "next/link";
+
 import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
-import { SearchForm } from "@/components/search/SearchForm";
 import { createClient } from "@/lib/supabase/server";
-import { getBookmarkedPostIds } from "@/services/bookmarks";
+import { getAllBookmarkedPostIds } from "@/services/bookmarks";
 import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
+import { getPostsByIds } from "@/services/posts";
 import { getProfilesByUserIds } from "@/services/profile";
-import { searchPosts } from "@/services/search";
 import { CommentWithAuthor } from "@/types/comment";
 
-type SearchPageProps = {
-  searchParams: Promise<{
-    q?: string;
-  }>;
-};
-
-export default async function SearchPage({
-  searchParams,
-}: SearchPageProps) {
-  const { q = "" } = await searchParams;
-  const query = q.trim();
-
+export default async function BookmarksPage() {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const posts = query
-    ? await searchPosts(supabase, query)
-    : [];
+  if (!user) {
+    return (
+      <>
+        <Header />
+
+        <main className="mx-auto max-w-2xl p-6">
+          <p className="text-muted-foreground">
+            保存済み投稿を見るにはログインしてください。
+          </p>
+
+          <Link
+            href="/login"
+            className="mt-4 inline-block font-medium text-primary"
+          >
+            ログインへ
+          </Link>
+        </main>
+      </>
+    );
+  }
+
+  const bookmarkedPostIds =
+    await getAllBookmarkedPostIds(
+      supabase,
+      user.id
+    );
+
+  const posts = await getPostsByIds(
+    supabase,
+    bookmarkedPostIds
+  );
 
   const comments = await getCommentsByPostIds(
     supabase,
     posts.map((post) => post.id)
-  );
-
-  const bookmarkedPostIds = user
-    ? await getBookmarkedPostIds(
-        supabase,
-        user.id,
-        posts.map((post) => post.id)
-      )
-    : [];
-
-  const bookmarkedPostIdSet = new Set(
-    bookmarkedPostIds
   );
 
   const userIds = [
@@ -85,27 +91,30 @@ export default async function SearchPage({
     );
   }
 
-  const postsWithMeta = user
-    ? await Promise.all(
-        posts.map(async (post) => ({
-          post,
-          author:
-            profilesByUserId.get(post.user_id) ?? null,
-          likeCount: await getLikeCount(
-            supabase,
-            post.id
-          ),
-          liked: await isLiked(
-            supabase,
-            user.id,
-            post.id
-          ),
-          bookmarked: bookmarkedPostIdSet.has(post.id),
-          comments:
-            commentsByPostId.get(post.id) ?? [],
-        }))
-      )
-    : [];
+  const bookmarkedPostIdSet = new Set(
+    bookmarkedPostIds
+  );
+
+  const postsWithMeta = await Promise.all(
+    posts.map(async (post) => ({
+      post,
+      author:
+        profilesByUserId.get(post.user_id) ?? null,
+      likeCount: await getLikeCount(
+        supabase,
+        post.id
+      ),
+      liked: await isLiked(
+        supabase,
+        user.id,
+        post.id
+      ),
+      bookmarked:
+        bookmarkedPostIdSet.has(post.id),
+      comments:
+        commentsByPostId.get(post.id) ?? [],
+    }))
+  );
 
   return (
     <>
@@ -114,41 +123,22 @@ export default async function SearchPage({
       <main className="mx-auto min-h-screen max-w-3xl space-y-6 bg-muted/40 px-4 py-8 sm:px-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            サウナ・投稿検索
+            保存済み投稿
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            サウナ施設名や投稿内容から検索できます。
+            あとで見返したいサ活投稿を確認できます。
           </p>
         </div>
 
-        <SearchForm />
-
-        {!user ? (
+        {postsWithMeta.length === 0 ? (
           <div className="rounded-xl border bg-card p-8 text-center shadow-sm">
             <p className="text-muted-foreground">
-              検索結果を見るにはログインしてください。
-            </p>
-          </div>
-        ) : !query ? (
-          <div className="rounded-xl border bg-card p-8 text-center shadow-sm">
-            <p className="text-muted-foreground">
-              検索キーワードを入力してください。
-            </p>
-          </div>
-        ) : postsWithMeta.length === 0 ? (
-          <div className="rounded-xl border bg-card p-8 text-center shadow-sm">
-            <p className="text-muted-foreground">
-              「{query}」に一致する投稿はありませんでした。
+              保存済みの投稿はまだありません。
             </p>
           </div>
         ) : (
           <section className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              「{query}」の検索結果：
-              {postsWithMeta.length}件
-            </p>
-
             {postsWithMeta.map(
               ({
                 post,

@@ -2,6 +2,7 @@ import { Hero } from "@/components/home/Hero";
 import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
 import { createClient } from "@/lib/supabase/server";
+import { getBookmarkedPostIds } from "@/services/bookmarks";
 import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
@@ -31,6 +32,15 @@ export default async function Home() {
     supabase,
     posts.map((post) => post.id)
   );
+
+  // ログインユーザーが保存している投稿IDをまとめて取得
+  const bookmarkedPostIds = await getBookmarkedPostIds(
+    supabase,
+    user.id,
+    posts.map((post) => post.id)
+  );
+
+  const bookmarkedPostIdSet = new Set(bookmarkedPostIds);
 
   // 投稿者とコメント投稿者のIDをまとめる
   const userIds = [
@@ -86,6 +96,7 @@ export default async function Home() {
         user.id,
         post.id
       ),
+      bookmarked: bookmarkedPostIdSet.has(post.id),
       comments:
         commentsByPostId.get(post.id) ?? [],
     }))
@@ -113,6 +124,7 @@ export default async function Home() {
               author,
               likeCount,
               liked,
+              bookmarked,
               comments,
             }) => (
               <PostCard
@@ -122,6 +134,7 @@ export default async function Home() {
                 userId={user.id}
                 initialLiked={liked}
                 initialLikeCount={likeCount}
+                initialBookmarked={bookmarked}
                 comments={comments}
               />
             )

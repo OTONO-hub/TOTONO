@@ -27,6 +27,27 @@ export async function getPosts(
   return data ?? [];
 }
 
+export async function getPostsByIds(
+  supabase: SupabaseClient,
+  postIds: string[]
+): Promise<Post[]> {
+  if (postIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .in("id", postIds)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
+}
+
 export async function getPostById(
   supabase: SupabaseClient,
   id: string

@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
+import { getBookmarkedPostIds } from "@/services/bookmarks";
 import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
@@ -53,6 +54,14 @@ export default async function ProfilePage() {
     myPosts.map((post) => post.id)
   );
 
+  const bookmarkedPostIds = await getBookmarkedPostIds(
+    supabase,
+    user.id,
+    myPosts.map((post) => post.id)
+  );
+
+  const bookmarkedPostIdSet = new Set(bookmarkedPostIds);
+
   const commentAuthorProfiles =
     await getProfilesByUserIds(
       supabase,
@@ -101,6 +110,7 @@ export default async function ProfilePage() {
         user.id,
         post.id
       ),
+      bookmarked: bookmarkedPostIdSet.has(post.id),
       comments:
         commentsByPostId.get(post.id) ?? [],
     }))
@@ -177,6 +187,7 @@ export default async function ProfilePage() {
                 post,
                 likeCount,
                 liked,
+                bookmarked,
                 comments,
               }) => (
                 <PostCard
@@ -186,6 +197,7 @@ export default async function ProfilePage() {
                   userId={user.id}
                   initialLiked={liked}
                   initialLikeCount={likeCount}
+                  initialBookmarked={bookmarked}
                   comments={comments}
                 />
               )
