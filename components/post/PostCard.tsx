@@ -6,7 +6,7 @@ import { DeletePostButton } from "@/components/post/DeletePostButton";
 import { PostBody } from "@/components/post/PostBody";
 import { PostFooter } from "@/components/post/PostFooter";
 import { PostHeader } from "@/components/post/PostHeader";
-import { Comment } from "@/types/comment";
+import { CommentWithAuthor } from "@/types/comment";
 import { Post } from "@/types/post";
 import { Profile } from "@/types/profile";
 
@@ -16,7 +16,7 @@ type PostCardProps = {
   userId: string;
   initialLiked: boolean;
   initialLikeCount: number;
-  comments: Comment[];
+  comments: CommentWithAuthor[];
 };
 
 export function PostCard({

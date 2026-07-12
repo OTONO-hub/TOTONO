@@ -5,10 +5,14 @@ import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
-import { getCommentsByPostId } from "@/services/comments";
+import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
-import { getProfile } from "@/services/profile";
+import {
+  getProfile,
+  getProfilesByUserIds,
+} from "@/services/profile";
+import { CommentWithAuthor } from "@/types/comment";
 
 type UserProfilePageProps = {
   params: Promise<{
@@ -62,12 +66,61 @@ export default async function UserProfilePage({
     (post) => post.user_id === profile.id
   );
 
+  const comments = await getCommentsByPostIds(
+    supabase,
+    userPosts.map((post) => post.id)
+  );
+
+  const commentAuthorProfiles =
+    await getProfilesByUserIds(
+      supabase,
+      comments.map((comment) => comment.user_id)
+    );
+
+  const profilesByUserId = new Map(
+    [
+      profile,
+      ...commentAuthorProfiles,
+    ].map((item) => [item.id, item])
+  );
+
+  const commentsByPostId = new Map<
+    string,
+    CommentWithAuthor[]
+  >();
+
+  for (const comment of comments) {
+    const commentWithAuthor: CommentWithAuthor = {
+      comment,
+      author:
+        profilesByUserId.get(comment.user_id) ?? null,
+    };
+
+    const currentComments =
+      commentsByPostId.get(comment.post_id) ?? [];
+
+    currentComments.push(commentWithAuthor);
+
+    commentsByPostId.set(
+      comment.post_id,
+      currentComments
+    );
+  }
+
   const userPostsWithMeta = await Promise.all(
     userPosts.map(async (post) => ({
       post,
-      likeCount: await getLikeCount(supabase, post.id),
-      liked: await isLiked(supabase, user.id, post.id),
-      comments: await getCommentsByPostId(supabase, post.id),
+      likeCount: await getLikeCount(
+        supabase,
+        post.id
+      ),
+      liked: await isLiked(
+        supabase,
+        user.id,
+        post.id
+      ),
+      comments:
+        commentsByPostId.get(post.id) ?? [],
     }))
   );
 
@@ -87,12 +140,13 @@ export default async function UserProfilePage({
             />
 
             <div className="min-w-0 flex-1">
-              <h1 className="break-words text-3xl font-bold tracking-tight">
+              <h1 className="wrap-break-word text-3xl font-bold tracking-tight">
                 @{profile.username || "ユーザー"}
               </h1>
 
               <p className="mt-3 whitespace-pre-wrap text-muted-foreground">
-                {profile.bio || "自己紹介はまだありません。"}
+                {profile.bio ||
+                  "自己紹介はまだありません。"}
               </p>
 
               <div className="mt-4 flex justify-center gap-6 text-sm sm:justify-start">
@@ -122,7 +176,7 @@ export default async function UserProfilePage({
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="wrap-break-word text-2xl font-bold">
             @{profile.username || "ユーザー"}さんの投稿
           </h2>
 
@@ -134,7 +188,12 @@ export default async function UserProfilePage({
             </div>
           ) : (
             userPostsWithMeta.map(
-              ({ post, likeCount, liked, comments }) => (
+              ({
+                post,
+                likeCount,
+                liked,
+                comments,
+              }) => (
                 <PostCard
                   key={post.id}
                   post={post}

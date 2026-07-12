@@ -4,10 +4,14 @@ import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
-import { getCommentsByPostId } from "@/services/comments";
+import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
-import { getProfile } from "@/services/profile";
+import {
+  getProfile,
+  getProfilesByUserIds,
+} from "@/services/profile";
+import { CommentWithAuthor } from "@/types/comment";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -22,9 +26,14 @@ export default async function ProfilePage() {
         <Header />
 
         <main className="mx-auto max-w-2xl p-6">
-          <p>ログインしてください。</p>
+          <p className="text-muted-foreground">
+            ログインしてください。
+          </p>
 
-          <Link href="/login" className="text-primary">
+          <Link
+            href="/login"
+            className="mt-4 inline-block font-medium text-primary"
+          >
             ログインへ
           </Link>
         </main>
@@ -35,14 +44,65 @@ export default async function ProfilePage() {
   const profile = await getProfile(supabase, user.id);
   const posts = await getPosts(supabase);
 
-  const myPosts = posts.filter((post) => post.user_id === user.id);
+  const myPosts = posts.filter(
+    (post) => post.user_id === user.id
+  );
+
+  const comments = await getCommentsByPostIds(
+    supabase,
+    myPosts.map((post) => post.id)
+  );
+
+  const commentAuthorProfiles =
+    await getProfilesByUserIds(
+      supabase,
+      comments.map((comment) => comment.user_id)
+    );
+
+  const profilesByUserId = new Map(
+    [
+      profile,
+      ...commentAuthorProfiles,
+    ].map((item) => [item.id, item])
+  );
+
+  const commentsByPostId = new Map<
+    string,
+    CommentWithAuthor[]
+  >();
+
+  for (const comment of comments) {
+    const commentWithAuthor: CommentWithAuthor = {
+      comment,
+      author:
+        profilesByUserId.get(comment.user_id) ?? null,
+    };
+
+    const currentComments =
+      commentsByPostId.get(comment.post_id) ?? [];
+
+    currentComments.push(commentWithAuthor);
+
+    commentsByPostId.set(
+      comment.post_id,
+      currentComments
+    );
+  }
 
   const myPostsWithMeta = await Promise.all(
     myPosts.map(async (post) => ({
       post,
-      likeCount: await getLikeCount(supabase, post.id),
-      liked: await isLiked(supabase, user.id, post.id),
-      comments: await getCommentsByPostId(supabase, post.id),
+      likeCount: await getLikeCount(
+        supabase,
+        post.id
+      ),
+      liked: await isLiked(
+        supabase,
+        user.id,
+        post.id
+      ),
+      comments:
+        commentsByPostId.get(post.id) ?? [],
     }))
   );
 
@@ -60,18 +120,24 @@ export default async function ProfilePage() {
             />
 
             <div className="min-w-0 flex-1">
-              <h1 className="break-words text-3xl font-bold tracking-tight">
+              <h1 className="wrap-break-word text-3xl font-bold tracking-tight">
                 @{profile.username || "ユーザー"}
               </h1>
 
               <p className="mt-3 whitespace-pre-wrap text-muted-foreground">
-                {profile.bio || "自己紹介はまだありません。"}
+                {profile.bio ||
+                  "自己紹介はまだありません。"}
               </p>
 
               <div className="mt-4 flex justify-center gap-6 text-sm sm:justify-start">
                 <div>
-                  <span className="font-bold">{myPosts.length}</span>
-                  <span className="ml-1 text-muted-foreground">投稿</span>
+                  <span className="font-bold">
+                    {myPosts.length}
+                  </span>
+
+                  <span className="ml-1 text-muted-foreground">
+                    投稿
+                  </span>
                 </div>
               </div>
 
@@ -88,7 +154,9 @@ export default async function ProfilePage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold">自分の投稿</h2>
+          <h2 className="text-2xl font-bold">
+            自分の投稿
+          </h2>
 
           {myPostsWithMeta.length === 0 ? (
             <div className="rounded-xl border bg-card p-8 text-center shadow-sm">
@@ -105,7 +173,12 @@ export default async function ProfilePage() {
             </div>
           ) : (
             myPostsWithMeta.map(
-              ({ post, likeCount, liked, comments }) => (
+              ({
+                post,
+                likeCount,
+                liked,
+                comments,
+              }) => (
                 <PostCard
                   key={post.id}
                   post={post}

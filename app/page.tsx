@@ -2,10 +2,11 @@ import { Hero } from "@/components/home/Hero";
 import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
 import { createClient } from "@/lib/supabase/server";
-import { getCommentsByPostId } from "@/services/comments";
+import { getCommentsByPostIds } from "@/services/comments";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
 import { getProfilesByUserIds } from "@/services/profile";
+import { CommentWithAuthor } from "@/types/comment";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -23,24 +24,70 @@ export default async function Home() {
     );
   }
 
+  // 投稿とコメントを取得
   const posts = await getPosts(supabase);
 
+  const comments = await getCommentsByPostIds(
+    supabase,
+    posts.map((post) => post.id)
+  );
+
+  // 投稿者とコメント投稿者のIDをまとめる
+  const userIds = [
+    ...posts.map((post) => post.user_id),
+    ...comments.map((comment) => comment.user_id),
+  ];
+
+  // 必要なプロフィールを1回で取得
   const profiles = await getProfilesByUserIds(
     supabase,
-    posts.map((post) => post.user_id)
+    userIds
   );
 
   const profilesByUserId = new Map(
     profiles.map((profile) => [profile.id, profile])
   );
 
+  // 投稿IDごとにコメントを分類
+  const commentsByPostId = new Map<
+    string,
+    CommentWithAuthor[]
+  >();
+
+  for (const comment of comments) {
+    const commentWithAuthor: CommentWithAuthor = {
+      comment,
+      author:
+        profilesByUserId.get(comment.user_id) ?? null,
+    };
+
+    const currentComments =
+      commentsByPostId.get(comment.post_id) ?? [];
+
+    currentComments.push(commentWithAuthor);
+
+    commentsByPostId.set(
+      comment.post_id,
+      currentComments
+    );
+  }
+
   const postsWithMeta = await Promise.all(
     posts.map(async (post) => ({
       post,
-      author: profilesByUserId.get(post.user_id) ?? null,
-      likeCount: await getLikeCount(supabase, post.id),
-      liked: await isLiked(supabase, user.id, post.id),
-      comments: await getCommentsByPostId(supabase, post.id),
+      author:
+        profilesByUserId.get(post.user_id) ?? null,
+      likeCount: await getLikeCount(
+        supabase,
+        post.id
+      ),
+      liked: await isLiked(
+        supabase,
+        user.id,
+        post.id
+      ),
+      comments:
+        commentsByPostId.get(post.id) ?? [],
     }))
   );
 
