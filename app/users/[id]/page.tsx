@@ -3,10 +3,16 @@ import { notFound } from "next/navigation";
 
 import { Header } from "@/components/layout/Header";
 import { PostCard } from "@/components/post/PostCard";
+import { FollowButton } from "@/components/profile/FollowButton";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
 import { getBookmarkedPostIds } from "@/services/bookmarks";
 import { getCommentsByPostIds } from "@/services/comments";
+import {
+  getFollowerCount,
+  getFollowingCount,
+  isFollowing,
+} from "@/services/follows";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
 import {
@@ -136,6 +142,19 @@ export default async function UserProfilePage({
 
   const isOwnProfile = user.id === profile.id;
 
+  const [followingCount, followerCount, following] =
+    await Promise.all([
+      getFollowingCount(supabase, profile.id),
+      getFollowerCount(supabase, profile.id),
+      isOwnProfile
+        ? Promise.resolve(false)
+        : isFollowing(
+            supabase,
+            user.id,
+            profile.id
+          ),
+    ]);
+
   return (
     <>
       <Header />
@@ -169,18 +188,44 @@ export default async function UserProfilePage({
                     投稿
                   </span>
                 </div>
+
+                <div>
+                  <span className="font-bold">
+                    {followingCount}
+                  </span>
+
+                  <span className="ml-1 text-muted-foreground">
+                    フォロー
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold">
+                    {followerCount}
+                  </span>
+
+                  <span className="ml-1 text-muted-foreground">
+                    フォロワー
+                  </span>
+                </div>
               </div>
 
-              {isOwnProfile && (
-                <div className="mt-6">
+              <div className="mt-6">
+                {isOwnProfile ? (
                   <Link
                     href="/profile/edit"
                     className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
                   >
                     プロフィール編集
                   </Link>
-                </div>
-              )}
+                ) : (
+                  <FollowButton
+                    currentUserId={user.id}
+                    targetUserId={profile.id}
+                    initialFollowing={following}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </section>

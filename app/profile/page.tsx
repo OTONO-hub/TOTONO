@@ -6,6 +6,10 @@ import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
 import { getBookmarkedPostIds } from "@/services/bookmarks";
 import { getCommentsByPostIds } from "@/services/comments";
+import {
+  getFollowerCount,
+  getFollowingCount,
+} from "@/services/follows";
 import { getLikeCount, isLiked } from "@/services/likes";
 import { getPosts } from "@/services/posts";
 import {
@@ -61,6 +65,12 @@ export default async function ProfilePage() {
   );
 
   const bookmarkedPostIdSet = new Set(bookmarkedPostIds);
+
+  const [followingCount, followerCount] =
+    await Promise.all([
+      getFollowingCount(supabase, user.id),
+      getFollowerCount(supabase, user.id),
+    ]);
 
   const commentAuthorProfiles =
     await getProfilesByUserIds(
@@ -147,6 +157,26 @@ export default async function ProfilePage() {
 
                   <span className="ml-1 text-muted-foreground">
                     投稿
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold">
+                    {followingCount}
+                  </span>
+
+                  <span className="ml-1 text-muted-foreground">
+                    フォロー
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold">
+                    {followerCount}
+                  </span>
+
+                  <span className="ml-1 text-muted-foreground">
+                    フォロワー
                   </span>
                 </div>
               </div>
