@@ -72,9 +72,9 @@ export default function EditProfilePage() {
 
         const profile = await getProfile(supabase, user.id);
 
-        setUsername(profile.username ?? "");
-        setBio(profile.bio ?? "");
-        setCurrentAvatarUrl(profile.avatar_url ?? null);
+        setUsername(profile?.username ?? "");
+        setBio(profile?.bio ?? "");
+        setCurrentAvatarUrl(profile?.avatar_url ?? null);
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -214,10 +214,6 @@ export default function EditProfilePage() {
         avatar_url: avatarUrl,
       });
 
-      /*
-       * profilesテーブルの更新成功後に、
-       * 以前のプロフィール画像をStorageから削除します。
-       */
       if (avatarFile && currentAvatarUrl) {
         const oldAvatarPath =
           getAvatarImagePath(currentAvatarUrl);
@@ -242,10 +238,6 @@ export default function EditProfilePage() {
       router.push("/profile");
       router.refresh();
     } catch (error) {
-      /*
-       * 新しい画像のアップロード後にDB更新が失敗した場合、
-       * 使用されない新画像をStorageから削除します。
-       */
       if (newUploadedAvatarPath) {
         try {
           await deleteAvatarImage(
@@ -406,10 +398,7 @@ export default function EditProfilePage() {
             type="submit"
             size="lg"
             className="w-full"
-            disabled={
-              saving ||
-              processingImage
-            }
+            disabled={saving || processingImage}
           >
             {saving ? (
               <>

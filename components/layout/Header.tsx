@@ -7,6 +7,7 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadNotificationCount } from "@/services/notifications";
 
@@ -117,6 +118,8 @@ export async function Header() {
                 プロフィール
               </span>
             </Link>
+
+            <LogoutButton />
           </nav>
         ) : (
           <nav

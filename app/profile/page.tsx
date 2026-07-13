@@ -16,7 +16,7 @@ import {
   getProfile,
   getProfilesByUserIds,
 } from "@/services/profile";
-import { CommentWithAuthor } from "@/types/comment";
+import type { CommentWithAuthor } from "@/types/comment";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -47,6 +47,35 @@ export default async function ProfilePage() {
   }
 
   const profile = await getProfile(supabase, user.id);
+
+  if (!profile) {
+    return (
+      <>
+        <Header />
+
+        <main className="mx-auto min-h-screen max-w-3xl bg-muted/40 px-4 py-8 sm:px-6">
+          <section className="rounded-2xl border bg-card p-8 text-center shadow-sm">
+            <h1 className="text-2xl font-bold tracking-tight">
+              プロフィールを設定しましょう
+            </h1>
+
+            <p className="mt-3 text-muted-foreground">
+              ユーザー名や自己紹介を設定すると、
+              TOTONOをより楽しめます。
+            </p>
+
+            <Link
+              href="/profile/edit"
+              className="mt-6 inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+            >
+              プロフィールを設定する
+            </Link>
+          </section>
+        </main>
+      </>
+    );
+  }
+
   const posts = await getPosts(supabase);
 
   const myPosts = posts.filter(

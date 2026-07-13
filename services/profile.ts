@@ -11,12 +11,12 @@ type UpdateProfileInput = {
 export async function getProfile(
   supabase: SupabaseClient,
   userId: string
-): Promise<Profile> {
+): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
@@ -54,8 +54,10 @@ export async function updateProfile(
 ) {
   const { error } = await supabase
     .from("profiles")
-    .update(input)
-    .eq("id", userId);
+    .upsert({
+      id: userId,
+      ...input,
+    });
 
   if (error) {
     throw new Error(error.message);

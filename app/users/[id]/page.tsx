@@ -19,7 +19,7 @@ import {
   getProfile,
   getProfilesByUserIds,
 } from "@/services/profile";
-import { CommentWithAuthor } from "@/types/comment";
+import type { CommentWithAuthor } from "@/types/comment";
 
 type UserProfilePageProps = {
   params: Promise<{
@@ -59,11 +59,9 @@ export default async function UserProfilePage({
     );
   }
 
-  let profile;
+  const profile = await getProfile(supabase, id);
 
-  try {
-    profile = await getProfile(supabase, id);
-  } catch {
+  if (!profile) {
     notFound();
   }
 

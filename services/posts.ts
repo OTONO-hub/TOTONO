@@ -1,11 +1,14 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+
 import { CreatePostInput, Post } from "@/types/post";
 
 export async function createPost(
   supabase: SupabaseClient,
   input: CreatePostInput
 ) {
-  const { error } = await supabase.from("posts").insert(input);
+  const { error } = await supabase
+    .from("posts")
+    .insert(input);
 
   if (error) {
     throw new Error(error.message);
@@ -56,7 +59,7 @@ export async function getPostById(
     .from("posts")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
