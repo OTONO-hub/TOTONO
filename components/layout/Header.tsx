@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  Bell,
   Bookmark,
   Search,
   SquarePen,
@@ -7,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import { getUnreadNotificationCount } from "@/services/notifications";
 
 export async function Header() {
   const supabase = await createClient();
@@ -14,6 +16,13 @@ export async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const unreadNotificationCount = user
+    ? await getUnreadNotificationCount(
+        supabase,
+        user.id
+      )
+    : 0;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
@@ -47,6 +56,30 @@ export async function Header() {
               <span className="hidden sm:inline">
                 検索
               </span>
+            </Link>
+
+            <Link
+              href="/notifications"
+              className="relative inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground sm:w-auto sm:gap-2 sm:px-3"
+              aria-label={
+                unreadNotificationCount > 0
+                  ? `通知、未読${unreadNotificationCount}件`
+                  : "通知"
+              }
+            >
+              <Bell className="size-4" />
+
+              <span className="hidden sm:inline">
+                通知
+              </span>
+
+              {unreadNotificationCount > 0 && (
+                <span className="absolute right-0.5 top-0.5 flex min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground sm:static sm:min-w-5 sm:leading-5">
+                  {unreadNotificationCount > 99
+                    ? "99+"
+                    : unreadNotificationCount}
+                </span>
+              )}
             </Link>
 
             <Link

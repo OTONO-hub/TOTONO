@@ -4,6 +4,7 @@ import { LikeButton } from "./LikeButton";
 type Props = {
   postId: string;
   userId: string;
+  postOwnerId: string;
   setCount: number;
   initialLiked: boolean;
   initialLikeCount: number;
@@ -14,6 +15,7 @@ type Props = {
 export function PostFooter({
   postId,
   userId,
+  postOwnerId,
   setCount,
   initialLiked,
   initialLikeCount,
@@ -28,6 +30,7 @@ export function PostFooter({
         <LikeButton
           postId={postId}
           userId={userId}
+          postOwnerId={postOwnerId}
           initialLiked={initialLiked}
           initialCount={initialLikeCount}
         />

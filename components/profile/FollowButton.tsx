@@ -1,7 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LoaderCircle, UserCheck, UserPlus } from "lucide-react";
+import {
+  LoaderCircle,
+  UserCheck,
+  UserPlus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -11,6 +15,7 @@ import {
   followUser,
   unfollowUser,
 } from "@/services/follows";
+import { createNotification } from "@/services/notifications";
 
 type Props = {
   currentUserId: string;
@@ -56,6 +61,20 @@ export function FollowButton({
         );
 
         setFollowing(true);
+
+        try {
+          await createNotification(supabase, {
+            recipientId: targetUserId,
+            actorId: currentUserId,
+            type: "follow",
+          });
+        } catch (notificationError) {
+          console.error(
+            "フォロー通知の作成に失敗しました。",
+            notificationError
+          );
+        }
+
         toast.success("フォローしました。");
       }
 

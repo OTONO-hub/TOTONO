@@ -9,15 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { createComment } from "@/services/comments";
+import { createNotification } from "@/services/notifications";
 
 type Props = {
   postId: string;
   userId: string;
+  postOwnerId: string;
 };
 
 const MAX_COMMENT_LENGTH = 300;
 
-export function CommentForm({ postId, userId }: Props) {
+export function CommentForm({
+  postId,
+  userId,
+  postOwnerId,
+}: Props) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
@@ -59,6 +65,20 @@ export function CommentForm({ postId, userId }: Props) {
         user_id: userId,
         content: trimmedContent,
       });
+
+      try {
+        await createNotification(supabase, {
+          recipientId: postOwnerId,
+          actorId: userId,
+          type: "comment",
+          postId,
+        });
+      } catch (notificationError) {
+        console.error(
+          "コメント通知の作成に失敗しました。",
+          notificationError
+        );
+      }
 
       setContent("");
       toast.success("コメントを投稿しました。");

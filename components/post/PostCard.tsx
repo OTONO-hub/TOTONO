@@ -61,6 +61,7 @@ export function PostCard({
       <PostFooter
         postId={post.id}
         userId={userId}
+        postOwnerId={post.user_id}
         setCount={post.set_count}
         initialLiked={initialLiked}
         initialLikeCount={initialLikeCount}
@@ -76,6 +77,7 @@ export function PostCard({
       <CommentForm
         postId={post.id}
         userId={userId}
+        postOwnerId={post.user_id}
       />
     </article>
   );
