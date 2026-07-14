@@ -1,4 +1,6 @@
-import { Button } from "../ui/button";
+import Link from "next/link";
+
+import { buttonVariants } from "../ui/button";
 
 export function Hero() {
   return (
@@ -14,7 +16,12 @@ export function Hero() {
       </p>
 
       <div className="mt-10">
-        <Button>ログイン</Button>
+        <Link
+          href="/login"
+          className={buttonVariants()}
+        >
+          ログイン
+        </Link>
       </div>
     </section>
   );
