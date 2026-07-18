@@ -78,13 +78,45 @@ export function LikeButton({
       onClick={handleLike}
       disabled={loading}
       aria-label={liked ? "いいねを解除" : "いいねする"}
-      className="flex items-center gap-1 disabled:opacity-50"
+      aria-pressed={liked}
+      className="
+        group
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        text-sm
+        text-muted-foreground
+        transition-colors
+        hover:text-foreground
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-ring
+        focus-visible:ring-offset-2
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+      "
     >
-      <span className="text-xl">
-        {liked ? "❤️" : "🤍"}
-      </span>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className={`size-5 transition-all duration-200 ${
+          liked
+            ? "fill-current text-red-500"
+            : "fill-none stroke-current group-hover:scale-105"
+        }`}
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path
+          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+        />
+      </svg>
 
-      <span>{count}</span>
+      <span className="tabular-nums">
+        {count}
+      </span>
     </button>
   );
 }

@@ -5,16 +5,19 @@ type Props = {
   saunaName: string;
 };
 
-export function PostImage({ imageUrl, saunaName }: Props) {
+export function PostImage({
+  imageUrl,
+  saunaName,
+}: Props) {
   return (
-    <div className="relative mt-4 h-80 w-full overflow-hidden rounded-2xl">
+    <figure className="relative aspect-16/10 w-full overflow-hidden rounded-[1.75rem] bg-muted">
       <Image
         src={imageUrl}
-        alt={saunaName}
+        alt={`${saunaName}の投稿画像`}
         fill
-        className="object-cover transition duration-300 hover:scale-105"
-        sizes="(max-width: 768px) 100vw, 768px"
+        sizes="(max-width: 768px) 100vw, 900px"
+        className="object-cover transition-transform duration-700 ease-out hover:scale-[1.03]"
       />
-    </div>
+    </figure>
   );
 }

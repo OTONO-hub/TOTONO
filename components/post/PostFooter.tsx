@@ -1,3 +1,8 @@
+import {
+  Flame,
+  MessageCircle,
+} from "lucide-react";
+
 import { BookmarkButton } from "./BookmarkButton";
 import { LikeButton } from "./LikeButton";
 
@@ -23,26 +28,94 @@ export function PostFooter({
   commentCount,
 }: Props) {
   return (
-    <div className="mt-6 flex items-center justify-between border-t pt-4 text-sm text-gray-500">
-      <span>🔥 {setCount}セット</span>
+    <footer>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        {/* セット数 */}
+        <div
+          className="
+            inline-flex
+            w-fit
+            items-center
+            gap-3
+            rounded-full
+            border border-border/50
+            bg-background/70
+            px-4
+            py-2.5
+            backdrop-blur-sm
+          "
+        >
+          <div
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-full
+              bg-accent/15
+              text-accent
+            "
+          >
+            <Flame
+              className="size-4"
+              strokeWidth={2}
+            />
+          </div>
 
-      <div className="flex items-center gap-6">
-        <LikeButton
-          postId={postId}
-          userId={userId}
-          postOwnerId={postOwnerId}
-          initialLiked={initialLiked}
-          initialCount={initialLikeCount}
-        />
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Sauna Set
+            </p>
 
-        <span>💬 {commentCount}</span>
+            <p className="text-sm font-semibold text-foreground">
+              {setCount} セット
+            </p>
+          </div>
+        </div>
 
-        <BookmarkButton
-          postId={postId}
-          userId={userId}
-          initialBookmarked={initialBookmarked}
-        />
+        {/* アクション */}
+        <div className="flex flex-wrap items-center gap-5">
+          <LikeButton
+            postId={postId}
+            userId={userId}
+            postOwnerId={postOwnerId}
+            initialLiked={initialLiked}
+            initialCount={initialLikeCount}
+          />
+
+          <div
+            className="
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              border border-border/40
+              bg-background/60
+              px-3
+              py-2
+              text-sm
+              text-muted-foreground
+            "
+            aria-label={`コメント${commentCount}件`}
+          >
+            <MessageCircle
+              className="size-4"
+              strokeWidth={1.8}
+            />
+
+            <span className="font-medium tabular-nums">
+              {commentCount}
+            </span>
+          </div>
+
+          <BookmarkButton
+            postId={postId}
+            userId={userId}
+            initialBookmarked={initialBookmarked}
+          />
+        </div>
       </div>
-    </div>
+    </footer>
   );
 }

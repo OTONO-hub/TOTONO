@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LogOut } from "lucide-react";
+import { LoaderCircle, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -47,13 +47,25 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      aria-label="ログアウト"
-      className="inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-50 sm:w-auto sm:gap-2 sm:px-3"
+      aria-label={loading ? "ログアウト中" : "ログアウト"}
+      className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <LogOut className="size-4" />
+      {loading ? (
+        <LoaderCircle
+          className="size-4.5 animate-spin"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+      ) : (
+        <LogOut
+          className="size-4.5"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+      )}
 
-      <span className="hidden sm:inline">
-        {loading ? "ログアウト中..." : "ログアウト"}
+      <span className="sr-only">
+        {loading ? "ログアウト中" : "ログアウト"}
       </span>
     </button>
   );

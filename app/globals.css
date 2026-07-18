@@ -7,38 +7,56 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground:
+    var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground:
+    var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,85 +64,590 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /*
+   * TOTONO Shadow Utilities
+   *
+   * shadow-totono-card
+   * shadow-totono-hover
+   * shadow-totono-floating
+   */
+  --shadow-totono-card: var(--totono-shadow-card);
+  --shadow-totono-hover: var(--totono-shadow-hover);
+  --shadow-totono-floating: var(--totono-shadow-floating);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /*
+   * TOTONO Brand Colors
+   *
+   * Primary:    #3e3a3a
+   * Background: #e6e5ef
+   * Accent:     #fdd000
+   * Secondary:  #9fd9f6
+   * Success:    #00b4b6
+   * Error:      #e95884
+   */
+
+  --background: #e6e5ef;
+  --foreground: #3e3a3a;
+
+  --card: #f8f8fb;
+  --card-foreground: #3e3a3a;
+
+  --popover: #f8f8fb;
+  --popover-foreground: #3e3a3a;
+
+  --primary: #3e3a3a;
+  --primary-foreground: #ffffff;
+
+  --secondary: #9fd9f6;
+  --secondary-foreground: #3e3a3a;
+
+  --muted: #d7d6e0;
+  --muted-foreground: #686363;
+
+  --accent: #fdd000;
+  --accent-foreground: #3e3a3a;
+
+  --success: #00b4b6;
+  --success-foreground: #ffffff;
+
+  --destructive: #e95884;
+  --destructive-foreground: #ffffff;
+
+  --border: #c9c8d2;
+  --input: #c9c8d2;
+  --ring: #00b4b6;
+
+  --chart-1: #fdd000;
+  --chart-2: #9fd9f6;
+  --chart-3: #00b4b6;
+  --chart-4: #e95884;
+  --chart-5: #3e3a3a;
+
+  --radius: 0.75rem;
+
+  --sidebar: #f8f8fb;
+  --sidebar-foreground: #3e3a3a;
+  --sidebar-primary: #3e3a3a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fdd000;
+  --sidebar-accent-foreground: #3e3a3a;
+  --sidebar-border: #c9c8d2;
+  --sidebar-ring: #00b4b6;
+
+  /*
+   * TOTONO Surface Colors
+   *
+   * 背景やカードを階層化するための補助色です。
+   */
+  --totono-surface: #f8f8fb;
+  --totono-surface-soft: #efeff5;
+  --totono-surface-warm: #f4f2ec;
+  --totono-surface-hover: #f1f1f6;
+  --totono-overlay: rgb(62 58 58 / 45%);
+
+  /*
+   * TOTONO Text Colors
+   *
+   * 文字の重要度を3段階に分けます。
+   */
+  --totono-text-primary: #3e3a3a;
+  --totono-text-secondary: #686363;
+  --totono-text-tertiary: #8b8686;
+
+  /*
+   * TOTONO Border Colors
+   *
+   * 通常時とホバー時の境界線です。
+   */
+  --totono-border-soft: rgb(62 58 58 / 10%);
+  --totono-border-medium: rgb(62 58 58 / 18%);
+  --totono-border-strong: rgb(62 58 58 / 28%);
+
+  /*
+   * TOTONO Layout
+   */
+  --totono-container-width: 72rem;
+  --totono-feed-width: 44rem;
+  --totono-content-padding: 1.25rem;
+  --totono-section-space: 5rem;
+
+  /*
+   * TOTONO Radius
+   */
+  --totono-radius-small: 0.75rem;
+  --totono-radius-medium: 1rem;
+  --totono-radius-large: 1.5rem;
+  --totono-radius-card: 1.75rem;
+  --totono-radius-round: 9999px;
+
+  /*
+   * TOTONO Shadows
+   *
+   * 強い影ではなく、ラウンジの照明のような
+   * 柔らかい奥行きを表現します。
+   */
+  --totono-shadow-card:
+    0 1px 2px rgb(62 58 58 / 4%),
+    0 10px 30px rgb(62 58 58 / 7%);
+
+  --totono-shadow-hover:
+    0 2px 4px rgb(62 58 58 / 5%),
+    0 16px 42px rgb(62 58 58 / 11%);
+
+  --totono-shadow-floating:
+    0 8px 24px rgb(62 58 58 / 10%),
+    0 24px 64px rgb(62 58 58 / 12%);
+
+  /*
+   * TOTONO Motion
+   */
+  --totono-duration-fast: 150ms;
+  --totono-duration-normal: 250ms;
+  --totono-duration-slow: 400ms;
+  --totono-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #242222;
+  --foreground: #f4f3f7;
+
+  --card: #312e2e;
+  --card-foreground: #f4f3f7;
+
+  --popover: #312e2e;
+  --popover-foreground: #f4f3f7;
+
+  --primary: #fdd000;
+  --primary-foreground: #3e3a3a;
+
+  --secondary: #27657f;
+  --secondary-foreground: #f4f3f7;
+
+  --muted: #464141;
+  --muted-foreground: #c8c4c4;
+
+  --accent: #fdd000;
+  --accent-foreground: #3e3a3a;
+
+  --success: #00b4b6;
+  --success-foreground: #ffffff;
+
+  --destructive: #e95884;
+  --destructive-foreground: #ffffff;
+
+  --border: #514c4c;
+  --input: #514c4c;
+  --ring: #9fd9f6;
+
+  --chart-1: #fdd000;
+  --chart-2: #9fd9f6;
+  --chart-3: #00b4b6;
+  --chart-4: #e95884;
+  --chart-5: #e6e5ef;
+
+  --sidebar: #312e2e;
+  --sidebar-foreground: #f4f3f7;
+  --sidebar-primary: #fdd000;
+  --sidebar-primary-foreground: #3e3a3a;
+  --sidebar-accent: #464141;
+  --sidebar-accent-foreground: #f4f3f7;
+  --sidebar-border: #514c4c;
+  --sidebar-ring: #9fd9f6;
+
+  --totono-surface: #312e2e;
+  --totono-surface-soft: #3a3636;
+  --totono-surface-warm: #39352f;
+  --totono-surface-hover: #403b3b;
+  --totono-overlay: rgb(0 0 0 / 60%);
+
+  --totono-text-primary: #f4f3f7;
+  --totono-text-secondary: #c8c4c4;
+  --totono-text-tertiary: #999393;
+
+  --totono-border-soft: rgb(255 255 255 / 8%);
+  --totono-border-medium: rgb(255 255 255 / 14%);
+  --totono-border-strong: rgb(255 255 255 / 22%);
+
+  --totono-shadow-card:
+    0 1px 2px rgb(0 0 0 / 18%),
+    0 10px 30px rgb(0 0 0 / 22%);
+
+  --totono-shadow-hover:
+    0 2px 4px rgb(0 0 0 / 22%),
+    0 16px 42px rgb(0 0 0 / 30%);
+
+  --totono-shadow-floating:
+    0 8px 24px rgb(0 0 0 / 28%),
+    0 24px 64px rgb(0 0 0 / 36%);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    color: var(--accent-foreground);
+    background: var(--accent);
+  }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ring) 35%, transparent);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /*
+   * Layout
+   */
+
+  .totono-container {
+    width: min(
+      calc(100% - (var(--totono-content-padding) * 2)),
+      var(--totono-container-width)
+    );
+    margin-inline: auto;
+  }
+
+  .totono-feed {
+    width: min(
+      calc(100% - (var(--totono-content-padding) * 2)),
+      var(--totono-feed-width)
+    );
+    margin-inline: auto;
+  }
+
+  /*
+   * Typography
+   */
+
+  .totono-display {
+    color: var(--totono-text-primary);
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 650;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .totono-heading {
+    color: var(--totono-text-primary);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .totono-title {
+    color: var(--totono-text-primary);
+    font-size: 1.25rem;
+    font-weight: 650;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+  }
+
+  .totono-body {
+    color: var(--totono-text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .totono-caption {
+    color: var(--totono-text-tertiary);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  /*
+   * Card
+   */
+
+  .totono-card {
+    border: 1px solid var(--totono-border-soft);
+    border-radius: var(--totono-radius-card);
+    background: var(--totono-surface);
+    box-shadow: var(--totono-shadow-card);
+  }
+
+  .totono-card-interactive {
+    border: 1px solid var(--totono-border-soft);
+    border-radius: var(--totono-radius-card);
+    background: var(--totono-surface);
+    box-shadow: var(--totono-shadow-card);
+    transition:
+      transform var(--totono-duration-normal) var(--totono-ease),
+      border-color var(--totono-duration-normal) var(--totono-ease),
+      box-shadow var(--totono-duration-normal) var(--totono-ease);
+  }
+
+  .totono-card-interactive:hover {
+    border-color: var(--totono-border-medium);
+    box-shadow: var(--totono-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  /*
+   * Button
+   */
+
+  .totono-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--totono-radius-round);
+    padding: 0.625rem 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color var(--totono-duration-fast) var(--totono-ease),
+      background-color var(--totono-duration-fast) var(--totono-ease),
+      border-color var(--totono-duration-fast) var(--totono-ease),
+      box-shadow var(--totono-duration-fast) var(--totono-ease),
+      transform var(--totono-duration-fast) var(--totono-ease);
+  }
+
+  .totono-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .totono-button:active {
+    transform: translateY(0);
+  }
+
+  .totono-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+  }
+
+  .totono-button-primary {
+    color: var(--primary-foreground);
+    background: var(--primary);
+    box-shadow: 0 6px 18px rgb(62 58 58 / 14%);
+  }
+
+  .totono-button-primary:hover {
+    box-shadow: 0 8px 24px rgb(62 58 58 / 20%);
+  }
+
+  .totono-button-accent {
+    color: var(--accent-foreground);
+    background: var(--accent);
+    box-shadow: 0 6px 18px rgb(253 208 0 / 20%);
+  }
+
+  .totono-button-accent:hover {
+    box-shadow: 0 8px 24px rgb(253 208 0 / 28%);
+  }
+
+  .totono-button-secondary {
+    color: var(--totono-text-primary);
+    border-color: var(--totono-border-medium);
+    background: var(--totono-surface);
+  }
+
+  .totono-button-secondary:hover {
+    border-color: var(--totono-border-strong);
+    background: var(--totono-surface-hover);
+  }
+
+  .totono-button-ghost {
+    color: var(--totono-text-secondary);
+    background: transparent;
+  }
+
+  .totono-button-ghost:hover {
+    color: var(--totono-text-primary);
+    background: var(--totono-surface-hover);
+  }
+
+  .totono-icon-button {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: var(--totono-radius-round);
+    color: var(--totono-text-secondary);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color var(--totono-duration-fast) var(--totono-ease),
+      background-color var(--totono-duration-fast) var(--totono-ease),
+      transform var(--totono-duration-fast) var(--totono-ease);
+  }
+
+  .totono-icon-button:hover {
+    color: var(--totono-text-primary);
+    background: var(--totono-surface-hover);
+    transform: translateY(-1px);
+  }
+
+  /*
+   * Form
+   */
+
+  .totono-field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .totono-label {
+    color: var(--totono-text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .totono-input,
+  .totono-textarea {
+    width: 100%;
+    border: 1px solid var(--totono-border-medium);
+    border-radius: var(--totono-radius-medium);
+    color: var(--totono-text-primary);
+    background: var(--totono-surface);
+    transition:
+      border-color var(--totono-duration-fast) var(--totono-ease),
+      box-shadow var(--totono-duration-fast) var(--totono-ease),
+      background-color var(--totono-duration-fast) var(--totono-ease);
+  }
+
+  .totono-input {
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .totono-textarea {
+    min-height: 8rem;
+    resize: vertical;
+    padding: 0.875rem 1rem;
+    line-height: 1.7;
+  }
+
+  .totono-input::placeholder,
+  .totono-textarea::placeholder {
+    color: var(--totono-text-tertiary);
+  }
+
+  .totono-input:hover,
+  .totono-textarea:hover {
+    border-color: var(--totono-border-strong);
+  }
+
+  .totono-input:focus,
+  .totono-textarea:focus {
+    border-color: var(--ring);
+    outline: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 14%, transparent);
+  }
+
+  .totono-input:disabled,
+  .totono-textarea:disabled {
+    cursor: not-allowed;
+    background: var(--totono-surface-soft);
+    opacity: 0.65;
+  }
+
+  .totono-helper-text {
+    color: var(--totono-text-tertiary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .totono-error-text {
+    color: var(--destructive);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  /*
+   * Divider
+   */
+
+  .totono-divider {
+    width: 100%;
+    height: 1px;
+    border: 0;
+    background: var(--totono-border-soft);
+  }
+
+  /*
+   * Motion
+   */
+
+  .totono-fade-in {
+    animation: totono-fade-in var(--totono-duration-slow)
+      var(--totono-ease) both;
+  }
+}
+
+@keyframes totono-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --totono-content-padding: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

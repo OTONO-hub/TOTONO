@@ -1,10 +1,20 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, LoaderCircle, Send } from "lucide-react";
+import {
+  ImagePlus,
+  LoaderCircle,
+  Send,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { SaunaSearch } from "@/components/saunas/SaunaSearch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,33 +25,110 @@ import {
 } from "@/services/image";
 import { createPost } from "@/services/posts";
 import {
+  getSaunaById,
+  type Sauna,
+} from "@/services/saunas";
+import {
   deletePostImage,
   uploadPostImage,
 } from "@/services/storage";
 
 const MAX_COMMENT_LENGTH = 1000;
-const MAX_SAUNA_NAME_LENGTH = 100;
 
 export default function NewPostPage() {
   const router = useRouter();
-  const supabase = createClient();
 
-  const [saunaName, setSaunaName] = useState("");
+  const [supabase] = useState(() => createClient());
+
+  const [selectedSauna, setSelectedSauna] =
+    useState<Sauna | null>(null);
+
+  const [initialSaunaLoading, setInitialSaunaLoading] =
+    useState(true);
+
   const [visitDate, setVisitDate] = useState("");
   const [setCount, setSetCount] = useState(3);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
   const [image, setImage] = useState<File | null>(null);
-  const [originalImageSize, setOriginalImageSize] = useState<number | null>(
-    null
-  );
-  const [compressedImageSize, setCompressedImageSize] = useState<
-    number | null
-  >(null);
+
+  const [originalImageSize, setOriginalImageSize] =
+    useState<number | null>(null);
+
+  const [compressedImageSize, setCompressedImageSize] =
+    useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [compressing, setCompressing] = useState(false);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadInitialSauna = async () => {
+      const searchParams = new URLSearchParams(
+        window.location.search
+      );
+
+      const saunaId = searchParams
+        .get("sauna_id")
+        ?.trim();
+
+      if (!saunaId) {
+        if (isActive) {
+          setInitialSaunaLoading(false);
+        }
+
+        return;
+      }
+
+      try {
+        const sauna = await getSaunaById(
+          supabase,
+          saunaId
+        );
+
+        if (!isActive) {
+          return;
+        }
+
+        if (!sauna) {
+          toast.error(
+            "指定されたサウナ施設が見つかりませんでした。"
+          );
+
+          return;
+        }
+
+        setSelectedSauna(sauna);
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+
+        console.error(
+          "投稿画面の施設情報取得に失敗しました。",
+          error
+        );
+
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "施設情報の取得に失敗しました。"
+        );
+      } finally {
+        if (isActive) {
+          setInitialSaunaLoading(false);
+        }
+      }
+    };
+
+    void loadInitialSauna();
+
+    return () => {
+      isActive = false;
+    };
+  }, [supabase]);
 
   const handleImageChange = async (
     event: ChangeEvent<HTMLInputElement>
@@ -63,7 +150,8 @@ export default function NewPostPage() {
     try {
       validatePostImage(file);
 
-      const compressedFile = await compressPostImage(file);
+      const compressedFile =
+        await compressPostImage(file);
 
       setImage(compressedFile);
       setCompressedImageSize(compressedFile.size);
@@ -91,17 +179,18 @@ export default function NewPostPage() {
   ) => {
     event.preventDefault();
 
-    const trimmedSaunaName = saunaName.trim();
     const trimmedComment = comment.trim();
 
-    if (!trimmedSaunaName) {
-      toast.error("サウナ施設名を入力してください。");
+    if (initialSaunaLoading) {
+      toast.error(
+        "施設情報の読み込みが完了するまでお待ちください。"
+      );
       return;
     }
 
-    if (trimmedSaunaName.length > MAX_SAUNA_NAME_LENGTH) {
+    if (!selectedSauna) {
       toast.error(
-        `サウナ施設名は${MAX_SAUNA_NAME_LENGTH}文字以内で入力してください。`
+        "検索候補からサウナ施設を選択してください。"
       );
       return;
     }
@@ -112,7 +201,9 @@ export default function NewPostPage() {
     }
 
     if (setCount < 1 || setCount > 10) {
-      toast.error("セット数は1〜10セットで入力してください。");
+      toast.error(
+        "セット数は1〜10セットで入力してください。"
+      );
       return;
     }
 
@@ -121,7 +212,9 @@ export default function NewPostPage() {
       return;
     }
 
-    if (trimmedComment.length > MAX_COMMENT_LENGTH) {
+    if (
+      trimmedComment.length > MAX_COMMENT_LENGTH
+    ) {
       toast.error(
         `コメントは${MAX_COMMENT_LENGTH}文字以内で入力してください。`
       );
@@ -129,7 +222,9 @@ export default function NewPostPage() {
     }
 
     if (compressing) {
-      toast.error("画像の最適化が完了するまでお待ちください。");
+      toast.error(
+        "画像の最適化が完了するまでお待ちください。"
+      );
       return;
     }
 
@@ -144,7 +239,10 @@ export default function NewPostPage() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        toast.error("投稿するにはログインが必要です。");
+        toast.error(
+          "投稿するにはログインが必要です。"
+        );
+
         router.push("/login");
         return;
       }
@@ -152,11 +250,12 @@ export default function NewPostPage() {
       let imageUrl: string | undefined;
 
       if (image) {
-        const uploadedImage = await uploadPostImage(
-          supabase,
-          user.id,
-          image
-        );
+        const uploadedImage =
+          await uploadPostImage(
+            supabase,
+            user.id,
+            image
+          );
 
         imageUrl = uploadedImage.publicUrl;
         uploadedFilePath = uploadedImage.filePath;
@@ -164,7 +263,8 @@ export default function NewPostPage() {
 
       await createPost(supabase, {
         user_id: user.id,
-        sauna_name: trimmedSaunaName,
+        sauna_id: selectedSauna.id,
+        sauna_name: selectedSauna.name,
         visit_date: visitDate,
         set_count: setCount,
         rating,
@@ -174,16 +274,19 @@ export default function NewPostPage() {
 
       toast.success("サ活を投稿しました！");
 
-      router.push("/");
+      router.push(`/saunas/${selectedSauna.id}`);
       router.refresh();
     } catch (error) {
       /*
        * 画像アップロード後に投稿DBへの保存が失敗した場合、
-       * 使われない画像がStorageに残らないよう削除します。
+       * 使用されない画像がStorageに残らないよう削除します。
        */
       if (uploadedFilePath) {
         try {
-          await deletePostImage(supabase, uploadedFilePath);
+          await deletePostImage(
+            supabase,
+            uploadedFilePath
+          );
         } catch (cleanupError) {
           console.error(
             "アップロード済み画像の削除に失敗しました。",
@@ -221,26 +324,45 @@ export default function NewPostPage() {
 
         <form
           onSubmit={handleCreatePost}
-          className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm"
+          className="
+            space-y-6
+            rounded-2xl
+            border
+            bg-card
+            p-6
+            shadow-sm
+          "
         >
-          <div className="space-y-2">
-            <label
-              htmlFor="saunaName"
-              className="text-sm font-medium"
-            >
-              サウナ施設名
-            </label>
+          {initialSaunaLoading ? (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">
+                サウナ施設
+              </p>
 
-            <Input
-              id="saunaName"
-              type="text"
-              value={saunaName}
-              onChange={(event) => setSaunaName(event.target.value)}
-              placeholder="例：サウナ＆カプセルホテル北欧"
-              maxLength={MAX_SAUNA_NAME_LENGTH}
-              disabled={loading}
+              <div
+                className="
+                  flex items-center gap-2
+                  rounded-2xl
+                  border border-border
+                  bg-muted/40
+                  px-4 py-3
+                  text-sm
+                  text-muted-foreground
+                "
+              >
+                <LoaderCircle className="size-4 animate-spin" />
+                施設情報を読み込んでいます...
+              </div>
+            </div>
+          ) : (
+            <SaunaSearch
+              key={selectedSauna?.id ?? "empty-sauna"}
+              selectedSauna={selectedSauna}
+              onSelectSauna={setSelectedSauna}
+              inputId="saunaName"
+              required
             />
-          </div>
+          )}
 
           <div className="space-y-2">
             <label
@@ -254,7 +376,9 @@ export default function NewPostPage() {
               id="visitDate"
               type="date"
               value={visitDate}
-              onChange={(event) => setVisitDate(event.target.value)}
+              onChange={(event) =>
+                setVisitDate(event.target.value)
+              }
               disabled={loading}
             />
           </div>
@@ -275,7 +399,9 @@ export default function NewPostPage() {
                 max={10}
                 value={setCount}
                 onChange={(event) =>
-                  setSetCount(Number(event.target.value))
+                  setSetCount(
+                    Number(event.target.value)
+                  )
                 }
                 disabled={loading}
               />
@@ -296,7 +422,9 @@ export default function NewPostPage() {
                 max={5}
                 value={rating}
                 onChange={(event) =>
-                  setRating(Number(event.target.value))
+                  setRating(
+                    Number(event.target.value)
+                  )
                 }
                 disabled={loading}
               />
@@ -341,9 +469,13 @@ export default function NewPostPage() {
                   {originalImageSize !== null &&
                     compressedImageSize !== null && (
                       <p>
-                        {formatFileSize(originalImageSize)}
+                        {formatFileSize(
+                          originalImageSize
+                        )}
                         {" → "}
-                        {formatFileSize(compressedImageSize)}
+                        {formatFileSize(
+                          compressedImageSize
+                        )}
                       </p>
                     )}
                 </div>
@@ -361,14 +493,17 @@ export default function NewPostPage() {
               </label>
 
               <span className="text-xs text-muted-foreground">
-                {comment.length} / {MAX_COMMENT_LENGTH}
+                {comment.length} /{" "}
+                {MAX_COMMENT_LENGTH}
               </span>
             </div>
 
             <Textarea
               id="comment"
               value={comment}
-              onChange={(event) => setComment(event.target.value)}
+              onChange={(event) =>
+                setComment(event.target.value)
+              }
               placeholder="サウナ、水風呂、外気浴など今日のサ活を記録..."
               maxLength={MAX_COMMENT_LENGTH}
               disabled={loading}
@@ -378,7 +513,11 @@ export default function NewPostPage() {
 
           <Button
             type="submit"
-            disabled={loading || compressing}
+            disabled={
+              loading ||
+              compressing ||
+              initialSaunaLoading
+            }
             className="w-full"
             size="lg"
           >
@@ -391,6 +530,11 @@ export default function NewPostPage() {
               <>
                 <LoaderCircle className="animate-spin" />
                 画像を最適化中...
+              </>
+            ) : initialSaunaLoading ? (
+              <>
+                <LoaderCircle className="animate-spin" />
+                施設情報を読み込み中...
               </>
             ) : (
               <>
