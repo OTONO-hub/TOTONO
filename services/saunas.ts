@@ -16,6 +16,12 @@ export type Sauna = {
   image_url: string | null;
   google_place_id: string | null;
   source: string | null;
+  has_sauna_room: boolean;
+  has_cold_bath: boolean;
+  has_outdoor_air_bath: boolean;
+  has_rest_area: boolean;
+  has_restaurant: boolean;
+  has_parking: boolean;
   is_verified: boolean;
   created_at: string;
   updated_at: string;
@@ -70,6 +76,12 @@ export async function searchSaunas(
         image_url,
         google_place_id,
         source,
+        has_sauna_room,
+        has_cold_bath,
+        has_outdoor_air_bath,
+        has_rest_area,
+        has_restaurant,
+        has_parking,
         is_verified,
         created_at,
         updated_at
@@ -78,8 +90,12 @@ export async function searchSaunas(
     .or(
       `name.ilike.%${trimmedKeyword}%,normalized_name.ilike.%${trimmedKeyword}%`
     )
-    .order("is_verified", { ascending: false })
-    .order("name", { ascending: true })
+    .order("is_verified", {
+      ascending: false,
+    })
+    .order("name", {
+      ascending: true,
+    })
     .limit(SAUNA_SEARCH_LIMIT);
 
   if (error) {
@@ -121,6 +137,12 @@ export async function getSaunaById(
         image_url,
         google_place_id,
         source,
+        has_sauna_room,
+        has_cold_bath,
+        has_outdoor_air_bath,
+        has_rest_area,
+        has_restaurant,
+        has_parking,
         is_verified,
         created_at,
         updated_at
@@ -157,11 +179,13 @@ export async function getPopularSaunas(
     MAX_POPULAR_SAUNA_LIMIT
   );
 
-  const { data: postRows, error: postsError } =
-    await supabase
-      .from("posts")
-      .select("sauna_id")
-      .not("sauna_id", "is", null);
+  const {
+    data: postRows,
+    error: postsError,
+  } = await supabase
+    .from("posts")
+    .select("sauna_id")
+    .not("sauna_id", "is", null);
 
   if (postsError) {
     throw new Error(
@@ -173,7 +197,10 @@ export async function getPopularSaunas(
     return [];
   }
 
-  const postCountBySaunaId = new Map<string, number>();
+  const postCountBySaunaId = new Map<
+    string,
+    number
+  >();
 
   for (const post of postRows) {
     if (
@@ -214,19 +241,21 @@ export async function getPopularSaunas(
     ([saunaId]) => saunaId
   );
 
-  const { data: saunaRows, error: saunasError } =
-    await supabase
-      .from("saunas")
-      .select(
-        `
-          id,
-          name,
-          prefecture,
-          city,
-          image_url
-        `
-      )
-      .in("id", rankedSaunaIds);
+  const {
+    data: saunaRows,
+    error: saunasError,
+  } = await supabase
+    .from("saunas")
+    .select(
+      `
+        id,
+        name,
+        prefecture,
+        city,
+        image_url
+      `
+    )
+    .in("id", rankedSaunaIds);
 
   if (saunasError) {
     throw new Error(

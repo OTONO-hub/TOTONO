@@ -9,8 +9,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const MAX_SEARCH_QUERY_LENGTH = 100;
+import {
+  MAX_SEARCH_QUERY_LENGTH,
+  normalizeSearchQuery,
+} from "@/lib/search-query";
 
 export function SearchForm() {
   const router = useRouter();
@@ -24,16 +26,19 @@ export function SearchForm() {
   ) => {
     event.preventDefault();
 
-    const trimmedQuery = query.trim();
+    const normalizedQuery =
+      normalizeSearchQuery(query);
 
-    if (!trimmedQuery) {
+    if (!normalizedQuery) {
       setQuery("");
       router.push("/search");
       return;
     }
 
+    setQuery(normalizedQuery);
+
     const params = new URLSearchParams();
-    params.set("q", trimmedQuery);
+    params.set("q", normalizedQuery);
 
     router.push(`/search?${params.toString()}`);
   };
@@ -47,6 +52,7 @@ export function SearchForm() {
     <form
       onSubmit={handleSubmit}
       className="space-y-2"
+      role="search"
     >
       <div className="flex gap-2">
         <div className="relative flex-1">
@@ -57,12 +63,14 @@ export function SearchForm() {
 
           <Input
             type="search"
+            name="q"
             value={query}
             onChange={(event) =>
               setQuery(event.target.value)
             }
             placeholder="サウナ名や投稿内容を検索"
             maxLength={MAX_SEARCH_QUERY_LENGTH}
+            autoComplete="off"
             aria-label="サウナや投稿を検索"
             className="pl-9 pr-10"
           />
@@ -72,9 +80,12 @@ export function SearchForm() {
               type="button"
               onClick={handleClear}
               aria-label="検索条件をクリア"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <X className="size-4" />
+              <X
+                className="size-4"
+                aria-hidden="true"
+              />
             </button>
           )}
         </div>
@@ -82,8 +93,13 @@ export function SearchForm() {
         <Button
           type="submit"
           className="shrink-0"
+          aria-label="検索を実行"
         >
-          <Search />
+          <Search
+            className="size-4"
+            aria-hidden="true"
+          />
+
           <span className="hidden sm:inline">
             検索
           </span>
@@ -91,8 +107,12 @@ export function SearchForm() {
       </div>
 
       <div className="flex justify-end">
-        <span className="text-xs text-muted-foreground">
-          {query.length} / {MAX_SEARCH_QUERY_LENGTH}
+        <span
+          className="text-xs text-muted-foreground"
+          aria-live="polite"
+        >
+          {query.length} /{" "}
+          {MAX_SEARCH_QUERY_LENGTH}
         </span>
       </div>
     </form>

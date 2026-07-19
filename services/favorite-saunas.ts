@@ -11,11 +11,6 @@ export type FavoriteSauna = {
 
 /**
  * 指定した施設がお気に入りに登録されているか確認します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @param saunaId 施設ID
- * @returns お気に入り登録済みの場合はtrue
  */
 export async function isFavoriteSauna(
   supabase: SupabaseClient,
@@ -40,10 +35,6 @@ export async function isFavoriteSauna(
 
 /**
  * 指定した施設をお気に入りに追加します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @param saunaId 施設ID
  */
 export async function addFavoriteSauna(
   supabase: SupabaseClient,
@@ -66,10 +57,6 @@ export async function addFavoriteSauna(
 
 /**
  * 指定した施設をお気に入りから解除します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @param saunaId 施設ID
  */
 export async function removeFavoriteSauna(
   supabase: SupabaseClient,
@@ -91,13 +78,6 @@ export async function removeFavoriteSauna(
 
 /**
  * 指定したユーザーのお気に入り施設IDをすべて取得します。
- *
- * 新しくお気に入りに追加した施設が先頭になるように、
- * created_atの降順で取得します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @returns お気に入り施設IDの配列
  */
 export async function getFavoriteSaunaIds(
   supabase: SupabaseClient,
@@ -107,7 +87,9 @@ export async function getFavoriteSaunaIds(
     .from("favorite_saunas")
     .select("sauna_id")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false,
+    });
 
   if (error) {
     throw new Error(
@@ -121,15 +103,8 @@ export async function getFavoriteSaunaIds(
 }
 
 /**
- * 指定した施設IDのうち、お気に入り登録されている施設IDを取得します。
- *
- * 施設一覧や検索結果で、複数の施設のお気に入り状態を
- * 一括取得するときに使用します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @param saunaIds 確認対象の施設ID一覧
- * @returns お気に入り登録済みの施設ID一覧
+ * 指定した施設IDのうち、
+ * お気に入り登録されている施設IDを取得します。
  */
 export async function getFavoriteSaunaIdsBySaunaIds(
   supabase: SupabaseClient,
@@ -162,19 +137,16 @@ export async function getFavoriteSaunaIdsBySaunaIds(
  *
  * favorite_saunasに保存されている順番を維持し、
  * 新しく追加した施設が先頭になるように返します。
- *
- * @param supabase Supabaseクライアント
- * @param userId ユーザーID
- * @returns お気に入り施設情報の配列
  */
 export async function getFavoriteSaunas(
   supabase: SupabaseClient,
   userId: string
 ): Promise<Sauna[]> {
-  const favoriteSaunaIds = await getFavoriteSaunaIds(
-    supabase,
-    userId
-  );
+  const favoriteSaunaIds =
+    await getFavoriteSaunaIds(
+      supabase,
+      userId
+    );
 
   if (favoriteSaunaIds.length === 0) {
     return [];
@@ -199,6 +171,12 @@ export async function getFavoriteSaunas(
         image_url,
         google_place_id,
         source,
+        has_sauna_room,
+        has_cold_bath,
+        has_outdoor_air_bath,
+        has_rest_area,
+        has_restaurant,
+        has_parking,
         is_verified,
         created_at,
         updated_at
@@ -213,16 +191,21 @@ export async function getFavoriteSaunas(
   }
 
   const saunaById = new Map(
-    (data ?? []).map((sauna) => [sauna.id, sauna])
+    (data ?? []).map((sauna) => [
+      sauna.id,
+      sauna,
+    ])
   );
 
-  return favoriteSaunaIds.flatMap((saunaId) => {
-    const sauna = saunaById.get(saunaId);
+  return favoriteSaunaIds.flatMap(
+    (saunaId) => {
+      const sauna = saunaById.get(saunaId);
 
-    if (!sauna) {
-      return [];
+      if (!sauna) {
+        return [];
+      }
+
+      return [sauna];
     }
-
-    return [sauna];
-  });
+  );
 }
