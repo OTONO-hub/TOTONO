@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { getSaunaMetricsBySaunaIds } from "@/services/sauna-metrics";
+
 export type Sauna = {
   id: string;
   name: string;
@@ -34,11 +36,31 @@ export type PopularSauna = {
   city: string | null;
   image_url: string | null;
   post_count: number;
+  favorite_count: number;
+  average_rating: number | null;
+  rating_count: number;
+  popularity_score: number;
 };
 
 const SAUNA_SEARCH_LIMIT = 10;
 const DEFAULT_POPULAR_SAUNA_LIMIT = 3;
 const MAX_POPULAR_SAUNA_LIMIT = 20;
+
+/**
+ * 総合ランキングを計算する前に、
+ * 投稿数を基準として取得する候補施設数の倍率です。
+ *
+ * 例：
+ * 表示件数が3件の場合は、
+ * 最大15施設を総合ランキングの候補にします。
+ */
+const POPULAR_SAUNA_CANDIDATE_MULTIPLIER = 5;
+
+/**
+ * 総合ランキング候補として取得する
+ * 最大施設数です。
+ */
+const MAX_POPULAR_SAUNA_CANDIDATES = 100;
 
 /**
  * saunasテーブルから施設名を検索します。
@@ -161,14 +183,22 @@ export async function getSaunaById(
 }
 
 /**
- * 投稿数の多い施設をランキング形式で取得します。
+ * TOTONO内で注目されている施設を、
+ * 総合人気ランキング形式で取得します。
  *
- * 現在はpostsテーブルのsauna_idを取得し、
- * アプリケーション側で施設ごとの投稿数を集計しています。
+ * ランキングには次の指標を使用します。
+ *
+ * ・サ活投稿数
+ * ・お気に入り人数
+ * ・評価件数
+ * ・平均評価
+ *
+ * 最初に投稿数をもとに候補施設を絞り込み、
+ * その候補について詳細な指標を一括取得します。
  *
  * @param supabase Supabaseクライアント
  * @param limit 取得する施設数
- * @returns 投稿数の多い施設一覧
+ * @returns 総合人気スコアの高い施設一覧
  */
 export async function getPopularSaunas(
   supabase: SupabaseClient,
@@ -179,6 +209,25 @@ export async function getPopularSaunas(
     MAX_POPULAR_SAUNA_LIMIT
   );
 
+  /*
+   * 総合ランキングを計算する候補施設数です。
+   *
+   * 表示件数より多めの候補を取得することで、
+   * 投稿数だけでなく、お気に入り数や評価も
+   * ランキングへ反映できるようにします。
+   */
+  const candidateLimit = Math.min(
+    Math.max(
+      safeLimit *
+        POPULAR_SAUNA_CANDIDATE_MULTIPLIER,
+      safeLimit
+    ),
+    MAX_POPULAR_SAUNA_CANDIDATES
+  );
+
+  /*
+   * まず、投稿と施設の紐付きを取得します。
+   */
   const {
     data: postRows,
     error: postsError,
@@ -189,7 +238,7 @@ export async function getPopularSaunas(
 
   if (postsError) {
     throw new Error(
-      `人気施設の投稿数取得に失敗しました: ${postsError.message}`
+      `人気施設の投稿情報取得に失敗しました: ${postsError.message}`
     );
   }
 
@@ -197,6 +246,9 @@ export async function getPopularSaunas(
     return [];
   }
 
+  /*
+   * 施設ごとの投稿数を集計します。
+   */
   const postCountBySaunaId = new Map<
     string,
     number
@@ -219,7 +271,11 @@ export async function getPopularSaunas(
     );
   }
 
-  const ranking = Array.from(
+  /*
+   * 投稿数の多い施設を、
+   * 総合ランキングの候補として選びます。
+   */
+  const candidateSaunaIds = Array.from(
     postCountBySaunaId.entries()
   )
     .sort((a, b) => {
@@ -231,31 +287,40 @@ export async function getPopularSaunas(
 
       return a[0].localeCompare(b[0]);
     })
-    .slice(0, safeLimit);
+    .slice(0, candidateLimit)
+    .map(([saunaId]) => saunaId);
 
-  if (ranking.length === 0) {
+  if (candidateSaunaIds.length === 0) {
     return [];
   }
 
-  const rankedSaunaIds = ranking.map(
-    ([saunaId]) => saunaId
-  );
-
-  const {
-    data: saunaRows,
-    error: saunasError,
-  } = await supabase
-    .from("saunas")
-    .select(
-      `
-        id,
-        name,
-        prefecture,
-        city,
-        image_url
-      `
-    )
-    .in("id", rankedSaunaIds);
+  /*
+   * 候補施設の基本情報と指標を並行して取得します。
+   */
+  const [
+    {
+      data: saunaRows,
+      error: saunasError,
+    },
+    metricsBySaunaId,
+  ] = await Promise.all([
+    supabase
+      .from("saunas")
+      .select(
+        `
+          id,
+          name,
+          prefecture,
+          city,
+          image_url
+        `
+      )
+      .in("id", candidateSaunaIds),
+    getSaunaMetricsBySaunaIds(
+      supabase,
+      candidateSaunaIds
+    ),
+  ]);
 
   if (saunasError) {
     throw new Error(
@@ -263,31 +328,125 @@ export async function getPopularSaunas(
     );
   }
 
-  const saunaById = new Map(
-    (saunaRows ?? []).map((sauna) => [
-      sauna.id,
-      sauna,
-    ])
-  );
+  /*
+   * 施設情報と指標を統合し、
+   * 総合人気スコアを計算します。
+   */
+  const popularSaunas = (saunaRows ?? []).map(
+    (sauna): PopularSauna => {
+      const metrics =
+        metricsBySaunaId[sauna.id];
 
-  return ranking.flatMap(
-    ([saunaId, postCount]) => {
-      const sauna = saunaById.get(saunaId);
+      const postCount =
+        metrics?.postCount ??
+        postCountBySaunaId.get(sauna.id) ??
+        0;
 
-      if (!sauna) {
-        return [];
-      }
+      const favoriteCount =
+        metrics?.favoriteCount ?? 0;
 
-      return [
-        {
-          id: sauna.id,
-          name: sauna.name,
-          prefecture: sauna.prefecture,
-          city: sauna.city,
-          image_url: sauna.image_url,
-          post_count: postCount,
-        },
-      ];
+      const averageRating =
+        metrics?.averageRating ?? null;
+
+      const ratingCount =
+        metrics?.ratingCount ?? 0;
+
+      const popularityScore =
+        calculatePopularityScore({
+          postCount,
+          favoriteCount,
+          averageRating,
+          ratingCount,
+        });
+
+      return {
+        id: sauna.id,
+        name: sauna.name,
+        prefecture: sauna.prefecture,
+        city: sauna.city,
+        image_url: sauna.image_url,
+        post_count: postCount,
+        favorite_count: favoriteCount,
+        average_rating: averageRating,
+        rating_count: ratingCount,
+        popularity_score: popularityScore,
+      };
     }
   );
+
+  /*
+   * 総合人気スコアの高い順に並べます。
+   *
+   * スコアが同じ場合は、
+   * お気に入り数、投稿数、施設IDの順で
+   * 並び順を安定させます。
+   */
+  return popularSaunas
+    .sort((a, b) => {
+      const scoreDifference =
+        b.popularity_score -
+        a.popularity_score;
+
+      if (scoreDifference !== 0) {
+        return scoreDifference;
+      }
+
+      const favoriteDifference =
+        b.favorite_count -
+        a.favorite_count;
+
+      if (favoriteDifference !== 0) {
+        return favoriteDifference;
+      }
+
+      const postDifference =
+        b.post_count - a.post_count;
+
+      if (postDifference !== 0) {
+        return postDifference;
+      }
+
+      return a.id.localeCompare(b.id);
+    })
+    .slice(0, safeLimit);
+}
+
+type PopularityScoreInput = {
+  postCount: number;
+  favoriteCount: number;
+  averageRating: number | null;
+  ratingCount: number;
+};
+
+/**
+ * 人気施設ランキングで使用する
+ * 総合人気スコアを計算します。
+ *
+ * 平均評価については、
+ * 評価件数が5件に達するまでは
+ * 影響を小さくします。
+ */
+function calculatePopularityScore({
+  postCount,
+  favoriteCount,
+  averageRating,
+  ratingCount,
+}: PopularityScoreInput): number {
+  const ratingReliability = Math.min(
+    ratingCount / 5,
+    1
+  );
+
+  const adjustedAverageRating =
+    averageRating === null
+      ? 0
+      : averageRating * ratingReliability;
+
+  const score =
+    postCount * 3 +
+    favoriteCount * 2 +
+    ratingCount +
+    adjustedAverageRating * 2;
+
+  return Number(score.toFixed(2));
 }
