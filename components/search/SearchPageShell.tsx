@@ -11,14 +11,18 @@ export function SearchPageShell({
     <main
       className="
         relative
+        isolate
         min-h-screen
         overflow-hidden
         bg-muted/25
         px-4
         pb-20
-        pt-10
+        pt-8
         sm:px-6
-        sm:pt-12
+        sm:pb-24
+        sm:pt-10
+        lg:px-8
+        lg:pt-12
       "
     >
       <div
@@ -27,7 +31,8 @@ export function SearchPageShell({
           pointer-events-none
           absolute
           -right-40
-          top-12
+          top-10
+          -z-10
           size-96
           rounded-full
           bg-secondary/15
@@ -41,7 +46,8 @@ export function SearchPageShell({
           pointer-events-none
           absolute
           -left-48
-          top-[32rem]
+          top-[36rem]
+          -z-10
           size-96
           rounded-full
           bg-accent/10
@@ -50,11 +56,25 @@ export function SearchPageShell({
       />
 
       <div
+        aria-hidden="true"
         className="
-          relative
+          pointer-events-none
+          absolute
+          bottom-24
+          right-[10%]
+          -z-10
+          size-72
+          rounded-full
+          bg-secondary/10
+          blur-3xl
+        "
+      />
+
+      <div
+        className="
           mx-auto
           w-full
-          max-w-6xl
+          max-w-7xl
         "
       >
         {children}

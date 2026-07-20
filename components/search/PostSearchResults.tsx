@@ -19,6 +19,7 @@ export function PostSearchResults({
   return (
     <section
       aria-labelledby="post-results-heading"
+      className="min-w-0"
     >
       <ResultSectionHeader
         id="post-results-heading"
@@ -26,6 +27,7 @@ export function PostSearchResults({
           <FileText
             className="size-4.5"
             strokeWidth={1.8}
+            aria-hidden="true"
           />
         }
         eyebrow="Sauna Journals"
@@ -43,8 +45,9 @@ export function PostSearchResults({
           className="
             mx-auto
             mt-8
-            max-w-3xl
+            max-w-4xl
             space-y-8
+            sm:mt-10
             sm:space-y-12
           "
         >

@@ -65,21 +65,81 @@ export function SaunaDetailContent({
     sauna.city,
     sauna.address,
   ]
-    .filter(Boolean)
+    .filter(
+      (value): value is string =>
+        typeof value === "string" &&
+        value.trim().length > 0
+    )
+    .map((value) => value.trim())
     .join(" ");
 
   return (
-    <main className="min-h-screen bg-[#e6e5ef]/45">
+    <main
+      className="
+        relative
+        min-h-screen
+        overflow-hidden
+        bg-[#e6e5ef]/45
+      "
+    >
       <div
         className="
+          pointer-events-none
+          absolute
+          left-[-8rem]
+          top-24
+          size-80
+          rounded-full
+          bg-[#9fd9f6]/16
+          blur-3xl
+        "
+        aria-hidden="true"
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          right-[-9rem]
+          top-[34rem]
+          size-96
+          rounded-full
+          bg-[#fdd000]/8
+          blur-3xl
+        "
+        aria-hidden="true"
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          bottom-32
+          left-1/3
+          size-80
+          rounded-full
+          bg-white/45
+          blur-3xl
+        "
+        aria-hidden="true"
+      />
+
+      <div
+        className="
+          relative
+          z-10
           mx-auto
           w-full
-          max-w-6xl
-          px-4
-          py-8
+          max-w-7xl
+          px-5
+          pb-20
+          pt-6
           sm:px-6
-          sm:py-10
+          sm:pb-24
+          sm:pt-8
           lg:px-8
+          lg:pb-28
+          lg:pt-10
         "
       >
         <SaunaDetailHeaderCard

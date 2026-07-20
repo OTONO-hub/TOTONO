@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 import { toast } from "sonner";
 
 import { createClient } from "@/lib/supabase/client";
@@ -20,12 +24,19 @@ export function BookmarkButton({
   userId,
   initialBookmarked,
 }: Props) {
-  const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const [bookmarked, setBookmarked] = useState(
-    initialBookmarked
+  const supabase = useMemo(
+    () => createClient(),
+    []
   );
-  const [loading, setLoading] = useState(false);
+
+  const [bookmarked, setBookmarked] =
+    useState(initialBookmarked);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const handleBookmark = async () => {
     if (loading) {
@@ -43,15 +54,29 @@ export function BookmarkButton({
         );
 
         setBookmarked(false);
-      } else {
-        await addBookmark(
-          supabase,
-          userId,
-          postId
+
+        toast.success(
+          "保存済み投稿から削除しました。"
         );
 
-        setBookmarked(true);
+        if (pathname === "/bookmarks") {
+          router.refresh();
+        }
+
+        return;
       }
+
+      await addBookmark(
+        supabase,
+        userId,
+        postId
+      );
+
+      setBookmarked(true);
+
+      toast.success(
+        "投稿を保存しました。"
+      );
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -94,11 +119,16 @@ export function BookmarkButton({
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
-        className={`size-5 transition-all duration-200 ${
-          bookmarked
-            ? "fill-current text-foreground"
-            : "fill-none stroke-current group-hover:scale-105"
-        }`}
+        className={`
+          size-5
+          transition-all
+          duration-200
+          ${
+            bookmarked
+              ? "fill-current text-foreground"
+              : "fill-none stroke-current group-hover:scale-105"
+          }
+        `}
         strokeWidth="1.7"
         strokeLinecap="round"
         strokeLinejoin="round"
