@@ -2,9 +2,13 @@ import Link from "next/link";
 import {
   Activity,
   ArrowRight,
+  BadgeCheck,
   Building2,
   CalendarDays,
   Edit3,
+  Flame,
+  LockKeyhole,
+  Map as MapIcon,
   PenLine,
   Sparkles,
   Star,
@@ -476,6 +480,27 @@ export default async function ProfilePage() {
     ratings.length > 0
       ? Math.max(...ratings).toFixed(1)
       : "-";
+
+  /*
+   * 実績バッジの達成状況を計算します。
+   * DBは使わず、整いサマリーと同じ投稿データだけで判定します。
+   */
+  const hasFirstSteam = totalSaunaVisits >= 1;
+  const hasSaunaLover = totalSaunaVisits >= 10;
+  const hasExplorer = visitedSaunas >= 5;
+  const hasPerfection = ratings.some(
+    (rating) => rating === 5
+  );
+
+  const saunaLoverRemaining = Math.max(
+    10 - totalSaunaVisits,
+    0
+  );
+
+  const explorerRemaining = Math.max(
+    5 - visitedSaunas,
+    0
+  );
 
   const memberSince = new Date(
     profile.created_at
@@ -1264,6 +1289,692 @@ export default async function ProfilePage() {
                   </dd>
                 </div>
               </dl>
+            </div>
+          </section>
+
+          {/* 実績・バッジ */}
+          <section
+            aria-labelledby="achievements-heading"
+            className="mt-8 sm:mt-10"
+          >
+            <div
+              className="
+                overflow-hidden
+                rounded-[2rem]
+                border border-border/55
+                bg-card/90
+                shadow-sm
+                backdrop-blur-md
+                sm:rounded-[2.5rem]
+              "
+            >
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-4
+                  border-b border-border/45
+                  px-5
+                  py-6
+                  sm:flex-row
+                  sm:items-end
+                  sm:justify-between
+                  sm:px-8
+                  sm:py-7
+                  lg:px-10
+                "
+              >
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="
+                        flex
+                        size-9
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-accent/20
+                        text-foreground
+                      "
+                    >
+                      <Trophy
+                        className="size-4"
+                        strokeWidth={1.8}
+                      />
+                    </span>
+
+                    <p
+                      className="
+                        text-xs
+                        font-semibold
+                        uppercase
+                        tracking-[0.25em]
+                        text-muted-foreground
+                      "
+                    >
+                      Achievements
+                    </p>
+                  </div>
+
+                  <h2
+                    id="achievements-heading"
+                    className="
+                      mt-4
+                      text-2xl
+                      font-semibold
+                      tracking-[-0.035em]
+                      text-foreground
+                      sm:text-3xl
+                    "
+                  >
+                    サ活の実績
+                  </h2>
+                </div>
+
+                <p
+                  className="
+                    max-w-md
+                    text-sm
+                    leading-7
+                    text-muted-foreground
+                  "
+                >
+                  記録を重ねるほど、新しいバッジが解放されます。
+                  次の整いを目指してみましょう。
+                </p>
+              </div>
+
+              <div
+                className="
+                  grid
+                  gap-4
+                  p-5
+                  sm:grid-cols-2
+                  sm:p-8
+                  lg:grid-cols-4
+                  lg:p-10
+                "
+              >
+                <article
+                  className={cn(
+                    `
+                      relative
+                      overflow-hidden
+                      rounded-[1.75rem]
+                      border
+                      p-5
+                      transition-transform
+                      duration-300
+                      sm:p-6
+                    `,
+                    hasFirstSteam
+                      ? `
+                          border-accent/35
+                          bg-accent/10
+                          hover:-translate-y-1
+                        `
+                      : `
+                          border-border/50
+                          bg-background/35
+                        `
+                  )}
+                >
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      `
+                        absolute -right-8 -top-8
+                        size-24
+                        rounded-full
+                        blur-2xl
+                      `,
+                      hasFirstSteam
+                        ? "bg-accent/25"
+                        : "bg-muted/60"
+                    )}
+                  />
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        flex
+                        size-11
+                        items-center
+                        justify-center
+                        rounded-2xl
+                      `,
+                      hasFirstSteam
+                        ? "bg-accent/25 text-foreground"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <Sparkles
+                      className="size-5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <p
+                    className="
+                      relative
+                      mt-5
+                      text-[0.6875rem]
+                      font-semibold
+                      uppercase
+                      tracking-[0.18em]
+                      text-muted-foreground
+                    "
+                  >
+                    First Steam
+                  </p>
+
+                  <h3
+                    className="
+                      relative
+                      mt-2
+                      text-lg
+                      font-semibold
+                      tracking-[-0.025em]
+                      text-foreground
+                    "
+                  >
+                    はじめての整い
+                  </h3>
+
+                  <p
+                    className="
+                      relative
+                      mt-3
+                      min-h-12
+                      text-sm
+                      leading-6
+                      text-muted-foreground
+                    "
+                  >
+                    最初のサ活を記録すると獲得できます。
+                  </p>
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        mt-5
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-full
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-semibold
+                      `,
+                      hasFirstSteam
+                        ? `
+                            bg-success/15
+                            text-success
+                          `
+                        : `
+                            bg-muted
+                            text-muted-foreground
+                          `
+                    )}
+                  >
+                    {hasFirstSteam ? (
+                      <>
+                        <BadgeCheck
+                          className="size-3.5"
+                          strokeWidth={2}
+                        />
+                        達成済み
+                      </>
+                    ) : (
+                      <>
+                        <LockKeyhole
+                          className="size-3.5"
+                          strokeWidth={1.8}
+                        />
+                        あと1投稿
+                      </>
+                    )}
+                  </div>
+                </article>
+
+                <article
+                  className={cn(
+                    `
+                      relative
+                      overflow-hidden
+                      rounded-[1.75rem]
+                      border
+                      p-5
+                      transition-transform
+                      duration-300
+                      sm:p-6
+                    `,
+                    hasSaunaLover
+                      ? `
+                          border-accent/35
+                          bg-accent/10
+                          hover:-translate-y-1
+                        `
+                      : `
+                          border-border/50
+                          bg-background/35
+                        `
+                  )}
+                >
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      `
+                        absolute -right-8 -top-8
+                        size-24
+                        rounded-full
+                        blur-2xl
+                      `,
+                      hasSaunaLover
+                        ? "bg-accent/25"
+                        : "bg-muted/60"
+                    )}
+                  />
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        flex
+                        size-11
+                        items-center
+                        justify-center
+                        rounded-2xl
+                      `,
+                      hasSaunaLover
+                        ? "bg-accent/25 text-foreground"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <Flame
+                      className="size-5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <p
+                    className="
+                      relative
+                      mt-5
+                      text-[0.6875rem]
+                      font-semibold
+                      uppercase
+                      tracking-[0.18em]
+                      text-muted-foreground
+                    "
+                  >
+                    Sauna Lover
+                  </p>
+
+                  <h3
+                    className="
+                      relative
+                      mt-2
+                      text-lg
+                      font-semibold
+                      tracking-[-0.025em]
+                      text-foreground
+                    "
+                  >
+                    サウナ愛好家
+                  </h3>
+
+                  <p
+                    className="
+                      relative
+                      mt-3
+                      min-h-12
+                      text-sm
+                      leading-6
+                      text-muted-foreground
+                    "
+                  >
+                    サ活を10回記録すると獲得できます。
+                  </p>
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        mt-5
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-full
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-semibold
+                      `,
+                      hasSaunaLover
+                        ? `
+                            bg-success/15
+                            text-success
+                          `
+                        : `
+                            bg-muted
+                            text-muted-foreground
+                          `
+                    )}
+                  >
+                    {hasSaunaLover ? (
+                      <>
+                        <BadgeCheck
+                          className="size-3.5"
+                          strokeWidth={2}
+                        />
+                        達成済み
+                      </>
+                    ) : (
+                      <>
+                        <LockKeyhole
+                          className="size-3.5"
+                          strokeWidth={1.8}
+                        />
+                        あと{saunaLoverRemaining}投稿
+                      </>
+                    )}
+                  </div>
+                </article>
+
+                <article
+                  className={cn(
+                    `
+                      relative
+                      overflow-hidden
+                      rounded-[1.75rem]
+                      border
+                      p-5
+                      transition-transform
+                      duration-300
+                      sm:p-6
+                    `,
+                    hasExplorer
+                      ? `
+                          border-secondary/45
+                          bg-secondary/10
+                          hover:-translate-y-1
+                        `
+                      : `
+                          border-border/50
+                          bg-background/35
+                        `
+                  )}
+                >
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      `
+                        absolute -right-8 -top-8
+                        size-24
+                        rounded-full
+                        blur-2xl
+                      `,
+                      hasExplorer
+                        ? "bg-secondary/30"
+                        : "bg-muted/60"
+                    )}
+                  />
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        flex
+                        size-11
+                        items-center
+                        justify-center
+                        rounded-2xl
+                      `,
+                      hasExplorer
+                        ? "bg-secondary/30 text-foreground"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <MapIcon
+                      className="size-5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <p
+                    className="
+                      relative
+                      mt-5
+                      text-[0.6875rem]
+                      font-semibold
+                      uppercase
+                      tracking-[0.18em]
+                      text-muted-foreground
+                    "
+                  >
+                    Explorer
+                  </p>
+
+                  <h3
+                    className="
+                      relative
+                      mt-2
+                      text-lg
+                      font-semibold
+                      tracking-[-0.025em]
+                      text-foreground
+                    "
+                  >
+                    サウナ探訪者
+                  </h3>
+
+                  <p
+                    className="
+                      relative
+                      mt-3
+                      min-h-12
+                      text-sm
+                      leading-6
+                      text-muted-foreground
+                    "
+                  >
+                    5つの異なる施設を記録すると獲得できます。
+                  </p>
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        mt-5
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-full
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-semibold
+                      `,
+                      hasExplorer
+                        ? `
+                            bg-success/15
+                            text-success
+                          `
+                        : `
+                            bg-muted
+                            text-muted-foreground
+                          `
+                    )}
+                  >
+                    {hasExplorer ? (
+                      <>
+                        <BadgeCheck
+                          className="size-3.5"
+                          strokeWidth={2}
+                        />
+                        達成済み
+                      </>
+                    ) : (
+                      <>
+                        <LockKeyhole
+                          className="size-3.5"
+                          strokeWidth={1.8}
+                        />
+                        あと{explorerRemaining}施設
+                      </>
+                    )}
+                  </div>
+                </article>
+
+                <article
+                  className={cn(
+                    `
+                      relative
+                      overflow-hidden
+                      rounded-[1.75rem]
+                      border
+                      p-5
+                      transition-transform
+                      duration-300
+                      sm:p-6
+                    `,
+                    hasPerfection
+                      ? `
+                          border-secondary/45
+                          bg-secondary/10
+                          hover:-translate-y-1
+                        `
+                      : `
+                          border-border/50
+                          bg-background/35
+                        `
+                  )}
+                >
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      `
+                        absolute -right-8 -top-8
+                        size-24
+                        rounded-full
+                        blur-2xl
+                      `,
+                      hasPerfection
+                        ? "bg-secondary/30"
+                        : "bg-muted/60"
+                    )}
+                  />
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        flex
+                        size-11
+                        items-center
+                        justify-center
+                        rounded-2xl
+                      `,
+                      hasPerfection
+                        ? "bg-secondary/30 text-foreground"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <Star
+                      className="size-5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <p
+                    className="
+                      relative
+                      mt-5
+                      text-[0.6875rem]
+                      font-semibold
+                      uppercase
+                      tracking-[0.18em]
+                      text-muted-foreground
+                    "
+                  >
+                    Perfection
+                  </p>
+
+                  <h3
+                    className="
+                      relative
+                      mt-2
+                      text-lg
+                      font-semibold
+                      tracking-[-0.025em]
+                      text-foreground
+                    "
+                  >
+                    至高の整い
+                  </h3>
+
+                  <p
+                    className="
+                      relative
+                      mt-3
+                      min-h-12
+                      text-sm
+                      leading-6
+                      text-muted-foreground
+                    "
+                  >
+                    評価5.0のサ活を記録すると獲得できます。
+                  </p>
+
+                  <div
+                    className={cn(
+                      `
+                        relative
+                        mt-5
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-full
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-semibold
+                      `,
+                      hasPerfection
+                        ? `
+                            bg-success/15
+                            text-success
+                          `
+                        : `
+                            bg-muted
+                            text-muted-foreground
+                          `
+                    )}
+                  >
+                    {hasPerfection ? (
+                      <>
+                        <BadgeCheck
+                          className="size-3.5"
+                          strokeWidth={2}
+                        />
+                        達成済み
+                      </>
+                    ) : (
+                      <>
+                        <LockKeyhole
+                          className="size-3.5"
+                          strokeWidth={1.8}
+                        />
+                        未達成
+                      </>
+                    )}
+                  </div>
+                </article>
+              </div>
             </div>
           </section>
 
