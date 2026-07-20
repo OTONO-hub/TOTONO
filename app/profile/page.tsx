@@ -1,10 +1,14 @@
 import Link from "next/link";
 import {
+  Activity,
   ArrowRight,
+  Building2,
   CalendarDays,
   Edit3,
   PenLine,
   Sparkles,
+  Star,
+  Trophy,
   Users,
 } from "lucide-react";
 
@@ -432,6 +436,47 @@ export default async function ProfilePage() {
       }))
     );
 
+  /*
+   * 整いサマリーを計算します。
+   * 既に取得している myPosts のみを使用するため、
+   * DBやAPIへの追加アクセスはありません。
+   */
+  const totalSaunaVisits = myPosts.length;
+
+  const visitedSaunas = new Set(
+    myPosts
+      .map((post) =>
+        post.sauna_name
+          .trim()
+          .replace(/\\s+/g, " ")
+          .toLocaleLowerCase("ja-JP")
+      )
+      .filter(Boolean)
+  ).size;
+
+  const ratings = myPosts
+    .map((post) => post.rating)
+    .filter(
+      (rating): rating is number =>
+        typeof rating === "number" &&
+        Number.isFinite(rating)
+    );
+
+  const averageRating =
+    ratings.length > 0
+      ? (
+          ratings.reduce(
+            (total, rating) => total + rating,
+            0
+          ) / ratings.length
+        ).toFixed(1)
+      : "-";
+
+  const highestRating =
+    ratings.length > 0
+      ? Math.max(...ratings).toFixed(1)
+      : "-";
+
   const memberSince = new Date(
     profile.created_at
   ).toLocaleDateString("ja-JP", {
@@ -839,6 +884,388 @@ export default async function ProfilePage() {
               </div>
             </div>
                     </section>
+
+          {/* 整いサマリー */}
+          <section
+            aria-labelledby="sauna-summary-heading"
+            className="mt-8 sm:mt-10"
+          >
+            <div
+              className="
+                overflow-hidden
+                rounded-[2rem]
+                border border-border/55
+                bg-card/90
+                shadow-sm
+                backdrop-blur-md
+                sm:rounded-[2.5rem]
+              "
+            >
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-4
+                  border-b border-border/45
+                  px-5
+                  py-6
+                  sm:flex-row
+                  sm:items-end
+                  sm:justify-between
+                  sm:px-8
+                  sm:py-7
+                  lg:px-10
+                "
+              >
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="
+                        flex
+                        size-9
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-secondary/25
+                        text-foreground
+                      "
+                    >
+                      <Activity
+                        className="size-4"
+                        strokeWidth={1.8}
+                      />
+                    </span>
+
+                    <p
+                      className="
+                        text-xs
+                        font-semibold
+                        uppercase
+                        tracking-[0.25em]
+                        text-muted-foreground
+                      "
+                    >
+                      Sauna Summary
+                    </p>
+                  </div>
+
+                  <h2
+                    id="sauna-summary-heading"
+                    className="
+                      mt-4
+                      text-2xl
+                      font-semibold
+                      tracking-[-0.035em]
+                      text-foreground
+                      sm:text-3xl
+                    "
+                  >
+                    整いサマリー
+                  </h2>
+                </div>
+
+                <p
+                  className="
+                    max-w-md
+                    text-sm
+                    leading-7
+                    text-muted-foreground
+                  "
+                >
+                  これまでに記録したサ活から、
+                  あなたの整いの歩みをまとめています。
+                </p>
+              </div>
+
+              <dl
+                className="
+                  grid
+                  grid-cols-2
+                  divide-x
+                  divide-y
+                  divide-border/45
+                  sm:grid-cols-4
+                  sm:divide-y-0
+                "
+              >
+                <div
+                  className="
+                    min-w-0
+                    bg-background/25
+                    px-5
+                    py-6
+                    sm:px-6
+                    sm:py-7
+                    lg:px-8
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      size-10
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      bg-accent/20
+                      text-foreground
+                    "
+                  >
+                    <Activity
+                      className="size-4.5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <dt
+                    className="
+                      mt-5
+                      text-xs
+                      font-medium
+                      text-muted-foreground
+                    "
+                  >
+                    総サ活数
+                  </dt>
+
+                  <dd
+                    className="
+                      mt-2
+                      flex
+                      items-baseline
+                      gap-1.5
+                      text-3xl
+                      font-semibold
+                      tracking-[-0.04em]
+                      text-foreground
+                    "
+                  >
+                    <span className="tabular-nums">
+                      {totalSaunaVisits}
+                    </span>
+
+                    <span
+                      className="
+                        text-xs
+                        font-medium
+                        tracking-normal
+                        text-muted-foreground
+                      "
+                    >
+                      回
+                    </span>
+                  </dd>
+                </div>
+
+                <div
+                  className="
+                    min-w-0
+                    bg-background/25
+                    px-5
+                    py-6
+                    sm:px-6
+                    sm:py-7
+                    lg:px-8
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      size-10
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      bg-secondary/25
+                      text-foreground
+                    "
+                  >
+                    <Building2
+                      className="size-4.5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <dt
+                    className="
+                      mt-5
+                      text-xs
+                      font-medium
+                      text-muted-foreground
+                    "
+                  >
+                    訪問施設数
+                  </dt>
+
+                  <dd
+                    className="
+                      mt-2
+                      flex
+                      items-baseline
+                      gap-1.5
+                      text-3xl
+                      font-semibold
+                      tracking-[-0.04em]
+                      text-foreground
+                    "
+                  >
+                    <span className="tabular-nums">
+                      {visitedSaunas}
+                    </span>
+
+                    <span
+                      className="
+                        text-xs
+                        font-medium
+                        tracking-normal
+                        text-muted-foreground
+                      "
+                    >
+                      施設
+                    </span>
+                  </dd>
+                </div>
+
+                <div
+                  className="
+                    min-w-0
+                    bg-background/25
+                    px-5
+                    py-6
+                    sm:px-6
+                    sm:py-7
+                    lg:px-8
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      size-10
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      bg-accent/20
+                      text-foreground
+                    "
+                  >
+                    <Star
+                      className="size-4.5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <dt
+                    className="
+                      mt-5
+                      text-xs
+                      font-medium
+                      text-muted-foreground
+                    "
+                  >
+                    平均評価
+                  </dt>
+
+                  <dd
+                    className="
+                      mt-2
+                      flex
+                      items-baseline
+                      gap-1.5
+                      text-3xl
+                      font-semibold
+                      tracking-[-0.04em]
+                      text-foreground
+                    "
+                  >
+                    <span className="tabular-nums">
+                      {averageRating}
+                    </span>
+
+                    {averageRating !== "-" && (
+                      <span
+                        className="
+                          text-xs
+                          font-medium
+                          tracking-normal
+                          text-muted-foreground
+                        "
+                      >
+                        / 5.0
+                      </span>
+                    )}
+                  </dd>
+                </div>
+
+                <div
+                  className="
+                    min-w-0
+                    bg-background/25
+                    px-5
+                    py-6
+                    sm:px-6
+                    sm:py-7
+                    lg:px-8
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      size-10
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      bg-secondary/25
+                      text-foreground
+                    "
+                  >
+                    <Trophy
+                      className="size-4.5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <dt
+                    className="
+                      mt-5
+                      text-xs
+                      font-medium
+                      text-muted-foreground
+                    "
+                  >
+                    最高評価
+                  </dt>
+
+                  <dd
+                    className="
+                      mt-2
+                      flex
+                      items-baseline
+                      gap-1.5
+                      text-3xl
+                      font-semibold
+                      tracking-[-0.04em]
+                      text-foreground
+                    "
+                  >
+                    <span className="tabular-nums">
+                      {highestRating}
+                    </span>
+
+                    {highestRating !== "-" && (
+                      <span
+                        className="
+                          text-xs
+                          font-medium
+                          tracking-normal
+                          text-muted-foreground
+                        "
+                      >
+                        / 5.0
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </section>
 
           <FavoriteSaunasSection userId={user.id} />
 
