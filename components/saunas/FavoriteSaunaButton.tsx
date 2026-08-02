@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Heart, LoaderCircle } from "lucide-react";
+import {
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Heart,
+  LoaderCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
@@ -22,13 +29,27 @@ export function FavoriteSaunaButton({
   initialFavorite,
 }: FavoriteSaunaButtonProps) {
   const router = useRouter();
+  const errorMessageId = useId();
 
-  const [isFavorite, setIsFavorite] =
-    useState(initialFavorite);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<
-    string | null
-  >(null);
+  const supabase = useMemo(
+    () => createClient(),
+    []
+  );
+
+  const [
+    isFavorite,
+    setIsFavorite,
+  ] = useState(initialFavorite);
+
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(false);
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState<string | null>(null);
 
   const handleFavorite = async () => {
     if (isLoading) {
@@ -42,8 +63,6 @@ export function FavoriteSaunaButton({
 
     setIsLoading(true);
     setErrorMessage(null);
-
-    const supabase = createClient();
 
     try {
       if (isFavorite) {
@@ -67,7 +86,7 @@ export function FavoriteSaunaButton({
       router.refresh();
     } catch (error) {
       console.error(
-        "お気に入りサウナの更新に失敗しました:",
+        "お気に入りサウナの更新に失敗しました。",
         error
       );
 
@@ -79,11 +98,25 @@ export function FavoriteSaunaButton({
     }
   };
 
-  const buttonLabel = userId
-    ? isFavorite
-      ? "お気に入り済み"
-      : "お気に入りに追加"
-    : "ログインしてお気に入りに追加";
+  const visibleLabel = !userId
+    ? "ログインしてお気に入りに追加"
+    : isLoading
+      ? isFavorite
+        ? "解除中..."
+        : "追加中..."
+      : isFavorite
+        ? "お気に入り済み"
+        : "お気に入りに追加";
+
+  const accessibleLabel = !userId
+    ? "ログインしてこの施設をお気に入りに追加"
+    : isLoading
+      ? isFavorite
+        ? "お気に入りから解除しています"
+        : "お気に入りに追加しています"
+      : isFavorite
+        ? "この施設をお気に入りから解除"
+        : "この施設をお気に入りに追加";
 
   return (
     <div className="w-full">
@@ -91,20 +124,37 @@ export function FavoriteSaunaButton({
         type="button"
         onClick={handleFavorite}
         disabled={isLoading}
+        aria-label={accessibleLabel}
         aria-pressed={isFavorite}
-        aria-label={buttonLabel}
+        aria-busy={isLoading}
+        aria-describedby={
+          errorMessage
+            ? errorMessageId
+            : undefined
+        }
         className={`
-          inline-flex w-full items-center
-          justify-center gap-2
-          rounded-full border px-6 py-3
-          text-sm font-medium
-          transition duration-200
+          inline-flex
+          min-h-11
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-full
+          border
+          px-6
+          py-3
+          text-sm
+          font-medium
+          transition
+          duration-200
           focus-visible:outline-none
           focus-visible:ring-2
           focus-visible:ring-[#fdd000]
           focus-visible:ring-offset-2
+          focus-visible:ring-offset-background
           disabled:cursor-not-allowed
           disabled:opacity-60
+          motion-reduce:transition-none
           ${
             isFavorite
               ? `
@@ -125,35 +175,46 @@ export function FavoriteSaunaButton({
       >
         {isLoading ? (
           <LoaderCircle
-            className="size-4 animate-spin"
             aria-hidden="true"
+            className="
+              size-4
+              animate-spin
+              motion-reduce:animate-none
+            "
           />
         ) : (
           <Heart
-            className={`size-4 ${
-              isFavorite
-                ? "fill-current"
-                : ""
-            }`}
             aria-hidden="true"
+            className={`
+              size-4
+              ${
+                isFavorite
+                  ? "fill-current"
+                  : ""
+              }
+            `}
           />
         )}
 
-        <span>{buttonLabel}</span>
+        <span>{visibleLabel}</span>
       </button>
 
-      {errorMessage && (
+      {errorMessage ? (
         <p
+          id={errorMessageId}
           role="alert"
           className="
-            mt-2 px-2 text-center
-            text-xs leading-5
+            mt-2
+            px-2
+            text-center
+            text-xs
+            leading-5
             text-[#e95884]
           "
         >
           {errorMessage}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

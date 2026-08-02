@@ -5,6 +5,12 @@ type ProfileAvatarProps = {
   avatarUrl: string | null;
   username: string | null;
   size?: "sm" | "md" | "lg" | "xl";
+
+  /*
+   * ユーザー名と同じリンク内に配置するなど、
+   * アバターが視覚的な装飾のみの場合に使用します。
+   */
+  decorative?: boolean;
 };
 
 const sizeClasses = {
@@ -12,47 +18,92 @@ const sizeClasses = {
   md: "size-10",
   lg: "size-16",
   xl: "size-28",
-};
+} as const;
 
 const iconSizeClasses = {
   sm: "size-4",
   md: "size-5",
   lg: "size-8",
   xl: "size-14",
-};
+} as const;
 
 const imageSizes = {
   sm: "32px",
   md: "40px",
   lg: "64px",
   xl: "112px",
-};
+} as const;
 
 export function ProfileAvatar({
   avatarUrl,
   username,
   size = "md",
+  decorative = false,
 }: ProfileAvatarProps) {
+  const normalizedUsername =
+    username?.trim() || null;
+
+  const accessibleLabel =
+    normalizedUsername
+      ? `${normalizedUsername}のプロフィール画像`
+      : "ユーザーのプロフィール画像";
+
   return (
     <div
-      className={`relative shrink-0 overflow-hidden rounded-full border bg-muted ${sizeClasses[size]}`}
+      role={
+        !avatarUrl && !decorative
+          ? "img"
+          : undefined
+      }
+      aria-label={
+        !avatarUrl && !decorative
+          ? accessibleLabel
+          : undefined
+      }
+      aria-hidden={
+        decorative
+          ? "true"
+          : undefined
+      }
+      className={`
+        relative
+        shrink-0
+        overflow-hidden
+        rounded-full
+        border
+        border-border/55
+        bg-muted
+        ${sizeClasses[size]}
+      `}
     >
       {avatarUrl ? (
         <Image
           src={avatarUrl}
           alt={
-            username
-              ? `${username}のプロフィール画像`
-              : "プロフィール画像"
+            decorative
+              ? ""
+              : accessibleLabel
           }
           fill
-          className="object-cover"
           sizes={imageSizes[size]}
+          className="object-cover"
         />
       ) : (
-        <div className="flex size-full items-center justify-center">
+        <div
+          aria-hidden="true"
+          className="
+            flex
+            size-full
+            items-center
+            justify-center
+          "
+        >
           <UserRound
-            className={`text-muted-foreground ${iconSizeClasses[size]}`}
+            aria-hidden="true"
+            className={`
+              text-muted-foreground
+              ${iconSizeClasses[size]}
+            `}
           />
         </div>
       )}

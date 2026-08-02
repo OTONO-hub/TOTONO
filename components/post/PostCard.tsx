@@ -4,10 +4,14 @@ import { Pencil } from "lucide-react";
 import { CommentForm } from "@/components/comment/CommentForm";
 import { CommentList } from "@/components/comment/CommentList";
 import { DeletePostButton } from "@/components/post/DeletePostButton";
-import { PostBody } from "@/components/post/PostBody";
+import {
+  PostBody,
+  type PostImageDisplayMode,
+} from "@/components/post/PostBody";
 import { PostFooter } from "@/components/post/PostFooter";
 import { PostHeader } from "@/components/post/PostHeader";
 import { CommentWithAuthor } from "@/types/comment";
+import type { PostImage } from "@/services/post-images";
 import { Post } from "@/types/post";
 import { Profile } from "@/types/profile";
 
@@ -19,6 +23,8 @@ type PostCardProps = {
   initialLikeCount: number;
   initialBookmarked: boolean;
   comments: CommentWithAuthor[];
+  images?: PostImage[];
+  imageDisplayMode?: PostImageDisplayMode;
 };
 
 export function PostCard({
@@ -29,6 +35,8 @@ export function PostCard({
   initialLikeCount,
   initialBookmarked,
   comments,
+  images = [],
+  imageDisplayMode = "cover",
 }: PostCardProps) {
   const isOwner = post.user_id === userId;
 
@@ -131,7 +139,13 @@ export function PostCard({
 
       {/* 投稿本文・画像 */}
       <div className="mt-5 px-5 sm:mt-6 sm:px-7">
-        <PostBody post={post} />
+        <PostBody
+          post={post}
+          images={images}
+          imageDisplayMode={
+            imageDisplayMode
+          }
+        />
       </div>
 
       {/* いいね・コメント・保存 */}

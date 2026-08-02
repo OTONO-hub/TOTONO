@@ -5,6 +5,7 @@ import {
   BookOpen,
   CalendarDays,
   ImageIcon,
+  Images,
   PenLine,
   Star,
 } from "lucide-react";
@@ -16,6 +17,7 @@ type SaunaCommunityPost = {
   rating: number;
   comment: string | null;
   image_url: string | null;
+  image_count?: number;
 };
 
 type SaunaCommunityPostsProps = {
@@ -50,10 +52,10 @@ export function SaunaCommunityPosts({
         className="
           flex
           flex-col
-          gap-5
+          gap-6
           border-b
           border-[#3e3a3a]/8
-          pb-6
+          pb-7
           sm:flex-row
           sm:items-end
           sm:justify-between
@@ -83,7 +85,7 @@ export function SaunaCommunityPosts({
               sm:text-3xl
             "
           >
-            この施設のサ活
+            この施設で整った人たち
           </h2>
 
           <p
@@ -95,8 +97,8 @@ export function SaunaCommunityPosts({
               text-[#3e3a3a]/60
             "
           >
-            実際にこの施設を訪れた人の、
-            サウナ体験を見てみましょう。
+            実際にこの施設を訪れたユーザーの、
+            写真や感想からサウナ体験を確認できます。
           </p>
         </div>
 
@@ -168,46 +170,127 @@ export function SaunaCommunityPosts({
                 aria-hidden="true"
               />
 
-              投稿する
+              サ活を投稿する
             </Link>
           )}
         </div>
       </div>
 
       {hasPosts ? (
-        <div
-          role="list"
-          aria-label="この施設のサ活一覧"
-          className="
-            mt-8
-            grid
-            gap-5
-            md:grid-cols-2
-          "
-        >
-          {posts.map((post) => (
-            <CommunityPostCard
-              key={post.id}
-              post={post}
-            />
-          ))}
-        </div>
+        <>
+          <div
+            role="list"
+            aria-label="この施設のサ活一覧"
+            className="
+              mt-8
+              grid
+              gap-5
+              md:grid-cols-2
+              xl:grid-cols-3
+            "
+          >
+            {posts.map((post) => (
+              <CommunityPostCard
+                key={post.id}
+                post={post}
+              />
+            ))}
+          </div>
+
+          <div
+            className="
+              mt-8
+              flex
+              flex-col
+              gap-4
+              rounded-[1.5rem]
+              border
+              border-[#3e3a3a]/7
+              bg-[#e6e5ef]/30
+              p-5
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+              sm:p-6
+            "
+          >
+            <div>
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-[#3e3a3a]
+                "
+              >
+                あなたのサウナ時間も残しませんか？
+              </p>
+
+              <p
+                className="
+                  mt-1
+                  text-xs
+                  leading-6
+                  text-[#3e3a3a]/50
+                "
+              >
+                写真や評価を記録すると、
+                次に訪れる人の参考にもなります。
+              </p>
+            </div>
+
+            <Link
+              href={`/posts/new?sauna_id=${saunaId}`}
+              className="
+                inline-flex
+                min-h-11
+                shrink-0
+                items-center
+                justify-center
+                gap-2
+                rounded-full
+                bg-white
+                px-5
+                py-2.5
+                text-sm
+                font-medium
+                text-[#3e3a3a]
+                shadow-sm
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:shadow-md
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[#3e3a3a]
+                focus-visible:ring-offset-2
+                motion-reduce:transform-none
+                motion-reduce:transition-none
+              "
+            >
+              <PenLine
+                className="size-4"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+
+              この施設で記録する
+            </Link>
+          </div>
+
+          <p
+            className="
+              mt-5
+              text-xs
+              leading-6
+              text-[#3e3a3a]/45
+            "
+          >
+            ※ 投稿内容は、TOTONOユーザーによるサ活記録です。
+            施設の最新情報は公式サイトでもご確認ください。
+          </p>
+        </>
       ) : (
         <EmptyCommunityState saunaId={saunaId} />
-      )}
-
-      {hasPosts && (
-        <p
-          className="
-            mt-6
-            text-xs
-            leading-6
-            text-[#3e3a3a]/45
-          "
-        >
-          ※ 投稿内容は、TOTONOユーザーによるサ活記録です。
-          施設の最新情報は公式サイトでもご確認ください。
-        </p>
       )}
     </section>
   );
@@ -237,7 +320,7 @@ function CommunityPostCard({
           h-full
           flex-col
           overflow-hidden
-          rounded-[1.75rem]
+          rounded-[1.6rem]
           border
           border-[#3e3a3a]/7
           bg-white/90
@@ -258,6 +341,7 @@ function CommunityPostCard({
       >
         <PostImage
           imageUrl={post.image_url}
+          imageCount={post.image_count ?? 0}
           saunaName={post.sauna_name}
         />
 
@@ -267,7 +351,6 @@ function CommunityPostCard({
             flex-1
             flex-col
             p-5
-            sm:p-6
           "
         >
           <div
@@ -429,11 +512,13 @@ function CommunityPostCard({
 
 type PostImageProps = {
   imageUrl: string | null;
+  imageCount: number;
   saunaName: string;
 };
 
 function PostImage({
   imageUrl,
+  imageCount,
   saunaName,
 }: PostImageProps) {
   if (!imageUrl) {
@@ -442,7 +527,7 @@ function PostImage({
         className="
           relative
           flex
-          aspect-[16/9]
+          aspect-[4/3]
           items-center
           justify-center
           overflow-hidden
@@ -527,7 +612,7 @@ function PostImage({
     <div
       className="
         relative
-        aspect-[16/10]
+        aspect-[4/3]
         w-full
         overflow-hidden
         bg-[#3e3a3a]/5
@@ -539,8 +624,8 @@ function PostImage({
         fill
         sizes="
           (max-width: 767px) 100vw,
-          (max-width: 1200px) 50vw,
-          560px
+          (max-width: 1279px) 50vw,
+          380px
         "
         className="
           object-cover
@@ -564,6 +649,38 @@ function PostImage({
         "
         aria-hidden="true"
       />
+
+      {imageCount > 1 ? (
+        <span
+          className="
+            absolute
+            right-3
+            top-3
+            inline-flex
+            items-center
+            gap-1.5
+            rounded-full
+            bg-black/65
+            px-3
+            py-1.5
+            text-xs
+            font-semibold
+            tabular-nums
+            text-white
+            shadow-sm
+            backdrop-blur-sm
+          "
+          aria-label={`${imageCount}枚の画像`}
+        >
+          <Images
+            className="size-3.5"
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+
+          {imageCount}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -593,7 +710,7 @@ function EmptyCommunityState({
         py-12
         text-center
         sm:px-10
-        sm:py-14
+        sm:py-16
       "
     >
       <div
@@ -648,7 +765,7 @@ function EmptyCommunityState({
           text-[#3e3a3a]
         "
       >
-        この施設の投稿はまだありません
+        まだ誰も、この施設で整っていません
       </p>
 
       <p
@@ -705,7 +822,7 @@ function EmptyCommunityState({
           aria-hidden="true"
         />
 
-        この施設で投稿する
+        最初のサ活を投稿する
       </Link>
     </div>
   );

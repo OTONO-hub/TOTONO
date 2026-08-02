@@ -59,7 +59,10 @@ export function BookmarkButton({
           "保存済み投稿から削除しました。"
         );
 
-        if (pathname === "/bookmarks") {
+        if (
+          pathname === "/bookmarks" ||
+          pathname.startsWith("/bookmarks/")
+        ) {
           router.refresh();
         }
 
@@ -88,32 +91,42 @@ export function BookmarkButton({
     }
   };
 
+  const accessibleLabel = loading
+    ? bookmarked
+      ? "ブックマークを解除しています"
+      : "ブックマークに保存しています"
+    : bookmarked
+      ? "ブックマークを解除"
+      : "ブックマークに保存";
+
   return (
     <button
       type="button"
       onClick={handleBookmark}
       disabled={loading}
-      aria-label={
-        bookmarked
-          ? "ブックマークを解除"
-          : "ブックマークに保存"
-      }
+      aria-label={accessibleLabel}
       aria-pressed={bookmarked}
+      aria-busy={loading}
       className="
         group
         inline-flex
+        size-11
+        shrink-0
         items-center
         justify-center
         rounded-full
         text-muted-foreground
         transition-colors
+        duration-200
         hover:text-foreground
         focus-visible:outline-none
         focus-visible:ring-2
         focus-visible:ring-ring
         focus-visible:ring-offset-2
+        focus-visible:ring-offset-background
         disabled:cursor-not-allowed
         disabled:opacity-50
+        motion-reduce:transition-none
       "
     >
       <svg
@@ -123,10 +136,11 @@ export function BookmarkButton({
           size-5
           transition-all
           duration-200
+          motion-reduce:transition-none
           ${
             bookmarked
               ? "fill-current text-foreground"
-              : "fill-none stroke-current group-hover:scale-105"
+              : "fill-none stroke-current group-hover:scale-105 motion-reduce:group-hover:scale-100"
           }
         `}
         strokeWidth="1.7"

@@ -1,6 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
@@ -37,7 +40,8 @@ function getNotificationAppearance(
   switch (type) {
     case "like":
       return {
-        message: "あなたの投稿にいいねしました。",
+        message:
+          "あなたの投稿にいいねしました。",
         label: "いいね",
         Icon: Heart,
         iconClassName:
@@ -56,7 +60,8 @@ function getNotificationAppearance(
 
     case "follow":
       return {
-        message: "あなたをフォローしました。",
+        message:
+          "あなたをフォローしました。",
         label: "フォロー",
         Icon: UserPlus,
         iconClassName:
@@ -65,14 +70,29 @@ function getNotificationAppearance(
   }
 }
 
-function formatNotificationDate(date: string) {
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+function formatNotificationDate(
+  date: string
+): string {
+  const parsedDate = new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+    return "日時不明";
+  }
+
+  return new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(parsedDate);
 }
 
 export function NotificationItem({
@@ -87,15 +107,21 @@ export function NotificationItem({
     []
   );
 
-  const [isRead, setIsRead] = useState(
+  const [
+    isRead,
+    setIsRead,
+  ] = useState(
     notification.isRead
   );
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
   const actorName =
-    actor?.username || "ユーザー";
+    actor?.username?.trim() ||
+    "ユーザー";
 
   const appearance =
     getNotificationAppearance(
@@ -115,6 +141,15 @@ export function NotificationItem({
       : notification.postId
         ? `/posts/${notification.postId}`
         : `/users/${notification.actorId}`;
+
+  const formattedDate =
+    formatNotificationDate(
+      notification.createdAt
+    );
+
+  const accessibleLabel = loading
+    ? "通知を開いています"
+    : `${isRead ? "" : "未読の"}${label}通知。${actorName}さんが${message} ${formattedDate}。詳細を開く`;
 
   const handleClick = async () => {
     if (loading) {
@@ -151,10 +186,12 @@ export function NotificationItem({
       type="button"
       onClick={handleClick}
       disabled={loading}
+      aria-label={accessibleLabel}
       aria-busy={loading}
       className={`
         group
         relative
+        min-h-11
         w-full
         overflow-hidden
         rounded-[1.5rem]
@@ -169,6 +206,7 @@ export function NotificationItem({
         focus-visible:ring-2
         focus-visible:ring-ring
         focus-visible:ring-offset-2
+        focus-visible:ring-offset-background
         disabled:cursor-wait
         disabled:opacity-70
         motion-reduce:transition-none
@@ -191,7 +229,7 @@ export function NotificationItem({
         }
       `}
     >
-      {!isRead && (
+      {!isRead ? (
         <span
           aria-hidden="true"
           className="
@@ -203,9 +241,10 @@ export function NotificationItem({
             bg-primary
           "
         />
-      )}
+      ) : null}
 
       <div
+        aria-hidden="true"
         className="
           flex
           items-start
@@ -216,16 +255,18 @@ export function NotificationItem({
         <div className="relative shrink-0">
           <ProfileAvatar
             avatarUrl={
-              actor?.avatar_url ?? null
+              actor?.avatar_url ??
+              null
             }
             username={
-              actor?.username ?? null
+              actor?.username ??
+              null
             }
             size="md"
+            decorative
           />
 
           <span
-            aria-label={`通知種別：${label}`}
             className={`
               absolute
               -bottom-1
@@ -242,9 +283,9 @@ export function NotificationItem({
             `}
           >
             <Icon
+              aria-hidden="true"
               className="size-3.5"
               strokeWidth={2}
-              aria-hidden="true"
             />
           </span>
         </div>
@@ -269,7 +310,7 @@ export function NotificationItem({
               @{actorName}
             </span>
 
-            {!isRead && (
+            {!isRead ? (
               <span
                 className="
                   inline-flex
@@ -285,7 +326,6 @@ export function NotificationItem({
                 "
               >
                 <span
-                  aria-hidden="true"
                   className="
                     size-1.5
                     rounded-full
@@ -295,7 +335,7 @@ export function NotificationItem({
 
                 未読
               </span>
-            )}
+            ) : null}
           </div>
 
           <p
@@ -325,16 +365,14 @@ export function NotificationItem({
           >
             <span>{label}</span>
 
-            <span aria-hidden="true">•</span>
+            <span>•</span>
 
             <time
               dateTime={
                 notification.createdAt
               }
             >
-              {formatNotificationDate(
-                notification.createdAt
-              )}
+              {formattedDate}
             </time>
           </div>
         </div>
@@ -343,7 +381,7 @@ export function NotificationItem({
           className="
             mt-1
             flex
-            size-9
+            size-11
             shrink-0
             items-center
             justify-center
@@ -362,12 +400,17 @@ export function NotificationItem({
         >
           {loading ? (
             <LoaderCircle
-              className="size-4 animate-spin"
-              strokeWidth={1.8}
               aria-hidden="true"
+              className="
+                size-4
+                animate-spin
+                motion-reduce:animate-none
+              "
+              strokeWidth={1.8}
             />
           ) : (
             <ArrowUpRight
+              aria-hidden="true"
               className="
                 size-4
                 transition-transform
@@ -378,7 +421,6 @@ export function NotificationItem({
                 motion-reduce:transition-none
               "
               strokeWidth={1.8}
-              aria-hidden="true"
             />
           )}
         </span>

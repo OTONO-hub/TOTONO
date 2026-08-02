@@ -1,21 +1,52 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
   Bell,
   BellRing,
   Compass,
+  Heart,
   LogIn,
+  MessageCircle,
   Sparkles,
+  UserPlus,
 } from "lucide-react";
 
+import { AppMobileNavigation } from "@/components/layout/AppMobileNavigation";
 import { Header } from "@/components/layout/Header";
-import { NotificationItem } from "@/components/notification/NotificationItem";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/state/EmptyState";
 import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 import { getNotificationsWithActors } from "@/services/notifications";
+import type {
+  NotificationType,
+} from "@/types/notification";
+import type { Profile } from "@/types/profile";
+
+type NotificationWithActor = {
+  notification: {
+    id: string;
+    recipientId: string;
+    actorId: string;
+    type: NotificationType;
+    postId: string | null;
+    isRead: boolean;
+    createdAt: string;
+  };
+  actor: Profile | null;
+};
+
+type NotificationGroup = {
+  key: string;
+  title: string;
+  description: string;
+  notifications: NotificationWithActor[];
+};
 
 export default async function NotificationsPage() {
-  const supabase = await createClient();
+  const supabase =
+    await createClient();
 
   const {
     data: { user },
@@ -26,48 +57,454 @@ export default async function NotificationsPage() {
       <>
         <Header />
 
-        <NotificationsPageShell>
-          <LoginRequiredState />
-        </NotificationsPageShell>
+        <main
+          className="
+            relative
+            min-h-screen
+            overflow-hidden
+            bg-muted/25
+            px-4
+            pb-28
+            pt-28
+            sm:px-6
+            sm:pt-32
+          "
+        >
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -right-36
+              top-16
+              size-112
+              rounded-full
+              bg-secondary/15
+              blur-3xl
+            "
+          />
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -left-40
+              top-[34rem]
+              size-96
+              rounded-full
+              bg-accent/10
+              blur-3xl
+            "
+          />
+
+          <section
+            aria-labelledby="notifications-login-heading"
+            className="
+              relative
+              mx-auto
+              max-w-2xl
+              overflow-hidden
+              rounded-[2rem]
+              border
+              border-border/55
+              bg-card/90
+              shadow-sm
+              backdrop-blur-md
+              sm:rounded-[2.5rem]
+            "
+          >
+            <div
+              className="
+                bg-linear-to-br
+                from-secondary/25
+                via-background
+                to-accent/10
+                px-6
+                py-14
+                text-center
+                sm:px-10
+                sm:py-16
+              "
+            >
+              <div
+                className="
+                  mx-auto
+                  flex
+                  size-16
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-border/50
+                  bg-card/75
+                  text-foreground
+                  shadow-sm
+                "
+              >
+                <Bell
+                  className="size-6"
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                />
+              </div>
+
+              <p
+                className="
+                  mt-6
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-[0.25em]
+                  text-muted-foreground
+                "
+              >
+                Connections
+              </p>
+
+              <h1
+                id="notifications-login-heading"
+                className="
+                  mt-4
+                  text-3xl
+                  font-semibold
+                  tracking-[-0.04em]
+                  text-foreground
+                  sm:text-4xl
+                "
+              >
+                新しいつながりを見る
+              </h1>
+
+              <p
+                className="
+                  mx-auto
+                  mt-4
+                  max-w-lg
+                  text-sm
+                  leading-7
+                  text-muted-foreground
+                  sm:text-base
+                  sm:leading-8
+                "
+              >
+                いいねやコメント、フォローなど、
+                TOTONOで生まれた新しい出来事を確認できます。
+              </p>
+
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({
+                    variant: "totono",
+                    size: "xl",
+                  }),
+                  "mt-8"
+                )}
+              >
+                <LogIn
+                  className="size-4"
+                  strokeWidth={1.8}
+                  data-icon="inline-start"
+                />
+
+                ログインする
+              </Link>
+            </div>
+          </section>
+        </main>
       </>
     );
   }
 
   const notifications =
-    await getNotificationsWithActors(
+    (await getNotificationsWithActors(
       supabase,
       user.id
+    )) as NotificationWithActor[];
+
+  const unreadNotifications =
+    notifications.filter(
+      ({ notification }) =>
+        !notification.isRead
     );
 
-  const unreadCount = notifications.filter(
-    ({ notification }) =>
-      !notification.isRead
-  ).length;
+  const unreadIds =
+    unreadNotifications.map(
+      ({ notification }) =>
+        notification.id
+    );
+
+  /*
+   * 通知画面を開いた時点で、
+   * 表示した未読通知を既読へ更新します。
+   *
+   * この画面では取得時点の状態を使うため、
+   * 今回新しく確認した通知には
+   * NEW表示が残ります。
+   */
+  if (unreadIds.length > 0) {
+    const { error } = await supabase
+      .from("notifications")
+      .update({
+        is_read: true,
+      })
+      .in("id", unreadIds)
+      .eq(
+        "recipient_id",
+        user.id
+      );
+
+    if (error) {
+      console.error(
+        "通知の既読更新に失敗しました。",
+        error
+      );
+    }
+  }
+
+  const groups =
+    groupNotifications(
+      notifications
+    );
 
   return (
     <>
       <Header />
 
-      <NotificationsPageShell>
-        <NotificationsHero
-          totalCount={notifications.length}
-          unreadCount={unreadCount}
+      <main
+        className="
+          relative
+          min-h-screen
+          overflow-hidden
+          bg-muted/25
+          pb-32
+          pt-28
+          sm:pb-28
+          sm:pt-32
+        "
+      >
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            -right-44
+            top-16
+            size-120
+            rounded-full
+            bg-secondary/15
+            blur-3xl
+          "
         />
 
-        {notifications.length === 0 ? (
-          <EmptyNotificationsState />
-        ) : (
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            -left-48
+            top-[42rem]
+            size-112
+            rounded-full
+            bg-accent/10
+            blur-3xl
+          "
+        />
+
+        <div
+          className="
+            relative
+            mx-auto
+            w-full
+            max-w-5xl
+            px-4
+            sm:px-6
+            lg:px-8
+          "
+        >
           <section
-            aria-labelledby="notifications-list-heading"
-            className="mt-12 sm:mt-16"
+            aria-labelledby="notifications-heading"
+            className="
+              relative
+              overflow-hidden
+              rounded-[2rem]
+              border
+              border-border/55
+              bg-card/90
+              shadow-sm
+              backdrop-blur-md
+              sm:rounded-[2.5rem]
+            "
+          >
+            <div
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                -right-24
+                -top-28
+                size-80
+                rounded-full
+                bg-secondary/30
+                blur-3xl
+              "
+            />
+
+            <div
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                -bottom-32
+                left-20
+                size-72
+                rounded-full
+                bg-accent/15
+                blur-3xl
+              "
+            />
+
+            <div
+              className="
+                relative
+                bg-linear-to-br
+                from-secondary/25
+                via-background
+                to-accent/10
+                px-6
+                py-10
+                sm:px-8
+                sm:py-12
+                lg:px-10
+              "
+            >
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-8
+                  sm:flex-row
+                  sm:items-end
+                  sm:justify-between
+                "
+              >
+                <div className="max-w-2xl">
+                  <div
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-full
+                      border
+                      border-border/55
+                      bg-card/70
+                      px-3.5
+                      py-2
+                      text-xs
+                      font-semibold
+                      uppercase
+                      tracking-[0.22em]
+                      text-muted-foreground
+                      shadow-sm
+                    "
+                  >
+                    <Bell
+                      className="
+                        size-3.5
+                        text-foreground
+                      "
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    />
+
+                    Connections
+                  </div>
+
+                  <h1
+                    id="notifications-heading"
+                    className="
+                      mt-6
+                      text-4xl
+                      font-semibold
+                      tracking-[-0.05em]
+                      text-foreground
+                      sm:text-5xl
+                    "
+                  >
+                    通知
+                  </h1>
+
+                  <p
+                    className="
+                      mt-4
+                      max-w-xl
+                      text-sm
+                      leading-7
+                      text-muted-foreground
+                      sm:text-base
+                      sm:leading-8
+                    "
+                  >
+                    サ活への共感やコメント、
+                    新しいフォローをまとめて確認できます。
+                  </p>
+                </div>
+
+                <NotificationSummary
+                  totalCount={
+                    notifications.length
+                  }
+                  unreadCount={
+                    unreadNotifications.length
+                  }
+                />
+              </div>
+            </div>
+          </section>
+
+          {notifications.length === 0 ? (
+            <EmptyNotifications />
+          ) : (
+            <div
+              className="
+                mt-12
+                space-y-12
+              "
+            >
+              {groups.map(
+                (group) => (
+                  <NotificationGroupSection
+                    key={group.key}
+                    group={group}
+                  />
+                )
+              )}
+            </div>
+          )}
+
+          <section
+            aria-labelledby="notifications-next-heading"
+            className="
+              mt-12
+              overflow-hidden
+              rounded-[2rem]
+              border
+              border-border/55
+              bg-card/80
+              p-6
+              shadow-sm
+              backdrop-blur-md
+              sm:p-8
+            "
           >
             <div
               className="
                 flex
                 flex-col
-                gap-4
+                gap-6
                 sm:flex-row
-                sm:items-end
+                sm:items-center
                 sm:justify-between
               "
             >
@@ -77,763 +514,765 @@ export default async function NotificationsPage() {
                     text-xs
                     font-semibold
                     uppercase
-                    tracking-[0.2em]
+                    tracking-[0.22em]
                     text-muted-foreground
                   "
                 >
-                  Recent Activity
+                  Join the Conversation
                 </p>
 
                 <h2
-                  id="notifications-list-heading"
+                  id="notifications-next-heading"
                   className="
-                    mt-2
+                    mt-3
                     text-2xl
                     font-semibold
-                    tracking-[-0.03em]
+                    tracking-[-0.035em]
                     text-foreground
                     sm:text-3xl
                   "
                 >
-                  最近の通知
+                  新しいサ活に出会う
                 </h2>
+
+                <p
+                  className="
+                    mt-3
+                    max-w-xl
+                    text-sm
+                    leading-7
+                    text-muted-foreground
+                  "
+                >
+                  Communityから、
+                  ほかのユーザーの記録や
+                  気になる施設を見つけてみましょう。
+                </p>
               </div>
 
-              <p
-                className="
-                  max-w-md
-                  text-sm
-                  leading-6
-                  text-muted-foreground
-                "
+              <Link
+                href="/community"
+                className={cn(
+                  buttonVariants({
+                    variant: "totono",
+                    size: "lg",
+                  }),
+                  "w-full sm:w-auto"
+                )}
               >
-                通知を選択すると、関連する投稿や
-                ユーザーページへ移動します。
-              </p>
-            </div>
+                <Compass
+                  className="size-4"
+                  strokeWidth={1.8}
+                  data-icon="inline-start"
+                />
 
-            <div
-              className="
-                mx-auto
-                mt-8
-                max-w-4xl
-                space-y-3
-                sm:mt-10
-                sm:space-y-4
-              "
-            >
-              {notifications.map(
-                ({ notification, actor }) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    actor={actor}
-                    recipientId={user.id}
-                  />
-                )
-              )}
+                Communityへ
+              </Link>
             </div>
           </section>
-        )}
-      </NotificationsPageShell>
+        </div>
+      </main>
+
+      <AppMobileNavigation />
     </>
   );
 }
 
-type NotificationsPageShellProps = {
-  children: ReactNode;
-};
-
-function NotificationsPageShell({
-  children,
-}: NotificationsPageShellProps) {
-  return (
-    <main
-      className="
-        relative
-        isolate
-        min-h-screen
-        overflow-hidden
-        bg-muted/25
-        px-4
-        pb-20
-        pt-8
-        sm:px-6
-        sm:pb-24
-        sm:pt-10
-        lg:px-8
-        lg:pt-12
-      "
-    >
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -right-44
-          top-8
-          -z-10
-          size-96
-          rounded-full
-          bg-secondary/15
-          blur-3xl
-        "
-      />
-
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -left-44
-          top-[35rem]
-          -z-10
-          size-96
-          rounded-full
-          bg-accent/10
-          blur-3xl
-        "
-      />
-
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          bottom-24
-          right-[8%]
-          -z-10
-          size-72
-          rounded-full
-          bg-secondary/10
-          blur-3xl
-        "
-      />
-
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-7xl
-        "
-      >
-        {children}
-      </div>
-    </main>
-  );
-}
-
-type NotificationsHeroProps = {
+type NotificationSummaryProps = {
   totalCount: number;
   unreadCount: number;
 };
 
-function NotificationsHero({
+function NotificationSummary({
   totalCount,
   unreadCount,
-}: NotificationsHeroProps) {
-  const hasUnreadNotifications =
-    unreadCount > 0;
-
+}: NotificationSummaryProps) {
   return (
-    <section
-      aria-labelledby="notifications-heading"
+    <div
       className="
-        relative
+        flex
+        w-full
+        max-w-sm
         overflow-hidden
-        rounded-[2rem]
+        rounded-[1.5rem]
         border
         border-border/55
-        bg-card/85
-        px-6
-        py-10
+        bg-card/75
         shadow-sm
-        backdrop-blur-md
-        sm:px-10
-        sm:py-12
+        sm:w-auto
       "
     >
       <div
-        aria-hidden="true"
         className="
-          pointer-events-none
-          absolute
-          -right-20
-          -top-24
-          size-64
-          rounded-full
-          bg-secondary/20
-          blur-3xl
-        "
-      />
-
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -bottom-28
-          left-[30%]
-          size-60
-          rounded-full
-          bg-accent/10
-          blur-3xl
-        "
-      />
-
-      <div
-        className="
-          relative
-          z-10
           flex
-          flex-col
-          gap-8
-          lg:flex-row
-          lg:items-end
-          lg:justify-between
+          flex-1
+          items-center
+          gap-3
+          border-r
+          border-border/45
+          px-4
+          py-4
+          sm:min-w-36
         "
       >
-        <div className="max-w-2xl">
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-            "
-          >
-            <span
-              className="
-                flex
-                size-10
-                items-center
-                justify-center
-                rounded-full
-                bg-secondary/20
-                text-foreground
-              "
-            >
-              <BellRing
-                className="size-4.5"
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            </span>
+        <span
+          className="
+            flex
+            size-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            bg-secondary/20
+            text-foreground
+          "
+        >
+          <Bell
+            className="size-4"
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+        </span>
 
-            <p
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[0.22em]
-                text-muted-foreground
-              "
-            >
-              Your Activity
-            </p>
-          </div>
-
-          <h1
-            id="notifications-heading"
+        <div>
+          <p
             className="
-              mt-6
-              text-3xl
+              text-[0.625rem]
               font-semibold
-              tracking-[-0.04em]
-              text-foreground
-              sm:text-4xl
+              uppercase
+              tracking-[0.18em]
+              text-muted-foreground
             "
           >
-            通知
-          </h1>
+            Total
+          </p>
 
           <p
             className="
-              mt-4
-              max-w-xl
-              text-sm
-              leading-7
-              text-muted-foreground
-              sm:text-base
-              sm:leading-8
+              mt-1
+              text-xl
+              font-semibold
+              tracking-[-0.03em]
+              text-foreground
             "
           >
-            いいね、コメント、フォローなど、
-            あなたのサ活に届いた反応を
-            ここで静かに確認できます。
+            {totalCount}
           </p>
         </div>
+      </div>
 
-        <div
+      <div
+        className="
+          flex
+          flex-1
+          items-center
+          gap-3
+          px-4
+          py-4
+          sm:min-w-36
+        "
+      >
+        <span
           className="
-            grid
-            w-full
-            grid-cols-2
-            gap-3
-            sm:w-auto
-            sm:min-w-[25rem]
+            flex
+            size-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            bg-accent/20
+            text-foreground
           "
         >
-          <NotificationMetric
-            label="すべての通知"
-            value={totalCount}
-            icon={
-              <Bell
-                className="size-4.5"
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            }
+          <BellRing
+            className="size-4"
+            strokeWidth={1.8}
+            aria-hidden="true"
           />
+        </span>
 
-          <NotificationMetric
-            label="未読"
-            value={unreadCount}
-            highlighted={
-              hasUnreadNotifications
-            }
-            icon={
-              hasUnreadNotifications ? (
-                <Sparkles
-                  className="size-4.5"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-              ) : (
-                <Bell
-                  className="size-4.5"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-              )
-            }
-          />
+        <div>
+          <p
+            className="
+              text-[0.625rem]
+              font-semibold
+              uppercase
+              tracking-[0.18em]
+              text-muted-foreground
+            "
+          >
+            New
+          </p>
+
+          <p
+            className="
+              mt-1
+              text-xl
+              font-semibold
+              tracking-[-0.03em]
+              text-foreground
+            "
+          >
+            {unreadCount}
+          </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-type NotificationMetricProps = {
-  label: string;
-  value: number;
-  icon: ReactNode;
-  highlighted?: boolean;
+type NotificationGroupSectionProps = {
+  group: NotificationGroup;
 };
 
-function NotificationMetric({
-  label,
-  value,
-  icon,
-  highlighted = false,
-}: NotificationMetricProps) {
+function NotificationGroupSection({
+  group,
+}: NotificationGroupSectionProps) {
+  if (
+    group.notifications.length === 0
+  ) {
+    return null;
+  }
+
   return (
-    <div
-      className={`
-        rounded-[1.5rem]
-        border
-        px-4
-        py-4
-        shadow-sm
-        sm:px-5
-        ${
-          highlighted
-            ? `
-              border-primary/20
-              bg-primary/[0.055]
-            `
-            : `
-              border-border/55
-              bg-background/65
-            `
-        }
-      `}
-      aria-label={`${label}は${value}件です`}
+    <section
+      aria-labelledby={`notification-group-${group.key}`}
     >
       <div
         className="
           flex
-          items-start
-          justify-between
-          gap-3
+          flex-col
+          gap-2
+          border-b
+          border-border/55
+          pb-5
+          sm:flex-row
+          sm:items-end
+          sm:justify-between
         "
       >
         <div>
           <p
             className="
               text-xs
-              leading-5
+              font-semibold
+              uppercase
+              tracking-[0.22em]
               text-muted-foreground
             "
           >
-            {label}
+            Activity
           </p>
 
-          <p
+          <h2
+            id={`notification-group-${group.key}`}
             className="
-              mt-1
+              mt-2
               text-2xl
               font-semibold
-              tabular-nums
-              tracking-[-0.03em]
+              tracking-[-0.035em]
               text-foreground
             "
           >
-            {value}
-
-            <span
-              className="
-                ml-1
-                text-sm
-                font-normal
-                text-muted-foreground
-              "
-            >
-              件
-            </span>
-          </p>
+            {group.title}
+          </h2>
         </div>
-
-        <span
-          className={`
-            flex
-            size-9
-            shrink-0
-            items-center
-            justify-center
-            rounded-full
-            ${
-              highlighted
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-foreground"
-            }
-          `}
-        >
-          {icon}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function EmptyNotificationsState() {
-  return (
-    <section
-      aria-labelledby="empty-notifications-heading"
-      className="
-        relative
-        mt-10
-        overflow-hidden
-        rounded-[2rem]
-        border
-        border-dashed
-        border-border/70
-        bg-card/70
-        px-6
-        py-14
-        text-center
-        sm:mt-12
-        sm:px-10
-        sm:py-16
-      "
-    >
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          left-1/2
-          top-0
-          size-52
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          bg-secondary/15
-          blur-3xl
-        "
-      />
-
-      <div className="relative z-10">
-        <span
-          className="
-            mx-auto
-            flex
-            size-16
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-border/55
-            bg-background/70
-            text-muted-foreground
-            shadow-sm
-          "
-        >
-          <Bell
-            className="size-6"
-            strokeWidth={1.7}
-            aria-hidden="true"
-          />
-        </span>
-
-        <h2
-          id="empty-notifications-heading"
-          className="
-            mt-6
-            text-xl
-            font-semibold
-            tracking-[-0.025em]
-            text-foreground
-            sm:text-2xl
-          "
-        >
-          通知はまだありません
-        </h2>
 
         <p
           className="
-            mx-auto
-            mt-3
-            max-w-lg
             text-sm
-            leading-7
             text-muted-foreground
-            sm:text-base
           "
         >
-          投稿やフォローを通じて交流が生まれると、
-          ここに新しい通知が届きます。
+          {group.description}
         </p>
+      </div>
 
-        <div
-          className="
-            mt-8
-            flex
-            flex-col
-            items-center
-            justify-center
-            gap-3
-            sm:flex-row
-          "
-        >
-          <Link
-            href="/"
-            className="
-              inline-flex
-              min-h-11
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-full
-              bg-foreground
-              px-5
-              py-2.5
-              text-sm
-              font-semibold
-              text-background
-              transition
-              duration-200
-              hover:-translate-y-0.5
-              hover:opacity-90
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-ring
-              focus-visible:ring-offset-2
-              motion-reduce:transform-none
-              motion-reduce:transition-none
-              sm:w-auto
-            "
-          >
-            タイムラインを見る
-
-            <ArrowRight
-              className="size-4"
-              strokeWidth={1.8}
-              aria-hidden="true"
+      <div
+        className="
+          mt-6
+          overflow-hidden
+          rounded-[2rem]
+          border
+          border-border/55
+          bg-card/85
+          px-4
+          shadow-sm
+          backdrop-blur-md
+          sm:px-6
+        "
+      >
+        {group.notifications.map(
+          (
+            item,
+            index
+          ) => (
+            <NotificationTimelineItem
+              key={
+                item.notification.id
+              }
+              item={item}
+              isLast={
+                index ===
+                group.notifications
+                  .length -
+                  1
+              }
             />
-          </Link>
-
-          <Link
-            href="/search"
-            className="
-              inline-flex
-              min-h-11
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-full
-              border
-              border-border/70
-              bg-background/65
-              px-5
-              py-2.5
-              text-sm
-              font-semibold
-              text-foreground
-              transition
-              duration-200
-              hover:border-foreground/20
-              hover:bg-background
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-ring
-              focus-visible:ring-offset-2
-              motion-reduce:transition-none
-              sm:w-auto
-            "
-          >
-            <Compass
-              className="size-4"
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-
-            サ活を探す
-          </Link>
-        </div>
+          )
+        )}
       </div>
     </section>
   );
 }
 
-function LoginRequiredState() {
+type NotificationTimelineItemProps = {
+  item: NotificationWithActor;
+  isLast: boolean;
+};
+
+function NotificationTimelineItem({
+  item,
+  isLast,
+}: NotificationTimelineItemProps) {
+  const {
+    notification,
+    actor,
+  } = item;
+
+  const actorName =
+    actor?.username?.trim() ||
+    "TOTONOユーザー";
+
+  const notificationConfig =
+    getNotificationConfig(
+      notification.type
+    );
+
+  const NotificationIcon =
+    notificationConfig.icon;
+
+  const href =
+    notification.type ===
+      "follow" ||
+    !notification.postId
+      ? `/users/${notification.actorId}`
+      : `/posts/${notification.postId}`;
+
   return (
-    <section
-      aria-labelledby="notifications-login-heading"
+    <div
       className="
         relative
-        overflow-hidden
-        rounded-[2rem]
-        border
-        border-border/55
-        bg-card/85
-        px-6
-        py-14
-        text-center
-        shadow-sm
-        backdrop-blur-md
-        sm:px-10
-        sm:py-16
+        grid
+        grid-cols-[2.75rem_minmax(0,1fr)]
+        gap-4
+        sm:grid-cols-[3.25rem_minmax(0,1fr)]
+        sm:gap-5
       "
     >
       <div
-        aria-hidden="true"
         className="
-          pointer-events-none
-          absolute
-          -right-20
-          -top-20
-          size-56
-          rounded-full
-          bg-secondary/20
-          blur-3xl
+          relative
+          flex
+          justify-center
         "
-      />
-
-      <div className="relative z-10">
-        <span
-          className="
-            mx-auto
-            flex
-            size-16
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-border/55
-            bg-background/70
-            text-foreground
-            shadow-sm
-          "
-        >
-          <LogIn
-            className="size-6"
-            strokeWidth={1.7}
+      >
+        {!isLast ? (
+          <span
             aria-hidden="true"
+            className="
+              absolute
+              bottom-0
+              top-14
+              w-px
+              bg-border/70
+            "
           />
-        </span>
+        ) : null}
 
-        <p
-          className="
-            mt-5
-            text-xs
-            font-semibold
-            uppercase
-            tracking-[0.2em]
-            text-muted-foreground
-          "
+        <span
+          className={cn(
+            `
+              relative
+              z-10
+              mt-6
+              flex
+              size-10
+              items-center
+              justify-center
+              rounded-full
+              border
+              shadow-sm
+              sm:size-11
+            `,
+            notification.isRead
+              ? `
+                  border-border/60
+                  bg-background
+                  text-muted-foreground
+                `
+              : notificationConfig.iconClassName
+          )}
         >
-          Your Activity
-        </p>
-
-        <h1
-          id="notifications-login-heading"
-          className="
-            mt-3
-            text-2xl
-            font-semibold
-            tracking-[-0.03em]
-            text-foreground
-            sm:text-3xl
-          "
-        >
-          ログインが必要です
-        </h1>
-
-        <p
-          className="
-            mx-auto
-            mt-4
-            max-w-lg
-            text-sm
-            leading-7
-            text-muted-foreground
-            sm:text-base
-            sm:leading-8
-          "
-        >
-          いいね、コメント、フォローの通知を
-          確認するには、TOTONOへログインしてください。
-        </p>
-
-        <Link
-          href="/login"
-          className="
-            mt-8
-            inline-flex
-            min-h-11
-            items-center
-            justify-center
-            gap-2
-            rounded-full
-            bg-foreground
-            px-6
-            py-2.5
-            text-sm
-            font-semibold
-            text-background
-            transition
-            duration-200
-            hover:-translate-y-0.5
-            hover:opacity-90
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-ring
-            focus-visible:ring-offset-2
-            motion-reduce:transform-none
-            motion-reduce:transition-none
-          "
-        >
-          ログインへ
-
-          <ArrowRight
+          <NotificationIcon
             className="size-4"
             strokeWidth={1.8}
             aria-hidden="true"
           />
-        </Link>
+        </span>
       </div>
-    </section>
+
+      <Link
+        href={href}
+        className={cn(
+          `
+            group
+            relative
+            flex
+            min-w-0
+            items-center
+            gap-4
+            border-b
+            border-border/45
+            py-6
+            pr-1
+            transition-colors
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-ring
+            focus-visible:ring-offset-2
+          `,
+          !isLast &&
+            "border-b",
+          isLast &&
+            "border-b-0"
+        )}
+      >
+        <ProfileAvatar
+          avatarUrl={
+            actor?.avatar_url ??
+            null
+          }
+          username={actorName}
+          size="md"
+        />
+
+        <div className="min-w-0 flex-1">
+          <div
+            className="
+              flex
+              flex-wrap
+              items-center
+              gap-2
+            "
+          >
+            <p
+              className="
+                min-w-0
+                text-sm
+                leading-6
+                text-foreground
+              "
+            >
+              <span className="font-semibold">
+                {actorName}
+              </span>
+
+              <span className="text-foreground/75">
+                {
+                  notificationConfig.message
+                }
+              </span>
+            </p>
+
+            {!notification.isRead ? (
+              <span
+                className="
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  rounded-full
+                  bg-accent/20
+                  px-2.5
+                  py-1
+                  text-[0.625rem]
+                  font-semibold
+                  uppercase
+                  tracking-[0.14em]
+                  text-foreground
+                "
+              >
+                <span
+                  aria-hidden="true"
+                  className="
+                    size-1.5
+                    rounded-full
+                    bg-accent
+                  "
+                />
+
+                New
+              </span>
+            ) : null}
+          </div>
+
+          <p
+            className="
+              mt-1
+              text-xs
+              text-muted-foreground
+            "
+          >
+            {formatNotificationDate(
+              notification.createdAt
+            )}
+          </p>
+        </div>
+
+        <ArrowRight
+          className="
+            size-4
+            shrink-0
+            text-muted-foreground
+            transition-transform
+            duration-200
+            group-hover:translate-x-1
+            group-hover:text-foreground
+          "
+          strokeWidth={1.8}
+          aria-hidden="true"
+        />
+      </Link>
+    </div>
   );
+}
+
+function EmptyNotifications() {
+  return (
+    <EmptyState
+      className="mt-10"
+      eyebrow="Quiet Lounge"
+      icon={Bell}
+      title="まだ通知はありません"
+      description="サ活を投稿したり、Communityでほかのユーザーと交流すると、ここに新しい出来事が届きます。"
+      action={{
+        label: "Communityを見る",
+        href: "/community",
+        icon: Compass,
+      }}
+      secondaryAction={{
+        label: "サ活を投稿する",
+        href: "/posts/new",
+        icon: Sparkles,
+      }}
+    />
+  );
+}
+
+function getNotificationConfig(
+  type: NotificationType
+) {
+  switch (type) {
+    case "like":
+      return {
+        icon: Heart,
+        message:
+          "さんがあなたのサ活にいいねしました。",
+        iconClassName:
+          "border-error/20 bg-error/10 text-error",
+      };
+
+    case "comment":
+      return {
+        icon: MessageCircle,
+        message:
+          "さんがあなたのサ活にコメントしました。",
+        iconClassName:
+          "border-secondary/40 bg-secondary/20 text-foreground",
+      };
+
+    case "follow":
+      return {
+        icon: UserPlus,
+        message:
+          "さんがあなたをフォローしました。",
+        iconClassName:
+          "border-success/20 bg-success/10 text-success",
+      };
+
+    default:
+      return {
+        icon: Sparkles,
+        message:
+          "さんから新しい反応がありました。",
+        iconClassName:
+          "border-accent/30 bg-accent/15 text-foreground",
+      };
+  }
+}
+
+function groupNotifications(
+  notifications: NotificationWithActor[]
+): NotificationGroup[] {
+  const today:
+    NotificationWithActor[] = [];
+
+  const yesterday:
+    NotificationWithActor[] = [];
+
+  const thisWeek:
+    NotificationWithActor[] = [];
+
+  const older:
+    NotificationWithActor[] = [];
+
+  const now = new Date();
+
+  const todayStart =
+    startOfDay(now);
+
+  const yesterdayStart =
+    new Date(todayStart);
+
+  yesterdayStart.setDate(
+    yesterdayStart.getDate() - 1
+  );
+
+  const weekStart =
+    new Date(todayStart);
+
+  weekStart.setDate(
+    weekStart.getDate() - 7
+  );
+
+  for (const item of notifications) {
+    const createdAt =
+      new Date(
+        item.notification.createdAt
+      );
+
+    if (
+      createdAt >= todayStart
+    ) {
+      today.push(item);
+      continue;
+    }
+
+    if (
+      createdAt >= yesterdayStart
+    ) {
+      yesterday.push(item);
+      continue;
+    }
+
+    if (
+      createdAt >= weekStart
+    ) {
+      thisWeek.push(item);
+      continue;
+    }
+
+    older.push(item);
+  }
+
+  return [
+    {
+      key: "today",
+      title: "今日",
+      description:
+        `${today.length}件の出来事`,
+      notifications: today,
+    },
+    {
+      key: "yesterday",
+      title: "昨日",
+      description:
+        `${yesterday.length}件の出来事`,
+      notifications: yesterday,
+    },
+    {
+      key: "this-week",
+      title: "過去7日",
+      description:
+        `${thisWeek.length}件の出来事`,
+      notifications: thisWeek,
+    },
+    {
+      key: "older",
+      title: "さらに過去",
+      description:
+        `${older.length}件の出来事`,
+      notifications: older,
+    },
+  ];
+}
+
+function startOfDay(
+  date: Date
+): Date {
+  const result =
+    new Date(date);
+
+  result.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  return result;
+}
+
+function formatNotificationDate(
+  value: string
+): string {
+  const date = new Date(value);
+  const now = new Date();
+
+  const diffMilliseconds =
+    now.getTime() -
+    date.getTime();
+
+  const diffMinutes =
+    Math.floor(
+      diffMilliseconds /
+        (1000 * 60)
+    );
+
+  if (
+    diffMinutes >= 0 &&
+    diffMinutes < 1
+  ) {
+    return "たった今";
+  }
+
+  if (
+    diffMinutes >= 1 &&
+    diffMinutes < 60
+  ) {
+    return `${diffMinutes}分前`;
+  }
+
+  const diffHours =
+    Math.floor(
+      diffMinutes / 60
+    );
+
+  if (
+    diffHours >= 1 &&
+    diffHours < 24
+  ) {
+    return `${diffHours}時間前`;
+  }
+
+  return new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(date);
 }

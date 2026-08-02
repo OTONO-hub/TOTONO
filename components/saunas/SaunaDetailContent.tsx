@@ -1,7 +1,11 @@
 import type { RatingDistribution } from "@/services/sauna-metrics";
 
+import { FadeIn } from "@/components/motion/FadeIn";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
+import { MobileSaunaActionBar } from "@/components/saunas/MobileSaunaActionBar";
 import { SaunaCommunityPosts } from "@/components/saunas/SaunaCommunityPosts";
 import { SaunaDetailHeaderCard } from "@/components/saunas/SaunaDetailHeaderCard";
+import { SaunaDetailSectionNav } from "@/components/saunas/SaunaDetailSectionNav";
 import { SaunaFacilities } from "@/components/saunas/SaunaFacilities";
 import { SaunaMap } from "@/components/saunas/SaunaMap";
 import { SaunaRatingSummary } from "@/components/saunas/SaunaRatingSummary";
@@ -35,6 +39,7 @@ type SaunaPost = {
   rating: number;
   comment: string | null;
   image_url: string | null;
+  image_count?: number;
 };
 
 type SaunaDetailContentProps = {
@@ -132,66 +137,151 @@ export function SaunaDetailContent({
           w-full
           max-w-7xl
           px-5
-          pb-20
+          pb-36
           pt-6
           sm:px-6
-          sm:pb-24
+          sm:pb-40
           sm:pt-8
           lg:px-8
           lg:pb-28
           lg:pt-10
         "
       >
-        <SaunaDetailHeaderCard
-          saunaId={sauna.id}
-          name={sauna.name}
-          imageUrl={sauna.image_url}
-          isVerified={sauna.is_verified}
-          locationText={locationText}
-          userId={userId}
-          initialFavorite={initialFavorite}
-          averageRating={averageRating}
-          ratingCount={ratingCount}
-          postCount={postCount}
-          favoriteCount={favoriteCount}
-          openingHours={sauna.opening_hours}
-          phoneNumber={sauna.phone_number}
-          websiteUrl={sauna.website_url}
-          postalCode={sauna.postal_code}
-        />
+        <FadeIn
+          duration="slow"
+          distance="subtle"
+        >
+          <SaunaDetailHeaderCard
+            saunaId={sauna.id}
+            name={sauna.name}
+            imageUrl={sauna.image_url}
+            isVerified={sauna.is_verified}
+            locationText={locationText}
+            latitude={sauna.latitude}
+            longitude={sauna.longitude}
+            userId={userId}
+            initialFavorite={initialFavorite}
+            averageRating={averageRating}
+            ratingCount={ratingCount}
+            postCount={postCount}
+            favoriteCount={favoriteCount}
+            openingHours={sauna.opening_hours}
+            phoneNumber={sauna.phone_number}
+            websiteUrl={sauna.website_url}
+            postalCode={sauna.postal_code}
+          />
+        </FadeIn>
 
-        <SaunaFacilities
-          hasSaunaRoom={sauna.has_sauna_room}
-          hasColdBath={sauna.has_cold_bath}
-          hasOutdoorAirBath={
-            sauna.has_outdoor_air_bath
-          }
-          hasRestArea={sauna.has_rest_area}
-          hasRestaurant={sauna.has_restaurant}
-          hasParking={sauna.has_parking}
-        />
+        <FadeIn
+          delay={60}
+          duration="normal"
+          distance="subtle"
+        >
+          <SaunaDetailSectionNav />
+        </FadeIn>
 
-        <SaunaRatingSummary
-          saunaId={sauna.id}
-          averageRating={averageRating}
-          ratingCount={ratingCount}
-          ratingDistribution={ratingDistribution}
-        />
+        <div
+          className="
+            mt-6
+            grid
+            items-stretch
+            gap-6
+            sm:mt-8
+            xl:grid-cols-2
+            xl:gap-8
+          "
+        >
+          <div
+            id="sauna-facilities"
+            className="
+              scroll-mt-40
+              xl:h-full
+            "
+          >
+            <ScrollReveal
+              duration="slow"
+              distance="normal"
+            >
+              <SaunaFacilities
+                hasSaunaRoom={sauna.has_sauna_room}
+                hasColdBath={sauna.has_cold_bath}
+                hasOutdoorAirBath={
+                  sauna.has_outdoor_air_bath
+                }
+                hasRestArea={sauna.has_rest_area}
+                hasRestaurant={sauna.has_restaurant}
+                hasParking={sauna.has_parking}
+              />
+            </ScrollReveal>
+          </div>
 
-        <SaunaMap
-          name={sauna.name}
-          prefecture={sauna.prefecture}
-          city={sauna.city}
-          address={sauna.address}
-          latitude={sauna.latitude}
-          longitude={sauna.longitude}
-        />
+          <div
+            id="sauna-ratings"
+            className="
+              scroll-mt-40
+              xl:h-full
+            "
+          >
+            <ScrollReveal
+              delay={50}
+              duration="slow"
+              distance="normal"
+            >
+              <SaunaRatingSummary
+                saunaId={sauna.id}
+                averageRating={averageRating}
+                ratingCount={ratingCount}
+                ratingDistribution={
+                  ratingDistribution
+                }
+              />
+            </ScrollReveal>
+          </div>
+        </div>
 
-        <SaunaCommunityPosts
-          saunaId={sauna.id}
-          posts={posts}
-        />
+        <div
+          id="sauna-access"
+          className="scroll-mt-40"
+        >
+          <ScrollReveal
+            duration="slow"
+            distance="normal"
+          >
+            <SaunaMap
+              name={sauna.name}
+              prefecture={sauna.prefecture}
+              city={sauna.city}
+              address={sauna.address}
+              latitude={sauna.latitude}
+              longitude={sauna.longitude}
+            />
+          </ScrollReveal>
+        </div>
+
+        <div
+          id="sauna-community"
+          className="scroll-mt-40"
+        >
+          <ScrollReveal
+            delay={60}
+            duration="slow"
+            distance="normal"
+          >
+            <SaunaCommunityPosts
+              saunaId={sauna.id}
+              posts={posts}
+            />
+          </ScrollReveal>
+        </div>
       </div>
+
+      <MobileSaunaActionBar
+        saunaId={sauna.id}
+        name={sauna.name}
+        locationText={locationText}
+        latitude={sauna.latitude}
+        longitude={sauna.longitude}
+      />
     </main>
   );
 }

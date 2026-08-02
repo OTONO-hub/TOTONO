@@ -1,41 +1,42 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { ReactNode } from "react";
 
+import { SkipNavigation } from "@/components/layout/SkipNavigation";
+import { SiteJsonLd } from "@/components/seo/site-json-ld";
 import { Toaster } from "@/components/ui/sonner";
+import { siteMetadata } from "@/lib/site-metadata";
 
 import "./globals.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export const metadata: Metadata = siteMetadata;
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "TOTONO",
-  description: "サウナの記録を残し、自分だけのお気に入りサウナを見つけるSNS",
+type RootLayoutProps = {
+  children: ReactNode;
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: RootLayoutProps) {
   return (
-    <html lang="ja">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
-      >
-        {children}
+    <html
+      lang="ja"
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <SiteJsonLd />
 
-        <Toaster
-          position="top-center"
-          richColors
-        />
+        <SkipNavigation />
+
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-h-screen"
+        >
+          {children}
+        </main>
+
+        <Toaster />
       </body>
     </html>
   );

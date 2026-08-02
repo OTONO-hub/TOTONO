@@ -10,6 +10,8 @@ type SaunaDetailHeaderCardProps = {
   imageUrl: string | null;
   isVerified: boolean;
   locationText: string;
+  latitude: number | null;
+  longitude: number | null;
   userId: string | null;
   initialFavorite: boolean;
   averageRating: number | null;
@@ -28,6 +30,8 @@ export function SaunaDetailHeaderCard({
   imageUrl,
   isVerified,
   locationText,
+  latitude,
+  longitude,
   userId,
   initialFavorite,
   averageRating,
@@ -47,6 +51,9 @@ export function SaunaDetailHeaderCard({
           inline-flex
           items-center
           gap-2
+          rounded-full
+          px-1
+          py-2
           text-sm
           font-medium
           text-[#3e3a3a]/65
@@ -58,43 +65,65 @@ export function SaunaDetailHeaderCard({
           focus-visible:ring-offset-2
         "
       >
-        <ArrowLeft className="size-4" />
+        <ArrowLeft
+          className="size-4"
+          strokeWidth={1.8}
+          aria-hidden="true"
+        />
+
         検索結果へ戻る
       </Link>
 
       <section
+        id="sauna-visit-panel"
+        aria-label={`${name}の施設概要と訪問メニュー`}
         className="
-          mt-6
+          mt-5
+          scroll-mt-24
           overflow-hidden
           rounded-[2rem]
           border
-          border-black/5
-          bg-white
-          shadow-sm
+          border-white/70
+          bg-white/85
+          shadow-[0_22px_70px_rgba(62,58,58,0.09)]
+          backdrop-blur-xl
+          sm:mt-6
+          sm:rounded-[2.5rem]
         "
       >
-        <SaunaHero
-          name={name}
-          imageUrl={imageUrl}
-          isVerified={isVerified}
-          locationText={locationText}
-          averageRating={averageRating}
-          ratingCount={ratingCount}
-        />
+        <div
+          className="
+            grid
+            lg:grid-cols-[minmax(0,1.35fr)_minmax(22rem,0.65fr)]
+          "
+        >
+          <SaunaHero
+            name={name}
+            imageUrl={imageUrl}
+            isVerified={isVerified}
+            locationText={locationText}
+            averageRating={averageRating}
+            ratingCount={ratingCount}
+          />
 
-        <SaunaOverview
-          saunaId={saunaId}
-          userId={userId}
-          initialFavorite={initialFavorite}
-          averageRating={averageRating}
-          ratingCount={ratingCount}
-          postCount={postCount}
-          favoriteCount={favoriteCount}
-          openingHours={openingHours}
-          phoneNumber={phoneNumber}
-          websiteUrl={websiteUrl}
-          postalCode={postalCode}
-        />
+          <SaunaOverview
+            saunaId={saunaId}
+            name={name}
+            locationText={locationText}
+            latitude={latitude}
+            longitude={longitude}
+            userId={userId}
+            initialFavorite={initialFavorite}
+            averageRating={averageRating}
+            ratingCount={ratingCount}
+            postCount={postCount}
+            favoriteCount={favoriteCount}
+            openingHours={openingHours}
+            phoneNumber={phoneNumber}
+            websiteUrl={websiteUrl}
+            postalCode={postalCode}
+          />
+        </div>
       </section>
     </>
   );

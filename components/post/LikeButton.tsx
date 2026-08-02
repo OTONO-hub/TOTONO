@@ -22,11 +22,19 @@ export function LikeButton({
   initialLiked,
   initialCount,
 }: Props) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(
+    () => createClient(),
+    []
+  );
 
-  const [liked, setLiked] = useState(initialLiked);
-  const [count, setCount] = useState(initialCount);
-  const [loading, setLoading] = useState(false);
+  const [liked, setLiked] =
+    useState(initialLiked);
+
+  const [count, setCount] =
+    useState(initialCount);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const handleLike = async () => {
     if (loading) {
@@ -37,29 +45,43 @@ export function LikeButton({
 
     try {
       if (liked) {
-        await unlikePost(supabase, userId, postId);
+        await unlikePost(
+          supabase,
+          userId,
+          postId
+        );
 
         setLiked(false);
-        setCount((prev) => Math.max(prev - 1, 0));
-      } else {
-        await likePost(supabase, userId, postId);
+        setCount((previousCount) =>
+          Math.max(previousCount - 1, 0)
+        );
 
-        setLiked(true);
-        setCount((prev) => prev + 1);
+        return;
+      }
 
-        try {
-          await createNotification(supabase, {
-            recipientId: postOwnerId,
-            actorId: userId,
-            type: "like",
-            postId,
-          });
-        } catch (notificationError) {
-          console.error(
-            "いいね通知の作成に失敗しました。",
-            notificationError
-          );
-        }
+      await likePost(
+        supabase,
+        userId,
+        postId
+      );
+
+      setLiked(true);
+      setCount(
+        (previousCount) => previousCount + 1
+      );
+
+      try {
+        await createNotification(supabase, {
+          recipientId: postOwnerId,
+          actorId: userId,
+          type: "like",
+          postId,
+        });
+      } catch (notificationError) {
+        console.error(
+          "いいね通知の作成に失敗しました。",
+          notificationError
+        );
       }
     } catch (error) {
       toast.error(
@@ -72,49 +94,73 @@ export function LikeButton({
     }
   };
 
+  const accessibleLabel = loading
+    ? liked
+      ? "いいねを解除しています"
+      : "いいねしています"
+    : liked
+      ? "いいねを解除"
+      : "いいねする";
+
   return (
     <button
       type="button"
       onClick={handleLike}
       disabled={loading}
-      aria-label={liked ? "いいねを解除" : "いいねする"}
+      aria-label={accessibleLabel}
       aria-pressed={liked}
+      aria-busy={loading}
       className="
         group
         inline-flex
+        min-h-11
+        min-w-11
         items-center
+        justify-center
         gap-2
         rounded-full
+        px-2
         text-sm
         text-muted-foreground
         transition-colors
+        duration-200
         hover:text-foreground
         focus-visible:outline-none
         focus-visible:ring-2
         focus-visible:ring-ring
         focus-visible:ring-offset-2
+        focus-visible:ring-offset-background
         disabled:cursor-not-allowed
         disabled:opacity-50
+        motion-reduce:transition-none
       "
     >
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
-        className={`size-5 transition-all duration-200 ${
-          liked
-            ? "fill-current text-red-500"
-            : "fill-none stroke-current group-hover:scale-105"
-        }`}
+        className={`
+          size-5
+          transition-all
+          duration-200
+          motion-reduce:transition-none
+          ${
+            liked
+              ? "fill-current text-red-500"
+              : "fill-none stroke-current group-hover:scale-105 motion-reduce:group-hover:scale-100"
+          }
+        `}
         strokeWidth="1.7"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path
-          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
-        />
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" />
       </svg>
 
-      <span className="tabular-nums">
+      <span
+        aria-live="polite"
+        aria-atomic="true"
+        className="tabular-nums"
+      >
         {count}
       </span>
     </button>

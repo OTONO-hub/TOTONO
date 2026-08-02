@@ -2,26 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
-  Bookmark,
-  Heart,
-  Home,
-  Search,
   SquarePen,
-  UserRound,
 } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { HeaderPrimaryNavigation } from "@/components/layout/HeaderPrimaryNavigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadNotificationCount } from "@/services/notifications";
-
-type NavigationItemProps = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-  mobileVisible?: boolean;
-  tabletVisible?: boolean;
-  badgeCount?: number;
-};
 
 export async function Header() {
   const supabase = await createClient();
@@ -36,6 +23,8 @@ export async function Header() {
         user.id
       )
     : 0;
+
+  const logoHref = "/";
 
   return (
     <header
@@ -66,7 +55,6 @@ export async function Header() {
             lg:px-5
           "
         >
-          {/* ヘッダー内の柔らかい背景装飾 */}
           <div
             aria-hidden="true"
             className="
@@ -91,10 +79,13 @@ export async function Header() {
             "
           />
 
-          {/* ロゴ */}
           <Link
-            href="/"
-            aria-label="TOTONOトップページ"
+            href={logoHref}
+            aria-label={
+              user
+                ? "TOTONO Todayへ移動する"
+                : "TOTONOトップページへ移動する"
+            }
             className="
               group relative z-10
               flex shrink-0
@@ -163,168 +154,71 @@ export async function Header() {
                   lg:block
                 "
               >
-                SAUNA COMMUNITY
+                SAUNA LIFE
               </span>
             </span>
           </Link>
 
           {user ? (
-            <nav
-              aria-label="メインナビゲーション"
+            <div
               className="
                 relative z-10
                 flex min-w-0
+                flex-1
                 items-center
-                gap-0.5
-                sm:gap-1
+                justify-end
+                gap-1
+                sm:gap-2
               "
             >
-              {/* PC用ナビゲーション */}
-              <div
+              <HeaderPrimaryNavigation />
+
+              <Link
+                href="/notifications"
+                aria-label={
+                  unreadNotificationCount > 0
+                    ? `通知、未読${unreadNotificationCount}件`
+                    : "通知"
+                }
                 className="
-                  hidden items-center
+                  relative
+                  inline-flex size-10
+                  shrink-0
+                  items-center justify-center
                   rounded-full
-                  border border-border/55
-                  bg-background/45
-                  p-1
-                  lg:flex
+                  text-muted-foreground
+                  transition
+                  duration-200
+                  hover:bg-background/70
+                  hover:text-foreground
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-ring
+                  focus-visible:ring-offset-2
+                  focus-visible:ring-offset-card
+                  lg:size-11
                 "
               >
-                <NavigationItem
-                  href="/"
-                  label="ホーム"
-                  icon={
-                    <Home
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
+                <Bell
+                  className="size-[1.125rem]"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
                 />
 
-                <NavigationItem
-                  href="/search"
-                  label="検索"
-                  icon={
-                    <Search
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <NavigationItem
-                  href="/favorite-saunas"
-                  label="お気に入り施設"
-                  icon={
-                    <Heart
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <NavigationItem
-                  href="/bookmarks"
-                  label="保存済み投稿"
-                  icon={
-                    <Bookmark
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <NavigationItem
-                  href="/notifications"
-                  label="通知"
-                  badgeCount={unreadNotificationCount}
-                  icon={
-                    <Bell
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <NavigationItem
-                  href="/profile"
-                  label="プロフィール"
-                  icon={
-                    <UserRound
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-              </div>
-
-              {/* タブレット・スマートフォン用ナビゲーション */}
-              <div className="flex items-center lg:hidden">
-                <MobileNavigationItem
-                  href="/search"
-                  label="検索"
-                  icon={
-                    <Search
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <MobileNavigationItem
-                  href="/favorite-saunas"
-                  label="お気に入り施設"
-                  icon={
-                    <Heart
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <MobileNavigationItem
-                  href="/notifications"
-                  label="通知"
-                  badgeCount={unreadNotificationCount}
-                  icon={
-                    <Bell
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-
-                <div className="hidden sm:block">
-                  <MobileNavigationItem
-                    href="/bookmarks"
-                    label="保存済み投稿"
-                    icon={
-                      <Bookmark
-                        className="size-[1.125rem]"
-                        strokeWidth={1.75}
-                      />
+                {unreadNotificationCount > 0 ? (
+                  <NotificationBadge
+                    count={
+                      unreadNotificationCount
                     }
                   />
-                </div>
+                ) : null}
+              </Link>
 
-                <MobileNavigationItem
-                  href="/profile"
-                  label="プロフィール"
-                  icon={
-                    <UserRound
-                      className="size-[1.125rem]"
-                      strokeWidth={1.75}
-                    />
-                  }
-                />
-              </div>
-
-              {/* 投稿ボタン */}
               <Link
                 href="/posts/new"
-                aria-label="サ活を投稿する"
+                aria-label="サ活を記録する"
                 className="
-                  group ml-1
+                  group
                   inline-flex min-h-11
                   shrink-0
                   items-center justify-center
@@ -345,7 +239,6 @@ export async function Header() {
                   focus-visible:ring-offset-2
                   focus-visible:ring-offset-card
                   active:translate-y-0
-                  sm:ml-2
                   sm:px-4
                   lg:min-h-12
                   lg:px-5
@@ -359,17 +252,18 @@ export async function Header() {
                     group-hover:rotate-[-4deg]
                   "
                   strokeWidth={1.8}
+                  aria-hidden="true"
                 />
 
                 <span className="hidden sm:inline">
-                  投稿する
+                  記録する
                 </span>
               </Link>
 
-              <div className="ml-0.5 shrink-0 sm:ml-1">
+              <div className="shrink-0">
                 <LogoutButton />
               </div>
-            </nav>
+            </div>
           ) : (
             <nav
               aria-label="認証ナビゲーション"
@@ -435,108 +329,6 @@ export async function Header() {
         </div>
       </div>
     </header>
-  );
-}
-
-function NavigationItem({
-  href,
-  label,
-  icon,
-  badgeCount = 0,
-}: NavigationItemProps) {
-  return (
-    <Link
-      href={href}
-      aria-label={
-        badgeCount > 0
-          ? `${label}、未読${badgeCount}件`
-          : label
-      }
-      className="
-        group relative
-        inline-flex min-h-10
-        items-center justify-center
-        gap-2
-        rounded-full
-        px-3
-        text-sm font-medium
-        text-muted-foreground
-        transition
-        duration-200
-        hover:bg-card
-        hover:text-foreground
-        hover:shadow-sm
-        focus-visible:outline-none
-        focus-visible:ring-2
-        focus-visible:ring-ring
-        focus-visible:ring-offset-1
-        focus-visible:ring-offset-background
-      "
-    >
-      <span
-        className="
-          transition-transform
-          duration-200
-          group-hover:-translate-y-0.5
-        "
-      >
-        {icon}
-      </span>
-
-      <span>{label}</span>
-
-      {badgeCount > 0 && (
-        <NotificationBadge count={badgeCount} />
-      )}
-    </Link>
-  );
-}
-
-type MobileNavigationItemProps = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-  badgeCount?: number;
-};
-
-function MobileNavigationItem({
-  href,
-  label,
-  icon,
-  badgeCount = 0,
-}: MobileNavigationItemProps) {
-  return (
-    <Link
-      href={href}
-      aria-label={
-        badgeCount > 0
-          ? `${label}、未読${badgeCount}件`
-          : label
-      }
-      className="
-        relative
-        inline-flex size-10
-        shrink-0
-        items-center justify-center
-        rounded-full
-        text-muted-foreground
-        transition
-        duration-200
-        hover:bg-background/70
-        hover:text-foreground
-        focus-visible:outline-none
-        focus-visible:ring-2
-        focus-visible:ring-ring
-        focus-visible:ring-offset-2
-        focus-visible:ring-offset-card
-      "
-    >
-      {icon}
-
-      {badgeCount > 0 && (
-        <NotificationBadge count={badgeCount} />
-      )}
-    </Link>
   );
 }
 

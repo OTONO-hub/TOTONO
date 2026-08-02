@@ -37,6 +37,8 @@ type PostMetrics = {
   ratingDistribution: RatingDistribution;
 };
 
+type RatingBucket = keyof RatingDistribution;
+
 /**
  * 指定された複数施設について、
  * 次の指標を一括取得します。
@@ -158,7 +160,7 @@ async function getPostMetricsBySaunaIds(
       (postCountBySaunaId[saunaId] ?? 0) + 1;
 
     const normalizedRating =
-      normalizeRating(row.rating);
+      normalizeRatingValue(row.rating);
 
     if (normalizedRating === null) {
       continue;
@@ -171,11 +173,14 @@ async function getPostMetricsBySaunaIds(
     ratingCountBySaunaId[saunaId] =
       (ratingCountBySaunaId[saunaId] ?? 0) + 1;
 
+    const ratingBucket =
+      getRatingBucket(normalizedRating);
+
     const currentDistribution =
       ratingDistributionBySaunaId[saunaId] ??
       createEmptyRatingDistribution();
 
-    currentDistribution[normalizedRating] += 1;
+    currentDistribution[ratingBucket] += 1;
 
     ratingDistributionBySaunaId[saunaId] =
       currentDistribution;
@@ -266,28 +271,38 @@ function createEmptyRatingDistribution(): RatingDistribution {
 }
 
 /**
- * 投稿の評価値を1〜5の整数へ変換します。
+ * 投稿の評価値を1.0〜5.0の小数第1位へ正規化します。
  *
- * nullや範囲外の値は集計対象外にします。
+ * null、非数値、範囲外の値は集計対象外にします。
  */
-function normalizeRating(
+function normalizeRatingValue(
   rating: number | null
-): 1 | 2 | 3 | 4 | 5 | null {
+): number | null {
   if (
     typeof rating !== "number" ||
-    !Number.isFinite(rating)
+    !Number.isFinite(rating) ||
+    rating < 1 ||
+    rating > 5
   ) {
     return null;
   }
 
+  return Math.round(rating * 10) / 10;
+}
+
+/**
+ * 小数評価を従来の星1〜5分布へ割り当てます。
+ *
+ * 平均値の計算では小数を保持し、
+ * 分布表示だけ最も近い整数の星へ分類します。
+ */
+function getRatingBucket(
+  rating: number
+): RatingBucket {
   const roundedRating = Math.round(rating);
 
-  if (
-    roundedRating < 1 ||
-    roundedRating > 5
-  ) {
-    return null;
-  }
-
-  return roundedRating as 1 | 2 | 3 | 4 | 5;
+  return Math.max(
+    1,
+    Math.min(5, roundedRating)
+  ) as RatingBucket;
 }

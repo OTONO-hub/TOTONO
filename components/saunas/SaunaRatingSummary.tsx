@@ -27,7 +27,9 @@ export function SaunaRatingSummary({
     <section
       aria-labelledby="rating-summary-heading"
       className="
-        mt-10
+        flex
+        h-full
+        flex-col
         overflow-hidden
         rounded-[2rem]
         border
@@ -37,7 +39,8 @@ export function SaunaRatingSummary({
         shadow-[0_18px_60px_rgba(62,58,58,0.07)]
         backdrop-blur-xl
         sm:p-8
-        lg:p-10
+        lg:p-8
+        2xl:p-10
       "
     >
       <div
@@ -51,6 +54,10 @@ export function SaunaRatingSummary({
           sm:flex-row
           sm:items-end
           sm:justify-between
+          xl:flex-col
+          xl:items-start
+          2xl:flex-row
+          2xl:items-end
         "
       >
         <div className="min-w-0">
@@ -89,8 +96,7 @@ export function SaunaRatingSummary({
               text-[#3e3a3a]/60
             "
           >
-            TOTONOに投稿されたサ活をもとに、
-            施設の評価を集計しています。
+            TOTONOに投稿されたサ活をもとに、施設の評価を集計しています。
           </p>
         </div>
 
@@ -115,16 +121,13 @@ export function SaunaRatingSummary({
             "
           >
             <Sparkles
-              className="
-                size-4
-                text-[#b59600]
-              "
+              className="size-4 text-[#b59600]"
               strokeWidth={1.8}
               aria-hidden="true"
             />
 
             <span>
-              {ratingCount}件のサ活から集計
+              {ratingCount}件から集計
             </span>
           </div>
         )}
@@ -133,12 +136,11 @@ export function SaunaRatingSummary({
       {hasRatings ? (
         <div
           className="
-            mt-8
-            grid
-            gap-8
-            lg:grid-cols-[17rem_1fr]
-            lg:items-center
-            lg:gap-10
+            mt-7
+            flex
+            flex-1
+            flex-col
+            gap-7
           "
         >
           <AverageRatingCard
@@ -150,6 +152,48 @@ export function SaunaRatingSummary({
             distribution={ratingDistribution}
             ratingCount={ratingCount}
           />
+
+          <Link
+            href={`/posts/new?sauna_id=${saunaId}`}
+            className="
+              mt-auto
+              inline-flex
+              min-h-12
+              items-center
+              justify-center
+              gap-2
+              rounded-full
+              border
+              border-[#3e3a3a]/10
+              bg-white/75
+              px-6
+              py-3
+              text-sm
+              font-medium
+              text-[#3e3a3a]
+              shadow-sm
+              transition-all
+              duration-200
+              hover:-translate-y-0.5
+              hover:border-[#3e3a3a]/18
+              hover:bg-white
+              hover:shadow-md
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-[#3e3a3a]
+              focus-visible:ring-offset-2
+              motion-reduce:transform-none
+              motion-reduce:transition-none
+            "
+          >
+            <PenLine
+              className="size-4"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
+
+            この施設でサ活を記録する
+          </Link>
         </div>
       ) : (
         <EmptyRatingState saunaId={saunaId} />
@@ -178,30 +222,24 @@ function AverageRatingCard({
       className="
         group
         relative
-        flex
-        min-h-64
-        flex-col
-        items-center
-        justify-center
         overflow-hidden
-        rounded-[1.75rem]
+        rounded-[1.5rem]
         border
         border-[#fdd000]/15
         bg-linear-to-br
         from-white
         via-[#fdd000]/5
         to-[#e6e5ef]/55
-        px-6
-        py-10
-        text-center
-        shadow-[0_16px_36px_rgba(62,58,58,0.06)]
+        p-5
+        shadow-[0_14px_32px_rgba(62,58,58,0.06)]
         transition-all
         duration-300
-        hover:-translate-y-1
+        hover:-translate-y-0.5
         hover:border-[#fdd000]/25
-        hover:shadow-[0_22px_46px_rgba(62,58,58,0.1)]
+        hover:shadow-[0_20px_40px_rgba(62,58,58,0.09)]
         motion-reduce:transform-none
         motion-reduce:transition-none
+        sm:p-6
       "
     >
       <div
@@ -240,115 +278,124 @@ function AverageRatingCard({
           relative
           z-10
           flex
-          items-center
-          gap-3
+          flex-col
+          gap-5
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
         "
       >
-        <span
-          className="
-            flex
-            size-12
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-white/80
-            bg-white/85
-            shadow-sm
-            backdrop-blur-md
-          "
-          aria-hidden="true"
-        >
-          <Star
+        <div>
+          <p
             className="
-              size-6
-              fill-[#fdd000]
-              text-[#fdd000]
+              text-xs
+              font-medium
+              uppercase
+              tracking-[0.18em]
+              text-[#3e3a3a]/40
             "
-            strokeWidth={1.8}
-          />
-        </span>
+          >
+            Overall Rating
+          </p>
 
-        <span
-          className="
-            text-6xl
-            font-semibold
-            tracking-[-0.065em]
-            text-[#3e3a3a]
-          "
-        >
-          {formattedAverageRating}
-        </span>
-      </div>
-
-      <p
-        className="
-          relative
-          z-10
-          mt-2
-          text-xs
-          font-medium
-          uppercase
-          tracking-[0.18em]
-          text-[#3e3a3a]/40
-        "
-      >
-        Overall Rating
-      </p>
-
-      <div
-        className="
-          relative
-          z-10
-          mt-6
-          flex
-          items-center
-          gap-1
-        "
-        role="img"
-        aria-label={`5点満点中${formattedAverageRating}点`}
-      >
-        {[1, 2, 3, 4, 5].map(
-          (starNumber) => {
-            const isActive =
-              starNumber <= roundedAverageRating;
-
-            return (
+          <div
+            className="
+              mt-2
+              flex
+              items-center
+              gap-3
+            "
+          >
+            <span
+              className="
+                flex
+                size-11
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/80
+                bg-white/85
+                shadow-sm
+                backdrop-blur-md
+              "
+              aria-hidden="true"
+            >
               <Star
-                key={starNumber}
-                className={`
+                className="
                   size-5
-                  ${
-                    isActive
-                      ? `
-                          fill-[#fdd000]
-                          text-[#fdd000]
-                        `
-                      : `
-                          fill-transparent
-                          text-[#3e3a3a]/18
-                        `
-                  }
-                `}
+                  fill-[#fdd000]
+                  text-[#fdd000]
+                "
                 strokeWidth={1.8}
-                aria-hidden="true"
               />
-            );
-          }
-        )}
-      </div>
+            </span>
 
-      <p
-        className="
-          relative
-          z-10
-          mt-4
-          text-sm
-          text-[#3e3a3a]/55
-        "
-      >
-        {ratingCount}件の評価
-      </p>
+            <span
+              className="
+                text-5xl
+                font-semibold
+                tracking-[-0.065em]
+                text-[#3e3a3a]
+              "
+            >
+              {formattedAverageRating}
+            </span>
+          </div>
+        </div>
+
+        <div className="sm:text-right">
+          <div
+            className="
+              flex
+              items-center
+              gap-1
+              sm:justify-end
+            "
+            role="img"
+            aria-label={`5点満点中${formattedAverageRating}点`}
+          >
+            {[1, 2, 3, 4, 5].map(
+              (starNumber) => {
+                const isActive =
+                  starNumber <= roundedAverageRating;
+
+                return (
+                  <Star
+                    key={starNumber}
+                    className={`
+                      size-4.5
+                      ${
+                        isActive
+                          ? `
+                              fill-[#fdd000]
+                              text-[#fdd000]
+                            `
+                          : `
+                              fill-transparent
+                              text-[#3e3a3a]/18
+                            `
+                      }
+                    `}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                );
+              }
+            )}
+          </div>
+
+          <p
+            className="
+              mt-2
+              text-sm
+              text-[#3e3a3a]/55
+            "
+          >
+            {ratingCount}件の評価
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -367,7 +414,16 @@ function RatingDistributionChart({
   ];
 
   return (
-    <div>
+    <div
+      className="
+        rounded-[1.5rem]
+        border
+        border-[#3e3a3a]/7
+        bg-white/70
+        p-5
+        sm:p-6
+      "
+    >
       <div
         className="
           flex
@@ -412,12 +468,7 @@ function RatingDistributionChart({
         </span>
       </div>
 
-      <div
-        className="
-          mt-6
-          space-y-5
-        "
-      >
+      <div className="mt-5 space-y-4">
         {ratings.map((rating) => {
           const count = distribution[rating];
 
@@ -434,11 +485,10 @@ function RatingDistributionChart({
               key={rating}
               className="
                 grid
-                grid-cols-[2.75rem_1fr_2.75rem]
+                grid-cols-[2.5rem_1fr_2.5rem]
                 items-center
                 gap-3
-                sm:grid-cols-[3.25rem_1fr_3.5rem]
-                sm:gap-4
+                sm:grid-cols-[3rem_1fr_3rem]
               "
             >
               <div
@@ -467,7 +517,7 @@ function RatingDistributionChart({
 
               <div
                 className="
-                  h-3.5
+                  h-3
                   overflow-hidden
                   rounded-full
                   bg-[#e6e5ef]/85
@@ -503,9 +553,10 @@ function RatingDistributionChart({
               <span
                 className="
                   text-right
-                  text-sm
+                  text-xs
                   tabular-nums
                   text-[#3e3a3a]/55
+                  sm:text-sm
                 "
               >
                 {count}件
@@ -529,9 +580,14 @@ function EmptyRatingState({
     <div
       className="
         relative
-        mt-8
+        mt-7
+        flex
+        flex-1
+        flex-col
+        items-center
+        justify-center
         overflow-hidden
-        rounded-[1.75rem]
+        rounded-[1.5rem]
         border
         border-dashed
         border-[#3e3a3a]/15
@@ -612,8 +668,7 @@ function EmptyRatingState({
           text-[#3e3a3a]/55
         "
       >
-        この施設を訪れたら、
-        あなたのサ活を記録して、
+        この施設を訪れたら、あなたのサ活を記録して、
         最初の評価を届けてみましょう。
       </p>
 

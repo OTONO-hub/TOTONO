@@ -1,7 +1,16 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { LoaderCircle, Send } from "lucide-react";
+import {
+  type FormEvent,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  LoaderCircle,
+  Send,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -25,55 +34,97 @@ export function CommentForm({
   postOwnerId,
 }: Props) {
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
 
-  const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(false);
+  const supabase = useMemo(
+    () => createClient(),
+    []
+  );
 
-  const trimmedContent = content.trim();
+  const inputRef =
+    useRef<HTMLInputElement>(null);
+
+  const characterCountId = useId();
+  const statusId = useId();
+
+  const [
+    content,
+    setContent,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const trimmedContent =
+    content.trim();
+
   const canSubmit =
     trimmedContent.length > 0 &&
-    trimmedContent.length <= MAX_COMMENT_LENGTH &&
+    trimmedContent.length <=
+      MAX_COMMENT_LENGTH &&
     !loading;
+
+  const isNearCharacterLimit =
+    content.length >=
+    MAX_COMMENT_LENGTH * 0.8;
 
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
 
-    if (!trimmedContent) {
-      toast.error("コメントを入力してください。");
+    if (loading) {
       return;
     }
 
-    if (trimmedContent.length > MAX_COMMENT_LENGTH) {
+    if (!trimmedContent) {
+      toast.error(
+        "コメントを入力してください。"
+      );
+
+      inputRef.current?.focus();
+      return;
+    }
+
+    if (
+      trimmedContent.length >
+      MAX_COMMENT_LENGTH
+    ) {
       toast.error(
         `コメントは${MAX_COMMENT_LENGTH}文字以内で入力してください。`
       );
-      return;
-    }
 
-    if (loading) {
+      inputRef.current?.focus();
       return;
     }
 
     setLoading(true);
 
     try {
-      await createComment(supabase, {
-        post_id: postId,
-        user_id: userId,
-        content: trimmedContent,
-      });
+      await createComment(
+        supabase,
+        {
+          post_id: postId,
+          user_id: userId,
+          content: trimmedContent,
+        }
+      );
 
       try {
-        await createNotification(supabase, {
-          recipientId: postOwnerId,
-          actorId: userId,
-          type: "comment",
-          postId,
-        });
-      } catch (notificationError) {
+        await createNotification(
+          supabase,
+          {
+            recipientId:
+              postOwnerId,
+            actorId: userId,
+            type: "comment",
+            postId,
+          }
+        );
+      } catch (
+        notificationError
+      ) {
         console.error(
           "コメント通知の作成に失敗しました。",
           notificationError
@@ -81,9 +132,18 @@ export function CommentForm({
       }
 
       setContent("");
-      toast.success("コメントを投稿しました。");
+
+      toast.success(
+        "コメントを投稿しました。"
+      );
 
       router.refresh();
+
+      window.requestAnimationFrame(
+        () => {
+          inputRef.current?.focus();
+        }
+      );
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -98,47 +158,141 @@ export function CommentForm({
   return (
     <form
       onSubmit={handleSubmit}
+      aria-label="コメントを投稿"
+      aria-busy={loading}
       className="mt-4 space-y-2"
     >
-      <div className="flex gap-2">
+      <div
+        className="
+          flex
+          items-center
+          gap-2
+        "
+      >
         <Input
+          ref={inputRef}
           type="text"
+          name="comment"
           value={content}
           onChange={(event) =>
-            setContent(event.target.value)
+            setContent(
+              event.target.value
+            )
           }
           placeholder="コメントを書く..."
-          maxLength={MAX_COMMENT_LENGTH}
+          maxLength={
+            MAX_COMMENT_LENGTH
+          }
           disabled={loading}
-          aria-label="コメント"
-          className="flex-1"
+          autoComplete="off"
+          aria-label="コメント内容"
+          aria-describedby={`${characterCountId} ${statusId}`}
+          className="
+            min-h-11
+            flex-1
+            rounded-xl
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-ring
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-background
+          "
         />
 
         <Button
           type="submit"
           size="sm"
           disabled={!canSubmit}
-          className="shrink-0"
+          aria-label={
+            loading
+              ? "コメントを送信しています"
+              : "コメントを送信"
+          }
+          aria-busy={loading}
+          className="
+            min-h-11
+            shrink-0
+            rounded-xl
+            px-4
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-ring
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-background
+            motion-reduce:transition-none
+          "
         >
           {loading ? (
-            <>
-              <LoaderCircle className="animate-spin" />
-              送信中
-            </>
+            <LoaderCircle
+              aria-hidden="true"
+              className="
+                size-4
+                animate-spin
+                motion-reduce:animate-none
+              "
+            />
           ) : (
-            <>
-              <Send />
-              送信
-            </>
+            <Send
+              aria-hidden="true"
+              className="size-4"
+            />
           )}
+
+          <span>
+            {loading
+              ? "送信中"
+              : "送信"}
+          </span>
         </Button>
       </div>
 
-      <div className="flex justify-end">
-        <span className="text-xs text-muted-foreground">
-          {content.length} / {MAX_COMMENT_LENGTH}
+      <div
+        className="
+          flex
+          justify-end
+          px-1
+        "
+      >
+        <span
+          id={characterCountId}
+          aria-live="polite"
+          aria-atomic="true"
+          className={`
+            text-xs
+            tabular-nums
+            transition-colors
+            motion-reduce:transition-none
+            ${
+              isNearCharacterLimit
+                ? "font-semibold text-error"
+                : "text-muted-foreground"
+            }
+          `}
+        >
+          <span aria-hidden="true">
+            {content.length} /{" "}
+            {MAX_COMMENT_LENGTH}
+          </span>
+
+          <span className="sr-only">
+            {MAX_COMMENT_LENGTH}
+            文字中
+            {content.length}
+            文字入力済み
+          </span>
         </span>
       </div>
+
+      <p
+        id={statusId}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {loading
+          ? "コメントを送信しています。"
+          : ""}
+      </p>
     </form>
   );
 }

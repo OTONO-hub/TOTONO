@@ -12,15 +12,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     setLoading(false);
 
@@ -30,34 +33,51 @@ export default function LoginPage() {
     }
 
     alert("ログインしました。");
-    router.push("/");
+
+    router.replace("/today");
+    router.refresh();
   };
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="mb-8 text-center text-3xl font-bold">ログイン</h1>
+        <h1 className="mb-8 text-center text-3xl font-bold">
+          ログイン
+        </h1>
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form
+          onSubmit={handleLogin}
+          className="space-y-5"
+        >
           <div>
-            <label className="mb-2 block font-medium">メールアドレス</label>
+            <label className="mb-2 block font-medium">
+              メールアドレス
+            </label>
+
             <input
               type="email"
               placeholder="example@gmail.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               className="w-full rounded-lg border p-3"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block font-medium">パスワード</label>
+            <label className="mb-2 block font-medium">
+              パスワード
+            </label>
+
             <input
               type="password"
               placeholder="********"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               className="w-full rounded-lg border p-3"
               required
             />
@@ -66,9 +86,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 p-3 font-bold text-white hover:bg-blue-700 disabled:bg-gray-400"
+            className="w-full rounded-lg bg-blue-600 p-3 font-bold text-white transition hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {loading ? "ログイン中..." : "ログイン"}
+            {loading
+              ? "ログイン中..."
+              : "ログイン"}
           </button>
         </form>
       </div>

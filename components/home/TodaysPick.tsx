@@ -1,121 +1,347 @@
+import Image from "next/image";
 import Link from "next/link";
+import {
+  ArrowRight,
+  ImageIcon,
+  MapPin,
+  Sparkles,
+  Star,
+} from "lucide-react";
 
-export function TodaysPick() {
+import type { RecommendedSauna } from "@/services/recommendations";
+
+type TodaysPickProps = {
+  sauna: RecommendedSauna | null;
+};
+
+function createLocationText(
+  prefecture: string | null,
+  city: string | null
+): string {
+  const location = [prefecture, city]
+    .filter(
+      (value): value is string =>
+        typeof value === "string" &&
+        value.trim().length > 0
+    )
+    .map((value) => value.trim())
+    .join(" ");
+
+  return location || "エリア情報なし";
+}
+
+export function TodaysPick({
+  sauna,
+}: TodaysPickProps) {
+  if (!sauna) {
+    return null;
+  }
+
+  const locationText = createLocationText(
+    sauna.prefecture,
+    sauna.city
+  );
+
+  const ratingText =
+    sauna.average_rating !== null
+      ? sauna.average_rating.toFixed(1)
+      : "未評価";
+
   return (
     <section
-      id="todays-pick"
-      className="bg-background py-20 sm:py-24 lg:py-32"
+      aria-labelledby="todays-pick-heading"
+      className="
+        overflow-hidden
+        rounded-[2rem]
+        border border-border/55
+        bg-card/90
+        shadow-sm
+        backdrop-blur-md
+      "
     >
-      <div className="mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
-        {/* セクション見出し */}
-        <div className="mb-10 sm:mb-14">
-          <p className="text-xs font-medium tracking-[0.24em] text-muted-foreground uppercase">
-            Today&apos;s Pick
-          </p>
+      <div
+        className="
+          grid
+          lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]
+        "
+      >
+        <Link
+          href={`/saunas/${sauna.id}`}
+          className="
+            group
+            relative
+            block
+            min-h-64
+            overflow-hidden
+            bg-muted/50
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-inset
+            focus-visible:ring-ring
+            sm:min-h-80
+            lg:min-h-full
+          "
+        >
+          {sauna.image_url ? (
+            <>
+              <Image
+                src={sauna.image_url}
+                alt={`${sauna.name}の施設画像`}
+                fill
+                sizes="
+                  (max-width: 1023px) 100vw,
+                  55vw
+                "
+                className="
+                  object-cover
+                  transition-transform
+                  duration-500
+                  group-hover:scale-[1.03]
+                  motion-reduce:transition-none
+                "
+              />
 
-          <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-3xl leading-tight font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">
-                今日行きたくなるサウナ
-              </h2>
-
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-                日常から少し離れて、心と身体をゆっくりほどく。
-                <br className="hidden sm:block" />
-                今日の気分に合う一軒を紹介します。
-              </p>
-            </div>
-
-            <Link
-              href="/search"
-              className="group inline-flex w-fit items-center gap-2 text-sm font-medium text-foreground"
-            >
-              サウナを探す
-
-              <span
+              <div
                 aria-hidden="true"
-                className="transition-transform duration-200 ease-out group-hover:translate-x-1"
-              >
-                →
-              </span>
-            </Link>
-          </div>
-        </div>
-
-        {/* おすすめ施設 */}
-        <article className="overflow-hidden rounded-[2rem] border border-border/50 bg-card">
-          <div className="grid lg:grid-cols-[1.35fr_0.65fr]">
-            {/* 写真 */}
+                className="
+                  absolute
+                  inset-0
+                  bg-gradient-to-t
+                  from-black/40
+                  via-black/5
+                  to-transparent
+                "
+              />
+            </>
+          ) : (
             <div
-              className="relative min-h-[360px] bg-cover bg-center sm:min-h-[480px] lg:min-h-[620px]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(180deg, rgba(20, 20, 18, 0.02) 40%, rgba(20, 20, 18, 0.28) 100%), url('/todays-pick.webp')",
-                backgroundColor: "#d8d4cc",
-              }}
-              role="img"
-              aria-label="今日おすすめする静かなサウナ施設"
+              className="
+                flex
+                h-full
+                min-h-64
+                items-center
+                justify-center
+                sm:min-h-80
+              "
             >
-              <div className="absolute top-6 left-6 rounded-full bg-background/80 px-4 py-2 text-xs font-medium text-foreground backdrop-blur-md sm:top-8 sm:left-8">
-                Editor&apos;s Choice
-              </div>
-            </div>
-
-            {/* 施設情報 */}
-            <div className="flex flex-col justify-between p-7 sm:p-10 lg:p-12">
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase">
-                  Tokyo · Ikebukuro
-                </p>
-
-                <h3 className="mt-5 text-3xl leading-tight font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">
-                  かるまる池袋
-                </h3>
+              <div className="text-center">
+                <ImageIcon
+                  className="
+                    mx-auto
+                    size-8
+                    text-muted-foreground
+                  "
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
 
                 <p
-                  className="mt-4 text-sm tracking-[0.16em] text-foreground"
-                  aria-label="評価5点満点中5点"
+                  className="
+                    mt-3
+                    text-sm
+                    font-medium
+                    text-muted-foreground
+                  "
                 >
-                  ★ ★ ★ ★ ★
+                  施設画像は準備中です
                 </p>
-
-                <p className="mt-8 text-base leading-8 text-muted-foreground">
-                  都会の中心で、自分のためだけの時間を過ごす。
-                  多彩なサウナと水風呂を巡りながら、深く静かに整う体験を。
-                </p>
-
-                <dl className="mt-10 grid grid-cols-2 gap-6 border-y border-border/60 py-6">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">
-                      おすすめ
-                    </dt>
-
-                    <dd className="mt-2 text-sm font-medium text-foreground">
-                      外気浴
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt className="text-xs text-muted-foreground">
-                      気分
-                    </dt>
-
-                    <dd className="mt-2 text-sm font-medium text-foreground">
-                      深く整いたい日
-                    </dd>
-                  </div>
-                </dl>
               </div>
-
-              <Link
-                href="/search?q=かるまる池袋"
-                className="mt-10 inline-flex h-12 w-full items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-accent-foreground transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90 sm:w-fit"
-              >
-                この施設を見つける
-              </Link>
             </div>
+          )}
+
+          <span
+            className="
+              absolute
+              left-5
+              top-5
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              border border-white/40
+              bg-white/85
+              px-3
+              py-1.5
+              text-xs
+              font-semibold
+              text-foreground
+              shadow-sm
+              backdrop-blur-md
+            "
+          >
+            <Sparkles
+              className="size-3.5"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
+
+            Today&apos;s Pick
+          </span>
+        </Link>
+
+        <div
+          className="
+            flex
+            flex-col
+            justify-center
+            px-5
+            py-8
+            sm:px-8
+            sm:py-10
+            lg:px-10
+            lg:py-12
+          "
+        >
+          <p
+            className="
+              text-xs
+              font-semibold
+              uppercase
+              tracking-[0.25em]
+              text-muted-foreground
+            "
+          >
+            Recommended for You
+          </p>
+
+          <h2
+            id="todays-pick-heading"
+            className="
+              mt-4
+              text-3xl
+              font-semibold
+              tracking-[-0.045em]
+              text-foreground
+              sm:text-4xl
+            "
+          >
+            {sauna.name}
+          </h2>
+
+          <div
+            className="
+              mt-5
+              flex
+              flex-wrap
+              items-center
+              gap-x-5
+              gap-y-3
+            "
+          >
+            <span
+              className="
+                inline-flex
+                items-center
+                gap-1.5
+                text-sm
+                font-semibold
+                text-foreground
+              "
+            >
+              <Star
+                className="
+                  size-4
+                  fill-accent
+                  text-accent
+                "
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+
+              {ratingText}
+            </span>
+
+            <span
+              className="
+                inline-flex
+                items-center
+                gap-1.5
+                text-sm
+                text-muted-foreground
+              "
+            >
+              <MapPin
+                className="size-4"
+                strokeWidth={1.7}
+                aria-hidden="true"
+              />
+
+              {locationText}
+            </span>
           </div>
-        </article>
+
+          <div
+            className="
+              mt-6
+              rounded-2xl
+              border border-secondary/30
+              bg-secondary/10
+              px-4
+              py-4
+            "
+          >
+            <p
+              className="
+                text-xs
+                font-semibold
+                text-foreground
+              "
+            >
+              おすすめの理由
+            </p>
+
+            <p
+              className="
+                mt-2
+                text-sm
+                leading-7
+                text-muted-foreground
+              "
+            >
+              {sauna.recommendation_reason ??
+                "TOTONOで注目されている人気施設です。"}
+            </p>
+          </div>
+
+          <Link
+            href={`/saunas/${sauna.id}`}
+            className="
+              mt-7
+              inline-flex
+              min-h-12
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-full
+              bg-primary
+              px-6
+              text-sm
+              font-semibold
+              text-primary-foreground
+              shadow-sm
+              transition
+              duration-200
+              hover:-translate-y-0.5
+              hover:shadow-md
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-ring
+              focus-visible:ring-offset-2
+              focus-visible:ring-offset-card
+              active:translate-y-0
+              sm:w-fit
+            "
+          >
+            施設の詳細を見る
+
+            <ArrowRight
+              className="size-4"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
+          </Link>
+        </div>
       </div>
     </section>
   );

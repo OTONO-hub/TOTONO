@@ -1,133 +1,226 @@
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
-import {
-  cva,
-  type VariantProps,
-} from "class-variance-authority";
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  `
-    group/button
-    inline-flex
-    shrink-0
-    items-center
-    justify-center
-    whitespace-nowrap
-    border
-    border-transparent
-    bg-clip-padding
-    text-sm
-    font-medium
-    outline-none
-    select-none
-    transition-all
-    focus-visible:border-ring
-    focus-visible:ring-3
-    focus-visible:ring-ring/50
-    active:not-aria-[haspopup]:translate-y-px
-    disabled:pointer-events-none
-    disabled:opacity-50
-    aria-invalid:border-destructive
-    aria-invalid:ring-3
-    aria-invalid:ring-destructive/20
-    dark:aria-invalid:border-destructive/50
-    dark:aria-invalid:ring-destructive/40
-    [&_svg]:pointer-events-none
-    [&_svg]:shrink-0
-    [&_svg:not([class*='size-'])]:size-4
-  `,
+  [
+    "inline-flex shrink-0 items-center justify-center gap-2",
+    "whitespace-nowrap",
+    "font-medium",
+    "transition-[color,background-color,border-color,box-shadow,transform]",
+    "duration-200 ease-out",
+    "outline-none",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "[&_svg]:pointer-events-none",
+    "[&_svg]:shrink-0",
+    "[&_svg:not([class*='size-'])]:size-4",
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring/50",
+    "focus-visible:ring-offset-2",
+    "focus-visible:ring-offset-background",
+    "aria-invalid:border-destructive",
+    "aria-invalid:ring-destructive/20",
+  ],
   {
     variants: {
       variant: {
-        default:
-          "rounded-lg bg-primary text-primary-foreground hover:bg-primary/80",
+        default: [
+          "border border-primary",
+          "bg-primary text-primary-foreground",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-primary/90",
+          "hover:shadow-md",
+          "active:translate-y-0",
+          "active:shadow-sm",
+        ],
 
-        outline:
-          "rounded-lg border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        primary: [
+          "border border-primary",
+          "bg-primary text-primary-foreground",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-primary/90",
+          "hover:shadow-md",
+          "active:translate-y-0",
+          "active:shadow-sm",
+        ],
 
-        secondary:
-          "rounded-lg bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        totono: [
+          "border border-primary",
+          "bg-primary text-primary-foreground",
+          "shadow-md",
+          "hover:-translate-y-0.5",
+          "hover:bg-primary/90",
+          "hover:shadow-lg",
+          "active:translate-y-0",
+          "active:shadow-md",
+        ],
 
-        ghost:
-          "rounded-lg hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        totonoOutline: [
+          "border border-primary/25",
+          "bg-background text-primary",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:border-primary/40",
+          "hover:bg-primary/5",
+          "hover:shadow-md",
+          "active:translate-y-0",
+          "active:shadow-sm",
+        ],
 
-        destructive:
-          "rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        secondary: [
+          "border border-secondary/60",
+          "bg-secondary/35 text-foreground",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-secondary/55",
+          "hover:shadow-md",
+          "active:translate-y-0",
+        ],
 
-        link:
-          "rounded-lg text-primary underline-offset-4 hover:underline",
+        accent: [
+          "border border-accent",
+          "bg-accent text-accent-foreground",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-accent/85",
+          "hover:shadow-md",
+          "active:translate-y-0",
+        ],
 
-        totono:
-          "rounded-full bg-primary text-primary-foreground shadow-sm duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg focus-visible:ring-ring/40 active:translate-y-0",
+        outline: [
+          "border border-border",
+          "bg-background text-foreground",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:border-primary/30",
+          "hover:bg-muted/50",
+          "hover:shadow-md",
+          "active:translate-y-0",
+        ],
 
-        totonoOutline:
-          "rounded-full border-border bg-card text-foreground shadow-sm duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background hover:shadow-md focus-visible:ring-ring/40 active:translate-y-0",
+        ghost: [
+          "border border-transparent",
+          "bg-transparent text-foreground",
+          "shadow-none",
+          "hover:bg-muted/60",
+          "hover:text-foreground",
+        ],
 
-        totonoGhost:
-          "rounded-full text-muted-foreground duration-200 hover:bg-muted hover:text-foreground focus-visible:ring-ring/40",
+        soft: [
+          "border border-border/30",
+          "bg-muted/60 text-foreground",
+          "shadow-none",
+          "hover:bg-muted",
+        ],
+
+        danger: [
+          "border border-destructive",
+          "bg-destructive text-white",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-destructive/90",
+          "hover:shadow-md",
+          "focus-visible:ring-destructive/30",
+          "active:translate-y-0",
+        ],
+
+        destructive: [
+          "border border-destructive",
+          "bg-destructive text-white",
+          "shadow-sm",
+          "hover:-translate-y-0.5",
+          "hover:bg-destructive/90",
+          "hover:shadow-md",
+          "focus-visible:ring-destructive/30",
+          "active:translate-y-0",
+        ],
+
+        link: [
+          "h-auto rounded-none",
+          "border-0 bg-transparent p-0",
+          "text-primary underline-offset-4",
+          "shadow-none",
+          "hover:underline",
+        ],
+
+        cta: [
+          "border border-primary",
+          "bg-primary text-primary-foreground",
+          "shadow-md",
+          "hover:-translate-y-0.5",
+          "hover:bg-primary/90",
+          "hover:shadow-lg",
+          "active:translate-y-0",
+          "active:shadow-md",
+        ],
       },
 
       size: {
-        default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        default: "h-10 rounded-xl px-4 py-2 text-sm",
+        sm: "h-9 rounded-lg px-3 text-sm",
+        lg: "h-12 rounded-2xl px-6 text-sm sm:text-base",
+        xl: "h-14 rounded-2xl px-7 text-base",
+        icon: "size-10 rounded-xl",
+        "icon-sm": "size-9 rounded-lg",
+        "icon-lg": "size-12 rounded-2xl",
+      },
 
-        xs:
-          "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
+      shape: {
+        default: "",
+        pill: "rounded-full",
+        square: "",
+      },
 
-        sm:
-          "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-
-        lg:
-          "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-
-        xl:
-          "h-12 gap-2 px-8 text-sm font-semibold has-data-[icon=inline-end]:pr-7 has-data-[icon=inline-start]:pl-7 [&_svg:not([class*='size-'])]:size-5",
-
-        icon:
-          "size-8",
-
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-
-        "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-
-        "icon-lg":
-          "size-9",
+      fullWidth: {
+        true: "w-full",
+        false: "",
       },
     },
 
     defaultVariants: {
       variant: "default",
       size: "default",
+      shape: "default",
+      fullWidth: false,
     },
   }
 );
 
 function Button({
   className,
-  variant = "default",
-  size = "default",
+  variant,
+  size,
+  shape,
+  fullWidth,
+  asChild = false,
+  type,
   ...props
-}: ButtonPrimitive.Props &
-  VariantProps<typeof buttonVariants>) {
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Component = asChild ? Slot : "button";
+
   return (
-    <ButtonPrimitive
+    <Component
       data-slot="button"
+      type={asChild ? undefined : (type ?? "button")}
       className={cn(
         buttonVariants({
           variant,
           size,
-          className,
-        })
+          shape,
+          fullWidth,
+        }),
+        className
       )}
       {...props}
     />
   );
 }
 
-export {
-  Button,
-  buttonVariants,
-};
+export { Button, buttonVariants };

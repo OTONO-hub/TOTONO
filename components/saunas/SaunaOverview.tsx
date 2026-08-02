@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Globe2,
   Heart,
+  MapPinned,
   MapPin,
   PenLine,
   Phone,
@@ -16,6 +17,10 @@ import { FavoriteSaunaButton } from "@/components/saunas/FavoriteSaunaButton";
 
 type SaunaOverviewProps = {
   saunaId: string;
+  name: string;
+  locationText: string;
+  latitude: number | null;
+  longitude: number | null;
   userId: string | null;
   initialFavorite: boolean;
   averageRating: number | null;
@@ -30,6 +35,10 @@ type SaunaOverviewProps = {
 
 export function SaunaOverview({
   saunaId,
+  name,
+  locationText,
+  latitude,
+  longitude,
   userId,
   initialFavorite,
   averageRating,
@@ -47,31 +56,226 @@ export function SaunaOverview({
     Boolean(websiteUrl) ||
     Boolean(postalCode);
 
+  const googleMapsUrl = createGoogleMapsUrl({
+    name,
+    locationText,
+    latitude,
+    longitude,
+  });
+
   return (
-    <div className="p-6 sm:p-8 lg:p-10">
-      <section aria-labelledby="sauna-metrics-title">
-        <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#3e3a3a]/40">
-            Community Insights
-          </p>
+    <div
+      className="
+        flex
+        h-full
+        flex-col
+        bg-white/95
+        p-6
+        sm:p-8
+        lg:p-8
+        xl:p-10
+      "
+    >
+      <header>
+        <p
+          className="
+            text-xs
+            font-semibold
+            uppercase
+            tracking-[0.22em]
+            text-[#3e3a3a]/40
+          "
+        >
+          Plan Your Visit
+        </p>
 
-          <h2
-            id="sauna-metrics-title"
-            className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#3e3a3a] sm:text-2xl"
+        <h2
+          className="
+            mt-2
+            text-2xl
+            font-semibold
+            tracking-[-0.04em]
+            text-[#3e3a3a]
+          "
+        >
+          今日、この施設へ
+        </h2>
+
+        <p
+          className="
+            mt-3
+            text-sm
+            leading-7
+            text-[#3e3a3a]/58
+          "
+        >
+          ルートや施設情報を確認して、
+          次のサウナ時間を計画しましょう。
+        </p>
+      </header>
+
+      <section
+        aria-labelledby="sauna-actions-title"
+        className="mt-7"
+      >
+        <h3
+          id="sauna-actions-title"
+          className="sr-only"
+        >
+          施設に関する操作
+        </h3>
+
+        <div className="flex flex-col gap-3">
+          {googleMapsUrl && (
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${name}までのルートをGoogleマップで開く`}
+              className="
+                inline-flex
+                min-h-12
+                items-center
+                justify-center
+                gap-2
+                rounded-full
+                bg-[#fdd000]
+                px-6
+                py-3
+                text-sm
+                font-semibold
+                text-[#3e3a3a]
+                shadow-sm
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:shadow-md
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[#3e3a3a]
+                focus-visible:ring-offset-2
+                active:translate-y-0
+                motion-reduce:transform-none
+                motion-reduce:transition-none
+              "
+            >
+              <MapPinned
+                className="size-4"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+
+              Googleマップでルートを見る
+
+              <ExternalLink
+                className="size-3.5"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+            </a>
+          )}
+
+          <FavoriteSaunaButton
+            saunaId={saunaId}
+            userId={userId}
+            initialFavorite={initialFavorite}
+          />
+
+          <Link
+            href={`/posts/new?sauna_id=${saunaId}`}
+            className="
+              inline-flex
+              min-h-12
+              items-center
+              justify-center
+              gap-2
+              rounded-full
+              bg-[#3e3a3a]
+              px-6
+              py-3
+              text-sm
+              font-medium
+              text-white
+              shadow-sm
+              transition-all
+              duration-200
+              hover:-translate-y-0.5
+              hover:bg-[#3e3a3a]/88
+              hover:shadow-md
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-[#3e3a3a]
+              focus-visible:ring-offset-2
+              active:translate-y-0
+              motion-reduce:transform-none
+              motion-reduce:transition-none
+            "
           >
-            施設のサ活データ
-          </h2>
+            <PenLine
+              className="size-4"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
 
-          <p className="mt-2 text-sm leading-6 text-[#3e3a3a]/55">
-            TOTONOに投稿された評価やサ活をもとにした情報です。
-          </p>
+            この施設で投稿する
+          </Link>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="sauna-metrics-title"
+        className="
+          mt-8
+          border-t
+          border-[#3e3a3a]/8
+          pt-8
+        "
+      >
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p
+              className="
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.2em]
+                text-[#3e3a3a]/40
+              "
+            >
+              Community
+            </p>
+
+            <h3
+              id="sauna-metrics-title"
+              className="
+                mt-1.5
+                text-lg
+                font-semibold
+                tracking-[-0.03em]
+                text-[#3e3a3a]
+              "
+            >
+              みんなのサ活データ
+            </h3>
+          </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
-          <MetricCard
+        <div
+          className="
+            mt-5
+            grid
+            grid-cols-3
+            gap-2
+          "
+        >
+          <CompactMetricCard
             icon={
               <Star
-                className="size-5 fill-[#fdd000] text-[#fdd000]"
+                className="
+                  size-4
+                  fill-[#fdd000]
+                  text-[#fdd000]
+                "
                 strokeWidth={1.8}
                 aria-hidden="true"
               />
@@ -83,225 +287,244 @@ export function SaunaOverview({
             }
             label={
               ratingCount > 0
-                ? `${ratingCount}件の評価`
-                : "まだ評価がありません"
+                ? `${ratingCount}件`
+                : "未評価"
             }
           />
 
-          <MetricCard
+          <CompactMetricCard
             icon={
               <BookOpen
-                className="size-5"
+                className="size-4"
                 strokeWidth={1.8}
                 aria-hidden="true"
               />
             }
             value={postCount.toString()}
-            label="サ活投稿"
+            label="サ活"
           />
 
-          <MetricCard
+          <CompactMetricCard
             icon={
               <Heart
-                className="size-5"
+                className="size-4"
                 strokeWidth={1.8}
                 aria-hidden="true"
               />
             }
             value={favoriteCount.toString()}
-            label="お気に入り"
+            label="保存"
           />
         </div>
       </section>
 
-      <div className="mt-8 border-t border-black/5 pt-8 sm:mt-10 sm:pt-10">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
-          <section aria-labelledby="facility-information-title">
-            <div className="mb-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#3e3a3a]/40">
-                Information
-              </p>
+      <section
+        aria-labelledby="facility-information-title"
+        className="
+          mt-8
+          border-t
+          border-[#3e3a3a]/8
+          pt-8
+        "
+      >
+        <p
+          className="
+            text-xs
+            font-semibold
+            uppercase
+            tracking-[0.2em]
+            text-[#3e3a3a]/40
+          "
+        >
+          Information
+        </p>
 
-              <h2
-                id="facility-information-title"
-                className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#3e3a3a]"
-              >
-                施設情報
-              </h2>
-            </div>
+        <h3
+          id="facility-information-title"
+          className="
+            mt-1.5
+            text-lg
+            font-semibold
+            tracking-[-0.03em]
+            text-[#3e3a3a]
+          "
+        >
+          訪問前の施設情報
+        </h3>
 
-            {hasFacilityInformation ? (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {openingHours && (
-                  <FacilityInformation
-                    icon={
-                      <Clock3
-                        className="size-4"
-                        strokeWidth={1.8}
-                        aria-hidden="true"
-                      />
-                    }
-                    label="営業時間"
-                    value={openingHours}
+        {hasFacilityInformation ? (
+          <div className="mt-5 grid gap-3">
+            {openingHours && (
+              <FacilityInformation
+                icon={
+                  <Clock3
+                    className="size-4"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
                   />
-                )}
-
-                {phoneNumber && (
-                  <FacilityInformation
-                    icon={
-                      <Phone
-                        className="size-4"
-                        strokeWidth={1.8}
-                        aria-hidden="true"
-                      />
-                    }
-                    label="電話番号"
-                    value={phoneNumber}
-                    href={`tel:${phoneNumber}`}
-                  />
-                )}
-
-                {websiteUrl && (
-                  <FacilityInformation
-                    icon={
-                      <Globe2
-                        className="size-4"
-                        strokeWidth={1.8}
-                        aria-hidden="true"
-                      />
-                    }
-                    label="公式サイト"
-                    value="公式サイトを見る"
-                    href={websiteUrl}
-                    external
-                  />
-                )}
-
-                {postalCode && (
-                  <FacilityInformation
-                    icon={
-                      <MapPin
-                        className="size-4"
-                        strokeWidth={1.8}
-                        aria-hidden="true"
-                      />
-                    }
-                    label="郵便番号"
-                    value={`〒${postalCode}`}
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="rounded-[1.5rem] border border-dashed border-[#3e3a3a]/15 bg-[#e6e5ef]/25 px-5 py-8 text-center">
-                <p className="text-sm leading-6 text-[#3e3a3a]/50">
-                  施設情報はまだ登録されていません。
-                </p>
-              </div>
-            )}
-          </section>
-
-          <aside
-            aria-labelledby="sauna-actions-title"
-            className="rounded-[1.75rem] border border-black/5 bg-[#e6e5ef]/35 p-5 sm:p-6"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#3e3a3a]/40">
-              Your Sauna Life
-            </p>
-
-            <h2
-              id="sauna-actions-title"
-              className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#3e3a3a]"
-            >
-              この施設を楽しむ
-            </h2>
-
-            <p className="mt-2 text-sm leading-6 text-[#3e3a3a]/55">
-              気になる施設として保存したり、訪問後のサ活を記録できます。
-            </p>
-
-            <div className="mt-5 flex flex-col gap-3">
-              <FavoriteSaunaButton
-                saunaId={saunaId}
-                userId={userId}
-                initialFavorite={initialFavorite}
+                }
+                label="営業時間"
+                value={openingHours}
               />
+            )}
 
-              <Link
-                href={`/posts/new?sauna_id=${saunaId}`}
-                className="
-                  inline-flex
-                  min-h-12
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-full
-                  bg-[#3e3a3a]
-                  px-6
-                  py-3
-                  text-sm
-                  font-medium
-                  text-white
-                  shadow-sm
-                  transition
-                  hover:-translate-y-0.5
-                  hover:bg-[#3e3a3a]/88
-                  hover:shadow-md
-                  focus-visible:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-[#3e3a3a]
-                  focus-visible:ring-offset-2
-                  active:translate-y-0
-                "
-              >
-                <PenLine
-                  className="size-4"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-                この施設で投稿する
-              </Link>
-            </div>
-          </aside>
-        </div>
-      </div>
+            {phoneNumber && (
+              <FacilityInformation
+                icon={
+                  <Phone
+                    className="size-4"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                }
+                label="電話番号"
+                value={phoneNumber}
+                href={`tel:${phoneNumber}`}
+              />
+            )}
+
+            {websiteUrl && (
+              <FacilityInformation
+                icon={
+                  <Globe2
+                    className="size-4"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                }
+                label="公式サイト"
+                value="公式サイトを見る"
+                href={websiteUrl}
+                external
+              />
+            )}
+
+            {postalCode && (
+              <FacilityInformation
+                icon={
+                  <MapPin
+                    className="size-4"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                }
+                label="郵便番号"
+                value={`〒${postalCode}`}
+              />
+            )}
+          </div>
+        ) : (
+          <div
+            className="
+              mt-5
+              rounded-[1.5rem]
+              border
+              border-dashed
+              border-[#3e3a3a]/15
+              bg-[#e6e5ef]/25
+              px-5
+              py-8
+              text-center
+            "
+          >
+            <p
+              className="
+                text-sm
+                leading-6
+                text-[#3e3a3a]/50
+              "
+            >
+              施設情報はまだ登録されていません。
+            </p>
+          </div>
+        )}
+      </section>
+
+      <p
+        className="
+          mt-auto
+          pt-7
+          text-xs
+          leading-6
+          text-[#3e3a3a]/42
+        "
+      >
+        ※ 営業時間などは変更される場合があります。
+        訪問前に公式情報もご確認ください。
+      </p>
     </div>
   );
 }
 
-type MetricCardProps = {
+type GoogleMapsUrlInput = {
+  name: string;
+  locationText: string;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+function createGoogleMapsUrl({
+  name,
+  locationText,
+  latitude,
+  longitude,
+}: GoogleMapsUrlInput) {
+  const hasCoordinates =
+    typeof latitude === "number" &&
+    Number.isFinite(latitude) &&
+    typeof longitude === "number" &&
+    Number.isFinite(longitude);
+
+  const destination = hasCoordinates
+    ? `${latitude},${longitude}`
+    : [name, locationText]
+        .filter(
+          (value) => value.trim().length > 0
+        )
+        .join(" ");
+
+  if (!destination) {
+    return null;
+  }
+
+  const searchParams = new URLSearchParams({
+    api: "1",
+    destination,
+    travelmode: "driving",
+  });
+
+  return `https://www.google.com/maps/dir/?${searchParams.toString()}`;
+}
+
+type CompactMetricCardProps = {
   icon: ReactNode;
   value: string;
   label: string;
 };
 
-function MetricCard({
+function CompactMetricCard({
   icon,
   value,
   label,
-}: MetricCardProps) {
+}: CompactMetricCardProps) {
   return (
     <div
       className="
-        flex
         min-w-0
-        items-center
-        gap-4
-        rounded-[1.5rem]
+        rounded-[1.25rem]
         border
-        border-black/5
-        bg-[#e6e5ef]/40
-        p-5
-        transition
-        hover:-translate-y-0.5
-        hover:bg-[#e6e5ef]/65
-        hover:shadow-sm
+        border-[#3e3a3a]/6
+        bg-[#e6e5ef]/38
+        px-3
+        py-4
+        text-center
       "
     >
       <span
         className="
+          mx-auto
           flex
-          size-11
-          shrink-0
+          size-9
           items-center
           justify-center
           rounded-full
@@ -313,14 +536,31 @@ function MetricCard({
         {icon}
       </span>
 
-      <span className="min-w-0">
-        <span className="block text-xl font-semibold tracking-tight text-[#3e3a3a]">
-          {value}
-        </span>
+      <span
+        className="
+          mt-3
+          block
+          truncate
+          text-xl
+          font-semibold
+          tracking-[-0.03em]
+          text-[#3e3a3a]
+        "
+      >
+        {value}
+      </span>
 
-        <span className="mt-0.5 block text-xs leading-5 text-[#3e3a3a]/50">
-          {label}
-        </span>
+      <span
+        className="
+          mt-0.5
+          block
+          truncate
+          text-[0.7rem]
+          leading-5
+          text-[#3e3a3a]/48
+        "
+      >
+        {label}
       </span>
     </div>
   );
@@ -360,18 +600,38 @@ function FacilityInformation({
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block text-xs text-[#3e3a3a]/45">
+        <span
+          className="
+            block
+            text-xs
+            text-[#3e3a3a]/45
+          "
+        >
           {label}
         </span>
 
-        <span className="mt-1 block break-words text-sm font-medium leading-6 text-[#3e3a3a]">
+        <span
+          className="
+            mt-1
+            block
+            break-words
+            text-sm
+            font-medium
+            leading-6
+            text-[#3e3a3a]
+          "
+        >
           {value}
         </span>
       </span>
 
       {external && (
         <ExternalLink
-          className="size-3.5 shrink-0 text-[#3e3a3a]/35"
+          className="
+            size-3.5
+            shrink-0
+            text-[#3e3a3a]/35
+          "
           strokeWidth={1.8}
           aria-hidden="true"
         />
@@ -386,7 +646,7 @@ function FacilityInformation({
     gap-3
     rounded-[1.25rem]
     border
-    border-black/5
+    border-[#3e3a3a]/6
     bg-[#e6e5ef]/30
     p-4
   `;
@@ -396,10 +656,15 @@ function FacilityInformation({
       <a
         href={href}
         target={external ? "_blank" : undefined}
-        rel={external ? "noopener noreferrer" : undefined}
+        rel={
+          external
+            ? "noopener noreferrer"
+            : undefined
+        }
         className={`
           ${className}
-          transition
+          transition-all
+          duration-200
           hover:-translate-y-0.5
           hover:bg-[#e6e5ef]/60
           hover:shadow-sm
@@ -407,6 +672,8 @@ function FacilityInformation({
           focus-visible:ring-2
           focus-visible:ring-[#3e3a3a]
           focus-visible:ring-offset-2
+          motion-reduce:transform-none
+          motion-reduce:transition-none
         `}
       >
         {content}

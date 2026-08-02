@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,10 +16,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { getPostImagesByPostId } from "@/services/post-images";
 import { deletePost } from "@/services/posts";
 import {
-  deletePostImage,
+  deletePostImages,
   getPostImagePath,
 } from "@/services/storage";
 
@@ -34,11 +35,19 @@ export function DeletePostButton({
   imageUrl,
 }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
-  const [loading, setLoading] = useState(false);
+  const [supabase] = useState(() =>
+    createClient()
+  );
+
+  const [loading, setLoading] =
+    useState(false);
 
   const handleDelete = async () => {
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -47,30 +56,87 @@ export function DeletePostButton({
         error: userError,
       } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-        toast.error("ログインしてください。");
+      if (
+        userError ||
+        !user
+      ) {
+        toast.error(
+          "ログインしてください。"
+        );
+
         router.push("/login");
         return;
       }
 
-      await deletePost(supabase, postId);
+      /*
+       * 投稿を削除するとpost_imagesのDB行は
+       * ON DELETE CASCADEで消えるため、
+       * 削除前にStorageパスを取得しておきます。
+       */
+      const postImages =
+        await getPostImagesByPostId(
+          supabase,
+          postId
+        );
 
-      if (imageUrl) {
-        const imagePath = getPostImagePath(imageUrl);
+      const imageUrls = [
+        ...postImages.map(
+          (image) => image.image_url
+        ),
+        imageUrl,
+      ].filter(
+        (url): url is string =>
+          typeof url === "string" &&
+          url.trim().length > 0
+      );
 
-        if (imagePath) {
-          try {
-            await deletePostImage(supabase, imagePath);
-          } catch (cleanupError) {
-            console.error(
-              "投稿画像の削除に失敗しました。",
-              cleanupError
-            );
-          }
+      const imagePaths = Array.from(
+        new Set(
+          imageUrls
+            .map((url) =>
+              getPostImagePath(url)
+            )
+            .filter(
+              (
+                path
+              ): path is string =>
+                typeof path === "string" &&
+                path.length > 0
+            )
+        )
+      );
+
+      await deletePost(
+        supabase,
+        postId
+      );
+
+      if (imagePaths.length > 0) {
+        try {
+          await deletePostImages(
+            supabase,
+            imagePaths
+          );
+        } catch (cleanupError) {
+          /*
+           * 投稿自体の削除は完了しているため、
+           * Storageの削除失敗だけでユーザー操作を
+           * 失敗扱いにはしません。
+           */
+          console.error(
+            "投稿画像の一括削除に失敗しました。",
+            cleanupError
+          );
+
+          toast.warning(
+            "投稿は削除されましたが、一部の画像整理に失敗しました。"
+          );
         }
       }
 
-      toast.success("投稿を削除しました。");
+      toast.success(
+        "投稿を削除しました。"
+      );
 
       router.refresh();
     } catch (error) {
@@ -93,38 +159,63 @@ export function DeletePostButton({
             variant="outline"
             size="sm"
             disabled={loading}
-            className="text-destructive hover:text-destructive"
+            aria-busy={loading}
+            className="
+              text-destructive
+              hover:text-destructive
+            "
           />
         }
       >
-        <Trash2 />
+        <Trash2
+          aria-hidden="true"
+        />
+
         削除
       </AlertDialogTrigger>
 
-      <AlertDialogContent>
+      <AlertDialogContent
+        aria-busy={loading}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>
             この投稿を削除しますか？
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            削除した投稿は元に戻すことができません。
+            削除した投稿は元に戻すことができません。投稿に含まれる画像も削除されます。
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>
+          <AlertDialogCancel
+            disabled={loading}
+          >
             キャンセル
           </AlertDialogCancel>
 
           <AlertDialogAction
-            onClick={handleDelete}
+            type="button"
             disabled={loading}
+            aria-label={
+              loading
+                ? "投稿を削除しています"
+                : "投稿を削除する"
+            }
+            aria-busy={loading}
             variant="destructive"
+            onClick={(event) => {
+              event.preventDefault();
+              void handleDelete();
+            }}
           >
-            <Trash2 />
+            <Trash2
+              aria-hidden="true"
+            />
 
-            {loading ? "削除中..." : "削除する"}
+            {loading
+              ? "削除中..."
+              : "削除する"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

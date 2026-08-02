@@ -128,7 +128,9 @@ export function SaunaFacilities({
     <section
       aria-labelledby="facility-features-heading"
       className="
-        mt-10
+        flex
+        h-full
+        flex-col
         overflow-hidden
         rounded-[2rem]
         border
@@ -138,7 +140,8 @@ export function SaunaFacilities({
         shadow-[0_18px_60px_rgba(62,58,58,0.07)]
         backdrop-blur-xl
         sm:p-8
-        lg:p-10
+        lg:p-8
+        2xl:p-10
       "
     >
       <div
@@ -152,6 +155,10 @@ export function SaunaFacilities({
           sm:flex-row
           sm:items-end
           sm:justify-between
+          xl:flex-col
+          xl:items-start
+          2xl:flex-row
+          2xl:items-end
         "
       >
         <div className="min-w-0">
@@ -234,9 +241,9 @@ export function SaunaFacilities({
       <aside
         aria-labelledby="facility-introduction-heading"
         className="
-          mt-8
+          mt-7
           overflow-hidden
-          rounded-[1.75rem]
+          rounded-[1.5rem]
           border
           border-[#9fd9f6]/30
           bg-linear-to-br
@@ -252,7 +259,7 @@ export function SaunaFacilities({
           <span
             className="
               flex
-              size-11
+              size-10
               shrink-0
               items-center
               justify-center
@@ -266,7 +273,7 @@ export function SaunaFacilities({
             aria-hidden="true"
           >
             <Sparkles
-              className="size-5 text-[#00b4b6]"
+              className="size-4.5 text-[#00b4b6]"
               strokeWidth={1.8}
             />
           </span>
@@ -288,23 +295,22 @@ export function SaunaFacilities({
               id="facility-introduction-heading"
               className="
                 mt-1.5
-                text-lg
+                text-base
                 font-semibold
                 tracking-[-0.025em]
                 text-[#3e3a3a]
+                sm:text-lg
               "
             >
-              TOTONOより
+              この施設での過ごし方
             </h3>
 
             <p
               className="
-                mt-3
-                max-w-3xl
+                mt-2
                 text-sm
                 leading-7
                 text-[#3e3a3a]/65
-                sm:text-base
               "
             >
               {facilityIntroduction}
@@ -317,11 +323,10 @@ export function SaunaFacilities({
         role="list"
         aria-label="施設の設備一覧"
         className="
-          mt-8
+          mt-7
           grid
-          gap-4
+          gap-3
           sm:grid-cols-2
-          lg:grid-cols-3
         "
       >
         {facilities.map((facility) => (
@@ -334,7 +339,8 @@ export function SaunaFacilities({
 
       <p
         className="
-          mt-6
+          mt-auto
+          pt-6
           text-xs
           leading-6
           text-[#3e3a3a]/45
@@ -389,10 +395,7 @@ function createFacilityIntroduction({
     return "サウナと水風呂を楽しんだあと、休憩スペースで落ち着いて過ごせる施設です。";
   }
 
-  if (
-    hasSaunaRoom &&
-    hasRestaurant
-  ) {
+  if (hasSaunaRoom && hasRestaurant) {
     return "サウナを楽しんだあと、施設内の食事処でサ飯まで楽しめます。";
   }
 
@@ -441,13 +444,13 @@ function FacilityFeatureCard({
         group
         relative
         flex
-        min-h-40
-        flex-col
-        justify-between
+        min-h-32
+        items-start
+        gap-4
         overflow-hidden
-        rounded-[1.5rem]
+        rounded-[1.35rem]
         border
-        p-5
+        p-4
         transition-all
         duration-300
         ease-out
@@ -460,10 +463,10 @@ function FacilityFeatureCard({
                 bg-linear-to-br
                 from-white/95
                 to-[#00b4b6]/8
-                shadow-[0_12px_30px_rgba(0,180,182,0.06)]
-                hover:-translate-y-1
+                shadow-[0_10px_26px_rgba(0,180,182,0.05)]
+                hover:-translate-y-0.5
                 hover:border-[#00b4b6]/25
-                hover:shadow-[0_18px_38px_rgba(0,180,182,0.12)]
+                hover:shadow-[0_16px_32px_rgba(0,180,182,0.1)]
               `
             : `
                 border-[#3e3a3a]/7
@@ -482,7 +485,7 @@ function FacilityFeatureCard({
           absolute
           -right-10
           -top-10
-          size-28
+          size-24
           rounded-full
           blur-2xl
           transition-opacity
@@ -496,124 +499,123 @@ function FacilityFeatureCard({
         aria-hidden="true"
       />
 
-      <div
-        className="
+      <span
+        className={`
           relative
           z-10
           flex
-          items-start
-          justify-between
-          gap-4
-        "
+          size-10
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+          border
+          transition
+          duration-300
+          motion-reduce:transform-none
+          motion-reduce:transition-none
+          ${
+            facility.available
+              ? `
+                  border-white/80
+                  bg-white/90
+                  text-[#007f81]
+                  shadow-sm
+                  backdrop-blur-md
+                  group-hover:scale-105
+                `
+              : `
+                  border-white/60
+                  bg-white/65
+                  text-[#3e3a3a]/38
+                  backdrop-blur-md
+                `
+          }
+        `}
+        aria-hidden="true"
       >
-        <span
-          className={`
+        {facility.icon}
+      </span>
+
+      <div className="relative z-10 min-w-0 flex-1">
+        <div
+          className="
             flex
-            size-11
-            shrink-0
-            items-center
-            justify-center
-            rounded-full
-            border
-            transition
-            duration-300
-            motion-reduce:transform-none
-            motion-reduce:transition-none
-            ${
-              facility.available
-                ? `
-                    border-white/80
-                    bg-white/90
-                    text-[#007f81]
-                    shadow-sm
-                    backdrop-blur-md
-                    group-hover:scale-105
-                    group-hover:shadow-md
-                  `
-                : `
-                    border-white/60
-                    bg-white/65
-                    text-[#3e3a3a]/38
-                    backdrop-blur-md
-                    group-hover:bg-white/85
-                  `
-            }
-          `}
-          aria-hidden="true"
+            items-start
+            justify-between
+            gap-2
+          "
         >
-          {facility.icon}
-        </span>
+          <h3
+            className={`
+              wrap-break-words
+              text-sm
+              font-semibold
+              tracking-[-0.015em]
+              sm:text-base
+              ${
+                facility.available
+                  ? "text-[#3e3a3a]"
+                  : "text-[#3e3a3a]/58"
+              }
+            `}
+          >
+            {facility.label}
+          </h3>
 
-        <span
-          className={`
-            inline-flex
-            shrink-0
-            items-center
-            gap-1.5
-            rounded-full
-            border
-            px-3
-            py-1.5
-            text-xs
-            font-medium
-            backdrop-blur-md
-            ${
-              facility.available
-                ? `
-                    border-[#00b4b6]/10
-                    bg-[#00b4b6]/10
-                    text-[#007f81]
-                  `
-                : `
-                    border-[#3e3a3a]/5
-                    bg-white/45
-                    text-[#3e3a3a]/45
-                  `
-            }
-          `}
-        >
-          {facility.available ? (
-            <>
-              <Check
-                className="size-3.5"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
-              あり
-            </>
-          ) : (
-            <>
-              <Minus
-                className="size-3.5"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
-              なし
-            </>
-          )}
-        </span>
-      </div>
-
-      <div className="relative z-10 mt-6 min-w-0">
-        <h3
-          className={`
-            wrap-break-words
-            text-base
-            font-semibold
-            tracking-[-0.015em]
-            ${
-              facility.available
-                ? "text-[#3e3a3a]"
-                : "text-[#3e3a3a]/58"
-            }
-          `}
-        >
-          {facility.label}
-        </h3>
+          <span
+            className={`
+              inline-flex
+              shrink-0
+              items-center
+              gap-1
+              rounded-full
+              border
+              px-2
+              py-1
+              text-[0.65rem]
+              font-medium
+              backdrop-blur-md
+              ${
+                facility.available
+                  ? `
+                      border-[#00b4b6]/10
+                      bg-[#00b4b6]/10
+                      text-[#007f81]
+                    `
+                  : `
+                      border-[#3e3a3a]/5
+                      bg-white/45
+                      text-[#3e3a3a]/45
+                    `
+              }
+            `}
+          >
+            {facility.available ? (
+              <>
+                <Check
+                  className="size-3"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+                あり
+              </>
+            ) : (
+              <>
+                <Minus
+                  className="size-3"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+                なし
+              </>
+            )}
+          </span>
+        </div>
 
         <p
           className={`
-            mt-1.5
+            mt-2
             wrap-break-words
             text-xs
             leading-5

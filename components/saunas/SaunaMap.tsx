@@ -73,6 +73,12 @@ export function SaunaMap({
     `?api=1&query=${encodedMapQuery}`,
   ].join("");
 
+  const routeUrl = [
+    "https://www.google.com/maps/dir/",
+    `?api=1&destination=${encodedMapQuery}`,
+    "&travelmode=driving",
+  ].join("");
+
   const destinationLabel =
     addressText || `${name}の所在地`;
 
@@ -86,209 +92,87 @@ export function SaunaMap({
         border
         border-white/70
         bg-white/85
-        p-6
         shadow-[0_18px_60px_rgba(62,58,58,0.07)]
         backdrop-blur-xl
-        sm:p-8
-        lg:p-10
       "
     >
       <div
         className="
-          flex
-          flex-col
-          gap-5
-          border-b
-          border-[#3e3a3a]/8
-          pb-6
-          sm:flex-row
-          sm:items-end
-          sm:justify-between
+          grid
+          lg:grid-cols-[minmax(18rem,0.38fr)_minmax(0,0.62fr)]
         "
       >
-        <div className="min-w-0">
-          <p
-            className="
-              text-xs
-              font-semibold
-              uppercase
-              tracking-[0.2em]
-              text-[#3e3a3a]/45
-            "
-          >
-            Location
-          </p>
-
-          <h2
-            id="sauna-map-heading"
-            className="
-              mt-2
-              text-2xl
-              font-semibold
-              tracking-[-0.035em]
-              text-[#3e3a3a]
-              sm:text-3xl
-            "
-          >
-            アクセス
-          </h2>
-
-          <p
-            className="
-              mt-3
-              max-w-xl
-              text-sm
-              leading-7
-              text-[#3e3a3a]/60
-            "
-          >
-            施設の所在地と周辺地図を確認できます。
-          </p>
-        </div>
-
-        <a
-          href={googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${name}をGoogleマップで開く（新しいタブで開きます）`}
+        <div
           className="
-            inline-flex
-            min-h-11
-            w-fit
-            shrink-0
-            items-center
-            justify-center
-            gap-2
-            rounded-full
-            border
-            border-[#3e3a3a]/10
-            bg-white/75
-            px-4
-            py-2.5
-            text-sm
-            font-medium
-            text-[#3e3a3a]/70
-            shadow-sm
-            backdrop-blur-md
-            transition-all
-            duration-200
-            hover:-translate-y-0.5
-            hover:border-[#3e3a3a]/18
-            hover:bg-white
-            hover:text-[#3e3a3a]
-            hover:shadow-md
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-[#3e3a3a]
-            focus-visible:ring-offset-2
-            motion-reduce:transform-none
-            motion-reduce:transition-none
+            flex
+            flex-col
+            p-6
+            sm:p-8
+            lg:p-10
           "
         >
-          <Navigation
-            className="size-4"
-            strokeWidth={1.8}
-            aria-hidden="true"
-          />
-
-          <span>Googleマップで開く</span>
-
-          <ExternalLink
-            className="size-3.5"
-            strokeWidth={1.8}
-            aria-hidden="true"
-          />
-        </a>
-      </div>
-
-      <div
-        className="
-          relative
-          mt-8
-          overflow-hidden
-          rounded-[1.75rem]
-          border
-          border-[#3e3a3a]/8
-          bg-[#e6e5ef]/40
-          shadow-[0_16px_40px_rgba(62,58,58,0.08)]
-        "
-      >
-        {embedUrl ? (
-          <>
-            <iframe
-              title={`${name}の所在地を示すGoogleマップ`}
-              src={embedUrl}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
+          <div>
+            <p
               className="
-                h-80
-                w-full
-                border-0
-                bg-[#e6e5ef]/40
-                sm:h-96
-                lg:h-[28rem]
-              "
-            />
-
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-x-0
-                bottom-0
-                h-24
-                bg-linear-to-t
-                from-[#3e3a3a]/18
-                to-transparent
-              "
-              aria-hidden="true"
-            />
-          </>
-        ) : (
-          <MapUnavailableState
-            name={name}
-            googleMapsUrl={googleMapsUrl}
-          />
-        )}
-
-        {addressText && (
-          <div
-            className="
-              absolute
-              inset-x-4
-              bottom-4
-              z-10
-              sm:inset-x-auto
-              sm:left-5
-              sm:max-w-md
-            "
-          >
-            <div
-              className="
-                flex
-                items-start
-                gap-3
-                rounded-[1.25rem]
-                border
-                border-white/70
-                bg-white/88
-                px-4
-                py-3.5
-                shadow-[0_12px_30px_rgba(62,58,58,0.14)]
-                backdrop-blur-xl
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.2em]
+                text-[#3e3a3a]/45
               "
             >
+              Location
+            </p>
+
+            <h2
+              id="sauna-map-heading"
+              className="
+                mt-2
+                text-2xl
+                font-semibold
+                tracking-[-0.035em]
+                text-[#3e3a3a]
+                sm:text-3xl
+              "
+            >
+              アクセス
+            </h2>
+
+            <p
+              className="
+                mt-3
+                max-w-md
+                text-sm
+                leading-7
+                text-[#3e3a3a]/60
+              "
+            >
+              現在地からのルートや、施設周辺の場所を確認できます。
+            </p>
+          </div>
+
+          <div
+            className="
+              mt-7
+              rounded-[1.5rem]
+              border
+              border-[#3e3a3a]/7
+              bg-[#e6e5ef]/35
+              p-5
+            "
+          >
+            <div className="flex items-start gap-3">
               <span
                 className="
                   flex
-                  size-9
+                  size-10
                   shrink-0
                   items-center
                   justify-center
                   rounded-full
-                  bg-[#e6e5ef]/80
+                  bg-white
                   text-[#3e3a3a]
+                  shadow-sm
                 "
                 aria-hidden="true"
               >
@@ -303,7 +187,9 @@ export function SaunaMap({
                   className="
                     text-xs
                     font-medium
-                    text-[#3e3a3a]/45
+                    uppercase
+                    tracking-[0.16em]
+                    text-[#3e3a3a]/40
                   "
                 >
                   Address
@@ -311,65 +197,188 @@ export function SaunaMap({
 
                 <address
                   className="
-                    mt-1
+                    mt-2
                     wrap-break-words
                     text-sm
                     not-italic
-                    leading-6
+                    leading-7
                     text-[#3e3a3a]
                   "
                 >
-                  {addressText}
+                  {destinationLabel}
                 </address>
               </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {!addressText && (
+          <div className="mt-6 grid gap-3">
+            <a
+              href={routeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${name}までのルートをGoogleマップで開く`}
+              className="
+                inline-flex
+                min-h-12
+                items-center
+                justify-center
+                gap-2
+                rounded-full
+                bg-[#fdd000]
+                px-6
+                py-3
+                text-sm
+                font-semibold
+                text-[#3e3a3a]
+                shadow-sm
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:shadow-md
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[#3e3a3a]
+                focus-visible:ring-offset-2
+                motion-reduce:transform-none
+                motion-reduce:transition-none
+              "
+            >
+              <Navigation
+                className="size-4"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+
+              現在地からルートを見る
+
+              <ExternalLink
+                className="size-3.5"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+            </a>
+
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${name}をGoogleマップで開く`}
+              className="
+                inline-flex
+                min-h-12
+                items-center
+                justify-center
+                gap-2
+                rounded-full
+                border
+                border-[#3e3a3a]/10
+                bg-white/75
+                px-6
+                py-3
+                text-sm
+                font-medium
+                text-[#3e3a3a]/70
+                shadow-sm
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:border-[#3e3a3a]/18
+                hover:bg-white
+                hover:text-[#3e3a3a]
+                hover:shadow-md
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[#3e3a3a]
+                focus-visible:ring-offset-2
+                motion-reduce:transform-none
+                motion-reduce:transition-none
+              "
+            >
+              <Map
+                className="size-4"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+
+              Googleマップで開く
+
+              <ExternalLink
+                className="size-3.5"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+            </a>
+          </div>
+
+          <p
+            className="
+              mt-auto
+              pt-7
+              text-xs
+              leading-6
+              text-[#3e3a3a]/45
+            "
+          >
+            ※ 営業時間や交通状況は変更される場合があります。
+            訪問前に施設の公式情報もご確認ください。
+          </p>
+        </div>
+
         <div
           className="
-            mt-4
-            flex
-            items-start
-            gap-2.5
-            rounded-[1.25rem]
-            bg-[#e6e5ef]/35
-            px-4
-            py-3.5
-            text-sm
-            leading-6
-            text-[#3e3a3a]/60
+            relative
+            min-h-80
+            overflow-hidden
+            border-t
+            border-[#3e3a3a]/8
+            bg-[#e6e5ef]/40
+            lg:min-h-[34rem]
+            lg:border-l
+            lg:border-t-0
           "
         >
-          <MapPin
-            className="
-              mt-0.5
-              size-4
-              shrink-0
-            "
-            strokeWidth={1.8}
-            aria-hidden="true"
-          />
+          {embedUrl ? (
+            <>
+              <iframe
+                title={`${name}の所在地を示すGoogleマップ`}
+                src={embedUrl}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                className="
+                  absolute
+                  inset-0
+                  h-full
+                  min-h-80
+                  w-full
+                  border-0
+                  bg-[#e6e5ef]/40
+                  lg:min-h-[34rem]
+                "
+              />
 
-          <span className="wrap-break-words">
-            {destinationLabel}
-          </span>
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  inset-x-0
+                  bottom-0
+                  h-24
+                  bg-linear-to-t
+                  from-[#3e3a3a]/12
+                  to-transparent
+                "
+                aria-hidden="true"
+              />
+            </>
+          ) : (
+            <MapUnavailableState
+              name={name}
+              googleMapsUrl={googleMapsUrl}
+            />
+          )}
         </div>
-      )}
-
-      <p
-        className="
-          mt-5
-          text-xs
-          leading-6
-          text-[#3e3a3a]/45
-        "
-      >
-        ※ 営業時間や交通状況は変更される場合があります。
-        訪問前に施設の公式情報もご確認ください。
-      </p>
+      </div>
     </section>
   );
 }
@@ -389,6 +398,7 @@ function MapUnavailableState({
         relative
         flex
         min-h-80
+        h-full
         flex-col
         items-center
         justify-center
@@ -396,7 +406,7 @@ function MapUnavailableState({
         px-6
         py-12
         text-center
-        sm:min-h-96
+        lg:min-h-[34rem]
       "
     >
       <div
@@ -462,7 +472,7 @@ function MapUnavailableState({
           text-[#3e3a3a]
         "
       >
-        地図を表示できません
+        ページ内で地図を表示できません
       </p>
 
       <p
@@ -477,7 +487,6 @@ function MapUnavailableState({
           text-[#3e3a3a]/55
         "
       >
-        現在、ページ内で地図を読み込めません。
         Googleマップでは施設の所在地を確認できます。
       </p>
 
@@ -485,7 +494,7 @@ function MapUnavailableState({
         href={googleMapsUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${name}をGoogleマップで確認する（新しいタブで開きます）`}
+        aria-label={`${name}をGoogleマップで確認する`}
         className="
           relative
           z-10

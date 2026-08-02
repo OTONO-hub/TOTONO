@@ -15,6 +15,8 @@ type SaunaHeroProps = {
   ratingCount: number;
 };
 
+const MAX_RATING = 5;
+
 export function SaunaHero({
   name,
   imageUrl,
@@ -23,12 +25,40 @@ export function SaunaHero({
   averageRating,
   ratingCount,
 }: SaunaHeroProps) {
-  const hasRating =
-    averageRating !== null && ratingCount > 0;
+  const normalizedName =
+    name.trim() || "サウナ施設";
 
-  const formattedAverageRating = hasRating
-    ? averageRating.toFixed(1)
-    : null;
+  const normalizedLocationText =
+    locationText.trim();
+
+  const normalizedRatingCount =
+    Math.max(0, ratingCount);
+
+  const hasRating =
+    averageRating !== null &&
+    Number.isFinite(averageRating) &&
+    normalizedRatingCount > 0;
+
+  const normalizedAverageRating =
+    hasRating
+      ? Math.max(
+          0,
+          Math.min(
+            MAX_RATING,
+            averageRating
+          )
+        )
+      : null;
+
+  const formattedAverageRating =
+    normalizedAverageRating !== null
+      ? normalizedAverageRating.toFixed(1)
+      : null;
+
+  const ratingLabel =
+    formattedAverageRating !== null
+      ? `平均評価は5点満点中${formattedAverageRating}点です。${normalizedRatingCount}件の評価があります`
+      : "この施設にはまだ評価がありません";
 
   return (
     <div
@@ -39,33 +69,38 @@ export function SaunaHero({
         w-full
         overflow-hidden
         bg-[#3e3a3a]
-        sm:aspect-[16/8]
-        lg:aspect-[16/7]
+        sm:aspect-[16/9]
+        lg:aspect-auto
+        lg:h-full
+        lg:min-h-[44rem]
       "
     >
       {imageUrl ? (
         <Image
           src={imageUrl}
-          alt={`${name}の施設画像`}
+          alt={`${normalizedName}の施設画像`}
           fill
           priority
           sizes="
-            (max-width: 768px) 100vw,
-            (max-width: 1200px) 90vw,
-            1152px
+            (max-width: 767px) 100vw,
+            (max-width: 1023px) 90vw,
+            760px
           "
           className="
             object-cover
             transition-transform
             duration-1000
             ease-out
-            group-hover:scale-[1.015]
+            group-hover:scale-[1.02]
             motion-reduce:transform-none
             motion-reduce:transition-none
+            motion-reduce:group-hover:scale-100
           "
         />
       ) : (
         <div
+          role="img"
+          aria-label={`${normalizedName}の施設画像はまだ登録されていません`}
           className="
             absolute
             inset-0
@@ -107,7 +142,10 @@ export function SaunaHero({
             "
           />
 
-          <div className="relative">
+          <div
+            aria-hidden="true"
+            className="relative"
+          >
             <div
               className="
                 mx-auto
@@ -123,9 +161,12 @@ export function SaunaHero({
               "
             >
               <Waves
-                className="size-6 text-white/70"
-                strokeWidth={1.5}
                 aria-hidden="true"
+                className="
+                  size-6
+                  text-white/70
+                "
+                strokeWidth={1.5}
               />
             </div>
 
@@ -163,7 +204,7 @@ export function SaunaHero({
           absolute
           inset-0
           bg-linear-to-t
-          from-black/80
+          from-black/85
           via-black/20
           to-black/15
         "
@@ -175,10 +216,10 @@ export function SaunaHero({
           absolute
           inset-x-0
           bottom-0
-          h-3/4
+          h-4/5
           bg-linear-to-t
-          from-black/60
-          via-black/15
+          from-black/70
+          via-black/20
           to-transparent
         "
       />
@@ -222,9 +263,12 @@ export function SaunaHero({
             "
           >
             <CheckCircle2
-              className="size-3.5 text-[#9fd9f6]"
-              strokeWidth={2}
               aria-hidden="true"
+              className="
+                size-3.5
+                text-[#9fd9f6]
+              "
+              strokeWidth={2}
             />
 
             確認済み施設
@@ -234,6 +278,8 @@ export function SaunaHero({
         )}
 
         <div
+          role="img"
+          aria-label={ratingLabel}
           className="
             inline-flex
             items-center
@@ -250,37 +296,51 @@ export function SaunaHero({
             shadow-sm
             backdrop-blur-md
           "
-          aria-label={
-            hasRating
-              ? `平均評価${formattedAverageRating}、${ratingCount}件の評価`
-              : "まだ評価はありません"
-          }
         >
           <Star
+            aria-hidden="true"
             className="
               size-3.5
               fill-[#fdd000]
               text-[#fdd000]
             "
             strokeWidth={1.8}
-            aria-hidden="true"
           />
 
-          {hasRating ? (
-            <>
-              <span>
-                {formattedAverageRating}
-              </span>
+          <span
+            aria-hidden="true"
+            className="
+              inline-flex
+              items-center
+              gap-1.5
+            "
+          >
+            {formattedAverageRating !== null ? (
+              <>
+                <span>
+                  {formattedAverageRating}
+                </span>
 
-              <span className="font-normal text-white/65">
-                （{ratingCount}件）
+                <span
+                  className="
+                    font-normal
+                    text-white/65
+                  "
+                >
+                  （{normalizedRatingCount}件）
+                </span>
+              </>
+            ) : (
+              <span
+                className="
+                  font-normal
+                  text-white/75
+                "
+              >
+                未評価
               </span>
-            </>
-          ) : (
-            <span className="font-normal text-white/75">
-              未評価
-            </span>
-          )}
+            )}
+          </span>
         </div>
       </div>
 
@@ -294,21 +354,7 @@ export function SaunaHero({
           lg:p-8
         "
       >
-        <div
-          className="
-            max-w-4xl
-            rounded-[1.5rem]
-            border
-            border-white/10
-            bg-black/15
-            p-4
-            shadow-lg
-            backdrop-blur-[2px]
-            sm:rounded-[1.75rem]
-            sm:p-6
-            lg:p-7
-          "
-        >
+        <div className="max-w-4xl">
           <p
             className="
               text-[0.65rem]
@@ -339,10 +385,10 @@ export function SaunaHero({
               lg:text-5xl
             "
           >
-            {name}
+            {normalizedName}
           </h1>
 
-          {locationText && (
+          {normalizedLocationText ? (
             <div
               className="
                 mt-3
@@ -358,20 +404,20 @@ export function SaunaHero({
               "
             >
               <MapPin
+                aria-hidden="true"
                 className="
                   mt-0.5
                   size-4
                   shrink-0
                 "
                 strokeWidth={1.8}
-                aria-hidden="true"
               />
 
               <span className="break-words">
-                {locationText}
+                {normalizedLocationText}
               </span>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

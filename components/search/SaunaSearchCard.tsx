@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -7,6 +8,7 @@ import {
   Heart,
   ImageIcon,
   MapPin,
+  Navigation,
   Star,
 } from "lucide-react";
 
@@ -20,6 +22,10 @@ type SaunaSearchCardProps = {
   ratingCount: number;
 };
 
+/**
+ * 施設検索結果に表示する
+ * サウナ施設カードです。
+ */
 export function SaunaSearchCard({
   sauna,
   postCount,
@@ -27,6 +33,10 @@ export function SaunaSearchCard({
   averageRating,
   ratingCount,
 }: SaunaSearchCardProps) {
+  /**
+   * 都道府県と市区町村を組み合わせて、
+   * 施設の所在地を作成します。
+   */
   const locationText = [
     sauna.prefecture,
     sauna.city,
@@ -39,20 +49,54 @@ export function SaunaSearchCard({
     .map((value) => value.trim())
     .join(" ");
 
+  /**
+   * 都道府県・市区町村がない場合は、
+   * 詳細住所を表示します。
+   */
   const displayLocation =
     locationText ||
     sauna.address?.trim() ||
     "所在地未登録";
 
+  /**
+   * 現在地検索を行った場合だけ、
+   * 現在地から施設までの距離を表示します。
+   *
+   * 通常検索ではdistance_kmが存在しないため、
+   * 距離表示は自動的に非表示になります。
+   */
+  const distanceLabel = formatDistanceKm(
+    sauna.distance_km
+  );
+
+  /**
+   * スクリーンリーダーなどで使用する
+   * 評価情報です。
+   */
   const ratingLabel =
     averageRating !== null
-      ? `${averageRating.toFixed(1)}、${ratingCount}件の評価`
+      ? `${averageRating.toFixed(
+          1
+        )}、${ratingCount}件の評価`
       : "まだ評価はありません";
+
+  /**
+   * カード全体の説明文です。
+   */
+  const cardAriaLabel = [
+    `${sauna.name}の施設詳細を見る`,
+    ratingLabel,
+    distanceLabel
+      ? `現在地から${distanceLabel}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("。");
 
   return (
     <Link
       href={`/saunas/${sauna.id}`}
-      aria-label={`${sauna.name}の施設詳細を見る。${ratingLabel}`}
+      aria-label={cardAriaLabel}
       className="
         group
         flex
@@ -161,6 +205,51 @@ export function SaunaSearchCard({
               {displayLocation}
             </span>
           </div>
+
+          {distanceLabel && (
+            <div
+              className="
+                mt-3
+                inline-flex
+                max-w-full
+                items-center
+                gap-2
+                rounded-full
+                border
+                border-[#9fd9f6]/45
+                bg-[#9fd9f6]/20
+                px-3
+                py-1.5
+                text-xs
+                font-semibold
+                text-[#3e3a3a]/75
+              "
+            >
+              <Navigation
+                className="
+                  size-3.5
+                  shrink-0
+                  text-[#00b4b6]
+                "
+                strokeWidth={1.9}
+                aria-hidden="true"
+              />
+
+              <span className="truncate">
+                現在地から
+              </span>
+
+              <span
+                className="
+                  shrink-0
+                  tabular-nums
+                  text-[#3e3a3a]
+                "
+              >
+                {distanceLabel}
+              </span>
+            </div>
+          )}
         </div>
 
         <div
@@ -266,6 +355,9 @@ type SaunaImageProps = {
   ratingCount: number;
 };
 
+/**
+ * 施設カード上部の画像エリアです。
+ */
 function SaunaImage({
   imageUrl,
   saunaName,
@@ -374,6 +466,10 @@ function SaunaImage({
   );
 }
 
+/**
+ * 施設画像が未登録の場合に表示する
+ * プレースホルダーです。
+ */
 function ImagePlaceholder() {
   return (
     <div
@@ -478,6 +574,9 @@ type RatingBadgeProps = {
   ratingCount: number;
 };
 
+/**
+ * 施設画像上に表示する評価バッジです。
+ */
 function RatingBadge({
   averageRating,
   ratingCount,
@@ -503,7 +602,9 @@ function RatingBadge({
       "
       aria-label={
         averageRating !== null
-          ? `平均評価${averageRating.toFixed(1)}、${ratingCount}件の評価`
+          ? `平均評価${averageRating.toFixed(
+              1
+            )}、${ratingCount}件の評価`
           : "まだ評価はありません"
       }
     >
@@ -550,12 +651,16 @@ function RatingBadge({
 }
 
 type MetricCardProps = {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: number;
   unit: string;
 };
 
+/**
+ * サ活数やお気に入り数を表示する
+ * 小さな指標カードです。
+ */
 function MetricCard({
   icon,
   label,
@@ -605,6 +710,7 @@ function MetricCard({
         "
       >
         {value}
+
         <span
           className="
             ml-0.5
@@ -618,4 +724,43 @@ function MetricCard({
       </p>
     </div>
   );
+}
+
+/**
+ * 現在地から施設までの距離を、
+ * 画面表示用の文字列へ変換します。
+ *
+ * 不正な値やマイナス値の場合は、
+ * 距離を表示しません。
+ */
+function formatDistanceKm(
+  distanceKm?: number | null
+): string | null {
+  if (
+    typeof distanceKm !== "number" ||
+    !Number.isFinite(distanceKm) ||
+    distanceKm < 0
+  ) {
+    return null;
+  }
+
+  /**
+   * 1km未満の場合は、
+   * メートル表示の方が分かりやすいため
+   * mへ変換します。
+   */
+  if (distanceKm < 1) {
+    const distanceMeters = Math.max(
+      Math.round(distanceKm * 1000),
+      1
+    );
+
+    return `${distanceMeters}m`;
+  }
+
+  /**
+   * 1km以上の場合は、
+   * 小数第1位まで表示します。
+   */
+  return `${distanceKm.toFixed(1)}km`;
 }

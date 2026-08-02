@@ -1,26 +1,34 @@
 import Link from "next/link";
 import {
-  Activity,
   ArrowRight,
-  BadgeCheck,
-  Building2,
-  CalendarDays,
   Edit3,
-  Flame,
-  LockKeyhole,
-  Map as MapIcon,
   PenLine,
   Sparkles,
-  Star,
-  Trophy,
   Users,
 } from "lucide-react";
 
 import { Header } from "@/components/layout/Header";
+import { FadeIn } from "@/components/motion/FadeIn";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { PostCard } from "@/components/post/PostCard";
+import { AchievementBadges } from "@/components/profile/AchievementBadges";
+import { AchievementCard } from "@/components/profile/AchievementCard";
+import { AnnualSaunaReport } from "@/components/profile/AnnualSaunaReport";
 import { FavoriteSaunasSection } from "@/components/profile/FavoriteSaunasSection";
-import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { JournalEntryCard } from "@/components/profile/JournalEntryCard";
+import { MonthlyActivityChart } from "@/components/profile/MonthlyActivityChart";
+import { NextAchievementCard } from "@/components/profile/NextAchievementCard";
+import { ProfileHero } from "@/components/profile/ProfileHero";
+import { SaunaPersonaCard } from "@/components/profile/SaunaPersonaCard";
+import { SaunaRhythmCard } from "@/components/profile/SaunaRhythmCard";
+import { SaunaSummary } from "@/components/profile/SaunaSummary";
+import { TopVisitedSaunas } from "@/components/profile/TopVisitedSaunas";
+import { XpStatusCard } from "@/components/profile/XpStatusCard";
 import { buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/state/EmptyState";
+import { calculateNextAchievement } from "@/lib/profile-next-achievement";
+import { calculateSaunaPersona } from "@/lib/profile-persona";
+import { calculateSaunaRhythm } from "@/lib/profile-rhythm";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { getBookmarkedPostIds } from "@/services/bookmarks";
@@ -33,11 +41,14 @@ import {
   getLikeCount,
   isLiked,
 } from "@/services/likes";
+import { getPostImagesByPostIds } from "@/services/post-images";
 import { getPosts } from "@/services/posts";
 import {
   getProfile,
   getProfilesByUserIds,
 } from "@/services/profile";
+import { getProfileInsights } from "@/services/profile-insights";
+import { calculateSaunaXp } from "@/services/profile-xp";
 import type { CommentWithAuthor } from "@/types/comment";
 
 export default async function ProfilePage() {
@@ -47,9 +58,6 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  /*
-   * 未ログイン時
-   */
   if (!user) {
     return (
       <>
@@ -71,7 +79,9 @@ export default async function ProfilePage() {
             aria-hidden="true"
             className="
               pointer-events-none
-              absolute -right-32 top-16
+              absolute
+              -right-32
+              top-16
               size-80
               rounded-full
               bg-secondary/15
@@ -85,7 +95,8 @@ export default async function ProfilePage() {
               mx-auto
               max-w-xl
               rounded-[2rem]
-              border border-border/55
+              border
+              border-border/55
               bg-card/90
               px-6
               py-14
@@ -183,9 +194,6 @@ export default async function ProfilePage() {
     user.id
   );
 
-  /*
-   * プロフィール未設定時
-   */
   if (!profile) {
     return (
       <>
@@ -207,7 +215,9 @@ export default async function ProfilePage() {
             aria-hidden="true"
             className="
               pointer-events-none
-              absolute -left-32 top-20
+              absolute
+              -left-32
+              top-20
               size-80
               rounded-full
               bg-accent/10
@@ -221,7 +231,8 @@ export default async function ProfilePage() {
               mx-auto
               max-w-2xl
               rounded-[2rem]
-              border border-border/55
+              border
+              border-border/55
               bg-card/90
               px-6
               py-14
@@ -317,33 +328,35 @@ export default async function ProfilePage() {
     );
   }
 
-  /*
-   * 投稿とフォロー数を取得します。
-   */
   const [
     posts,
     followingCount,
     followerCount,
   ] = await Promise.all([
     getPosts(supabase),
-    getFollowingCount(supabase, user.id),
-    getFollowerCount(supabase, user.id),
+    getFollowingCount(
+      supabase,
+      user.id
+    ),
+    getFollowerCount(
+      supabase,
+      user.id
+    ),
   ]);
 
   const myPosts = posts.filter(
-    (post) => post.user_id === user.id
+    (post) =>
+      post.user_id === user.id
   );
 
   const myPostIds = myPosts.map(
     (post) => post.id
   );
 
-  /*
-   * コメントとブックマークを並行して取得します。
-   */
   const [
     comments,
     bookmarkedPostIds,
+    postImagesByPostId,
   ] = await Promise.all([
     getCommentsByPostIds(
       supabase,
@@ -354,20 +367,21 @@ export default async function ProfilePage() {
       user.id,
       myPostIds
     ),
+    getPostImagesByPostIds(
+      supabase,
+      myPostIds
+    ),
   ]);
 
-  const bookmarkedPostIdSet = new Set(
-    bookmarkedPostIds
-  );
+  const bookmarkedPostIdSet =
+    new Set(bookmarkedPostIds);
 
-  /*
-   * コメント投稿者のプロフィールを取得します。
-   */
   const commentAuthorProfiles =
     await getProfilesByUserIds(
       supabase,
       comments.map(
-        (comment) => comment.user_id
+        (comment) =>
+          comment.user_id
       )
     );
 
@@ -381,16 +395,14 @@ export default async function ProfilePage() {
     ])
   );
 
-  /*
-   * 投稿IDごとにコメントを分類します。
-   */
   const commentsByPostId = new Map<
     string,
     CommentWithAuthor[]
   >();
 
   for (const comment of comments) {
-    const commentWithAuthor: CommentWithAuthor = {
+    const commentWithAuthor:
+      CommentWithAuthor = {
       comment,
       author:
         profilesByUserId.get(
@@ -413,101 +425,84 @@ export default async function ProfilePage() {
     );
   }
 
-  /*
-   * 投稿カードに必要な情報を取得します。
-   */
   const myPostsWithMeta =
     await Promise.all(
-      myPosts.map(async (post) => ({
-        post,
-        likeCount: await getLikeCount(
-          supabase,
-          post.id
-        ),
-        liked: await isLiked(
-          supabase,
-          user.id,
-          post.id
-        ),
-        bookmarked:
-          bookmarkedPostIdSet.has(
-            post.id
-          ),
-        comments:
-          commentsByPostId.get(
-            post.id
-          ) ?? [],
-      }))
-    );
-
-  /*
-   * 整いサマリーを計算します。
-   * 既に取得している myPosts のみを使用するため、
-   * DBやAPIへの追加アクセスはありません。
-   */
-  const totalSaunaVisits = myPosts.length;
-
-  const visitedSaunas = new Set(
-    myPosts
-      .map((post) =>
-        post.sauna_name
-          .trim()
-          .replace(/\\s+/g, " ")
-          .toLocaleLowerCase("ja-JP")
+      myPosts.map(
+        async (post) => ({
+          post,
+          likeCount:
+            await getLikeCount(
+              supabase,
+              post.id
+            ),
+          liked:
+            await isLiked(
+              supabase,
+              user.id,
+              post.id
+            ),
+          bookmarked:
+            bookmarkedPostIdSet.has(
+              post.id
+            ),
+          comments:
+            commentsByPostId.get(
+              post.id
+            ) ?? [],
+          images:
+            postImagesByPostId.get(
+              post.id
+            ) ?? [],
+        })
       )
-      .filter(Boolean)
-  ).size;
-
-  const ratings = myPosts
-    .map((post) => post.rating)
-    .filter(
-      (rating): rating is number =>
-        typeof rating === "number" &&
-        Number.isFinite(rating)
     );
 
-  const averageRating =
-    ratings.length > 0
-      ? (
-          ratings.reduce(
-            (total, rating) => total + rating,
-            0
-          ) / ratings.length
-        ).toFixed(1)
-      : "-";
+  const profileInsights =
+    getProfileInsights(myPosts);
 
-  const highestRating =
-    ratings.length > 0
-      ? Math.max(...ratings).toFixed(1)
-      : "-";
+  const saunaRhythm =
+    calculateSaunaRhythm(myPosts);
 
-  /*
-   * 実績バッジの達成状況を計算します。
-   * DBは使わず、整いサマリーと同じ投稿データだけで判定します。
-   */
-  const hasFirstSteam = totalSaunaVisits >= 1;
-  const hasSaunaLover = totalSaunaVisits >= 10;
-  const hasExplorer = visitedSaunas >= 5;
-  const hasPerfection = ratings.some(
-    (rating) => rating === 5
-  );
+  const saunaPersona =
+    calculateSaunaPersona(myPosts);
 
-  const saunaLoverRemaining = Math.max(
-    10 - totalSaunaVisits,
-    0
-  );
+  const nextAchievement =
+    calculateNextAchievement(
+      profileInsights
+    );
 
-  const explorerRemaining = Math.max(
-    5 - visitedSaunas,
-    0
-  );
+  const visitedSaunaCount =
+    new Set(
+      myPosts
+        .map((post) =>
+          post.sauna_name.trim()
+        )
+        .filter(Boolean)
+    ).size;
+
+  const totalSetCount =
+    myPosts.reduce(
+      (total, post) =>
+        total +
+        (post.set_count ?? 0),
+      0
+    );
+
+  const xp = calculateSaunaXp({
+    visitCount: myPosts.length,
+    visitedSaunaCount,
+    totalSetCount,
+  });
 
   const memberSince = new Date(
     profile.created_at
-  ).toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-  });
+  ).toLocaleDateString(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "long",
+    }
+  );
 
   return (
     <>
@@ -525,12 +520,13 @@ export default async function ProfilePage() {
           sm:pt-32
         "
       >
-        {/* 背景装飾 */}
         <div
           aria-hidden="true"
           className="
             pointer-events-none
-            absolute -right-40 top-20
+            absolute
+            -right-40
+            top-20
             size-120
             rounded-full
             bg-secondary/15
@@ -542,7 +538,9 @@ export default async function ProfilePage() {
           aria-hidden="true"
           className="
             pointer-events-none
-            absolute -left-40 top-136
+            absolute
+            -left-40
+            top-136
             size-112
             rounded-full
             bg-accent/8
@@ -561,1429 +559,172 @@ export default async function ProfilePage() {
             lg:px-8
           "
         >
-          {/* プロフィールヘッダー */}
-          <section
-            aria-labelledby="profile-heading"
-            className="
-              relative
-              overflow-hidden
-              rounded-[2rem]
-              border border-border/55
-              bg-card/90
-              shadow-sm
-              backdrop-blur-md
-              sm:rounded-[2.5rem]
-            "
+          <FadeIn
+            duration="slow"
+            distance="subtle"
           >
-            {/* 上部のラウンジ背景 */}
-            <div
-              className="
-                relative
-                h-28
-                overflow-hidden
-                border-b border-border/40
-                bg-linear-to-br
-                from-secondary/30
-                via-background
-                to-accent/15
-                sm:h-36
-              "
-            >
-              <div
-                aria-hidden="true"
-                className="
-                  absolute -right-10 -top-16
-                  size-52
-                  rounded-full
-                  bg-secondary/30
-                  blur-3xl
-                "
-              />
+            <ProfileHero
+              username={
+                profile.username
+              }
+              avatarUrl={
+                profile.avatar_url
+              }
+              bio={profile.bio}
+              memberSince={
+                memberSince
+              }
+              postCount={
+                myPosts.length
+              }
+              followingCount={
+                followingCount
+              }
+              followerCount={
+                followerCount
+              }
+            />
+          </FadeIn>
 
-              <div
-                aria-hidden="true"
-                className="
-                  absolute -bottom-20 left-16
-                  size-44
-                  rounded-full
-                  bg-accent/15
-                  blur-3xl
-                "
-              />
-
-              <p
-                className="
-                  absolute
-                  right-6
-                  top-6
-                  text-[0.625rem]
-                  font-semibold
-                  uppercase
-                  tracking-[0.28em]
-                  text-muted-foreground/70
-                  sm:right-8
-                  sm:top-8
-                "
-              >
-                My Sauna Lounge
-              </p>
-            </div>
-
-            <div
-              className="
-                px-5
-                pb-7
-                sm:px-8
-                sm:pb-9
-                lg:px-10
-              "
-            >
-              <div
-                className="
-                  -mt-12
-                  flex
-                  flex-col
-                  gap-6
-                  sm:-mt-14
-                  lg:flex-row
-                  lg:items-end
-                  lg:justify-between
-                "
-              >
-                <div
-                  className="
-                    flex
-                    flex-col
-                    items-center
-                    gap-5
-                    text-center
-                    sm:flex-row
-                    sm:items-end
-                    sm:text-left
-                  "
-                >
-                  <div
-                    className="
-                      rounded-full
-                      border-4
-                      border-card
-                      bg-card
-                      shadow-md
-                    "
-                  >
-                    <ProfileAvatar
-                      avatarUrl={
-                        profile.avatar_url
-                      }
-                      username={
-                        profile.username
-                      }
-                      size="xl"
-                    />
-                  </div>
-
-                  <div className="min-w-0 pb-1">
-                    <p
-                      className="
-                        text-[0.6875rem]
-                        font-semibold
-                        uppercase
-                        tracking-[0.2em]
-                        text-muted-foreground
-                      "
-                    >
-                      TOTONO Member
-                    </p>
-
-                    <h1
-                      id="profile-heading"
-                      className="
-                        mt-2
-                        wrap-break-word
-                        text-3xl
-                        font-semibold
-                        tracking-[-0.04em]
-                        text-foreground
-                        sm:text-4xl
-                      "
-                    >
-                      @
-                      {profile.username ||
-                        "ユーザー"}
-                    </h1>
-                  </div>
-                </div>
-
-                <Link
-                  href="/profile/edit"
-                  className={cn(
-                    buttonVariants({
-                      variant:
-                        "totonoOutline",
-                      size: "lg",
-                    }),
-                    "w-full px-5 sm:w-auto"
-                  )}
-                >
-                  <Edit3
-                    className="size-4"
-                    strokeWidth={1.8}
-                    data-icon="inline-start"
-                  />
-
-                  プロフィール編集
-                </Link>
-              </div>
-
-              <div
-                className="
-                  mt-7
-                  grid
-                  gap-6
-                  border-t border-border/45
-                  pt-7
-                  lg:grid-cols-[minmax(0,1fr)_auto]
-                  lg:items-end
-                "
-              >
-                {/* 自己紹介 */}
-                <div className="max-w-2xl">
-                  <p
-                    className="
-                      text-[0.6875rem]
-                      font-semibold
-                      uppercase
-                      tracking-[0.18em]
-                      text-muted-foreground
-                    "
-                  >
-                    About
-                  </p>
-
-                  <p
-                    className="
-                      mt-3
-                      whitespace-pre-wrap
-                      wrap-break-word
-                      text-sm
-                      leading-7
-                      text-foreground/80
-                      sm:text-base
-                      sm:leading-8
-                    "
-                  >
-                    {profile.bio ||
-                      "自己紹介はまだありません。プロフィール編集から、好きなサウナやサ活について書いてみましょう。"}
-                  </p>
-
-                  <div
-                    className="
-                      mt-4
-                      flex
-                      items-center
-                      gap-2
-                      text-xs
-                      text-muted-foreground
-                    "
-                  >
-                    <CalendarDays
-                      className="size-3.5"
-                      strokeWidth={1.7}
-                    />
-
-                    <span>
-                      {memberSince}から利用
-                    </span>
-                  </div>
-                </div>
-
-                {/* 投稿・フォロー数 */}
-                <dl
-                  className="
-                    grid
-                    grid-cols-3
-                    overflow-hidden
-                    rounded-2xl
-                    border border-border/50
-                    bg-background/45
-                  "
-                >
-                  <div
-                    className="
-                      min-w-0
-                      px-4
-                      py-4
-                      text-center
-                      sm:px-6
-                    "
-                  >
-                    <dt
-                      className="
-                        text-[0.6875rem]
-                        font-medium
-                        text-muted-foreground
-                      "
-                    >
-                      投稿
-                    </dt>
-
-                    <dd
-                      className="
-                        mt-1
-                        text-xl
-                        font-semibold
-                        tabular-nums
-                        text-foreground
-                      "
-                    >
-                      {myPosts.length}
-                    </dd>
-                  </div>
-
-                  <div
-                    className="
-                      min-w-0
-                      border-x
-                      border-border/45
-                      px-4
-                      py-4
-                      text-center
-                      sm:px-6
-                    "
-                  >
-                    <dt
-                      className="
-                        text-[0.6875rem]
-                        font-medium
-                        text-muted-foreground
-                      "
-                    >
-                      フォロー
-                    </dt>
-
-                    <dd
-                      className="
-                        mt-1
-                        text-xl
-                        font-semibold
-                        tabular-nums
-                        text-foreground
-                      "
-                    >
-                      {followingCount}
-                    </dd>
-                  </div>
-
-                  <div
-                    className="
-                      min-w-0
-                      px-4
-                      py-4
-                      text-center
-                      sm:px-6
-                    "
-                  >
-                    <dt
-                      className="
-                        text-[0.6875rem]
-                        font-medium
-                        text-muted-foreground
-                      "
-                    >
-                      フォロワー
-                    </dt>
-
-                    <dd
-                      className="
-                        mt-1
-                        text-xl
-                        font-semibold
-                        tabular-nums
-                        text-foreground
-                      "
-                    >
-                      {followerCount}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-                    </section>
-
-          {/* 整いサマリー */}
-          <section
-            aria-labelledby="sauna-summary-heading"
-            className="mt-8 sm:mt-10"
+          <ScrollReveal
+            duration="normal"
+            distance="subtle"
           >
-            <div
-              className="
-                overflow-hidden
-                rounded-[2rem]
-                border border-border/55
-                bg-card/90
-                shadow-sm
-                backdrop-blur-md
-                sm:rounded-[2.5rem]
-              "
-            >
-              <div
-                className="
-                  flex
-                  flex-col
-                  gap-4
-                  border-b border-border/45
-                  px-5
-                  py-6
-                  sm:flex-row
-                  sm:items-end
-                  sm:justify-between
-                  sm:px-8
-                  sm:py-7
-                  lg:px-10
-                "
-              >
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="
-                        flex
-                        size-9
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-secondary/25
-                        text-foreground
-                      "
-                    >
-                      <Activity
-                        className="size-4"
-                        strokeWidth={1.8}
-                      />
-                    </span>
+            <JournalEntryCard
+              monthlyVisits={
+                profileInsights.monthlyVisits
+              }
+              totalVisits={
+                profileInsights.totalSaunaVisits
+              }
+            />
+          </ScrollReveal>
 
-                    <p
-                      className="
-                        text-xs
-                        font-semibold
-                        uppercase
-                        tracking-[0.25em]
-                        text-muted-foreground
-                      "
-                    >
-                      Sauna Summary
-                    </p>
-                  </div>
-
-                  <h2
-                    id="sauna-summary-heading"
-                    className="
-                      mt-4
-                      text-2xl
-                      font-semibold
-                      tracking-[-0.035em]
-                      text-foreground
-                      sm:text-3xl
-                    "
-                  >
-                    整いサマリー
-                  </h2>
-                </div>
-
-                <p
-                  className="
-                    max-w-md
-                    text-sm
-                    leading-7
-                    text-muted-foreground
-                  "
-                >
-                  これまでに記録したサ活から、
-                  あなたの整いの歩みをまとめています。
-                </p>
-              </div>
-
-              <dl
-                className="
-                  grid
-                  grid-cols-2
-                  divide-x
-                  divide-y
-                  divide-border/45
-                  sm:grid-cols-4
-                  sm:divide-y-0
-                "
-              >
-                <div
-                  className="
-                    min-w-0
-                    bg-background/25
-                    px-5
-                    py-6
-                    sm:px-6
-                    sm:py-7
-                    lg:px-8
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      size-10
-                      items-center
-                      justify-center
-                      rounded-2xl
-                      bg-accent/20
-                      text-foreground
-                    "
-                  >
-                    <Activity
-                      className="size-4.5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <dt
-                    className="
-                      mt-5
-                      text-xs
-                      font-medium
-                      text-muted-foreground
-                    "
-                  >
-                    総サ活数
-                  </dt>
-
-                  <dd
-                    className="
-                      mt-2
-                      flex
-                      items-baseline
-                      gap-1.5
-                      text-3xl
-                      font-semibold
-                      tracking-[-0.04em]
-                      text-foreground
-                    "
-                  >
-                    <span className="tabular-nums">
-                      {totalSaunaVisits}
-                    </span>
-
-                    <span
-                      className="
-                        text-xs
-                        font-medium
-                        tracking-normal
-                        text-muted-foreground
-                      "
-                    >
-                      回
-                    </span>
-                  </dd>
-                </div>
-
-                <div
-                  className="
-                    min-w-0
-                    bg-background/25
-                    px-5
-                    py-6
-                    sm:px-6
-                    sm:py-7
-                    lg:px-8
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      size-10
-                      items-center
-                      justify-center
-                      rounded-2xl
-                      bg-secondary/25
-                      text-foreground
-                    "
-                  >
-                    <Building2
-                      className="size-4.5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <dt
-                    className="
-                      mt-5
-                      text-xs
-                      font-medium
-                      text-muted-foreground
-                    "
-                  >
-                    訪問施設数
-                  </dt>
-
-                  <dd
-                    className="
-                      mt-2
-                      flex
-                      items-baseline
-                      gap-1.5
-                      text-3xl
-                      font-semibold
-                      tracking-[-0.04em]
-                      text-foreground
-                    "
-                  >
-                    <span className="tabular-nums">
-                      {visitedSaunas}
-                    </span>
-
-                    <span
-                      className="
-                        text-xs
-                        font-medium
-                        tracking-normal
-                        text-muted-foreground
-                      "
-                    >
-                      施設
-                    </span>
-                  </dd>
-                </div>
-
-                <div
-                  className="
-                    min-w-0
-                    bg-background/25
-                    px-5
-                    py-6
-                    sm:px-6
-                    sm:py-7
-                    lg:px-8
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      size-10
-                      items-center
-                      justify-center
-                      rounded-2xl
-                      bg-accent/20
-                      text-foreground
-                    "
-                  >
-                    <Star
-                      className="size-4.5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <dt
-                    className="
-                      mt-5
-                      text-xs
-                      font-medium
-                      text-muted-foreground
-                    "
-                  >
-                    平均評価
-                  </dt>
-
-                  <dd
-                    className="
-                      mt-2
-                      flex
-                      items-baseline
-                      gap-1.5
-                      text-3xl
-                      font-semibold
-                      tracking-[-0.04em]
-                      text-foreground
-                    "
-                  >
-                    <span className="tabular-nums">
-                      {averageRating}
-                    </span>
-
-                    {averageRating !== "-" && (
-                      <span
-                        className="
-                          text-xs
-                          font-medium
-                          tracking-normal
-                          text-muted-foreground
-                        "
-                      >
-                        / 5.0
-                      </span>
-                    )}
-                  </dd>
-                </div>
-
-                <div
-                  className="
-                    min-w-0
-                    bg-background/25
-                    px-5
-                    py-6
-                    sm:px-6
-                    sm:py-7
-                    lg:px-8
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      size-10
-                      items-center
-                      justify-center
-                      rounded-2xl
-                      bg-secondary/25
-                      text-foreground
-                    "
-                  >
-                    <Trophy
-                      className="size-4.5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <dt
-                    className="
-                      mt-5
-                      text-xs
-                      font-medium
-                      text-muted-foreground
-                    "
-                  >
-                    最高評価
-                  </dt>
-
-                  <dd
-                    className="
-                      mt-2
-                      flex
-                      items-baseline
-                      gap-1.5
-                      text-3xl
-                      font-semibold
-                      tracking-[-0.04em]
-                      text-foreground
-                    "
-                  >
-                    <span className="tabular-nums">
-                      {highestRating}
-                    </span>
-
-                    {highestRating !== "-" && (
-                      <span
-                        className="
-                          text-xs
-                          font-medium
-                          tracking-normal
-                          text-muted-foreground
-                        "
-                      >
-                        / 5.0
-                      </span>
-                    )}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </section>
-
-          {/* 実績・バッジ */}
-          <section
-            aria-labelledby="achievements-heading"
-            className="mt-8 sm:mt-10"
+          <ScrollReveal
+            delay={40}
+            duration="slow"
+            distance="normal"
           >
-            <div
-              className="
-                overflow-hidden
-                rounded-[2rem]
-                border border-border/55
-                bg-card/90
-                shadow-sm
-                backdrop-blur-md
-                sm:rounded-[2.5rem]
-              "
-            >
-              <div
-                className="
-                  flex
-                  flex-col
-                  gap-4
-                  border-b border-border/45
-                  px-5
-                  py-6
-                  sm:flex-row
-                  sm:items-end
-                  sm:justify-between
-                  sm:px-8
-                  sm:py-7
-                  lg:px-10
-                "
-              >
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="
-                        flex
-                        size-9
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-accent/20
-                        text-foreground
-                      "
-                    >
-                      <Trophy
-                        className="size-4"
-                        strokeWidth={1.8}
-                      />
-                    </span>
+            <SaunaSummary
+              insights={
+                profileInsights
+              }
+            />
+          </ScrollReveal>
 
-                    <p
-                      className="
-                        text-xs
-                        font-semibold
-                        uppercase
-                        tracking-[0.25em]
-                        text-muted-foreground
-                      "
-                    >
-                      Achievements
-                    </p>
-                  </div>
+          <ScrollReveal
+            delay={60}
+            duration="slow"
+            distance="normal"
+          >
+            <AnnualSaunaReport
+              report={
+                profileInsights.annualReport
+              }
+            />
+          </ScrollReveal>
 
-                  <h2
-                    id="achievements-heading"
-                    className="
-                      mt-4
-                      text-2xl
-                      font-semibold
-                      tracking-[-0.035em]
-                      text-foreground
-                      sm:text-3xl
-                    "
-                  >
-                    サ活の実績
-                  </h2>
-                </div>
+          <ScrollReveal
+            duration="normal"
+            distance="subtle"
+          >
+            <SaunaRhythmCard
+              rhythm={saunaRhythm}
+            />
+          </ScrollReveal>
 
-                <p
-                  className="
-                    max-w-md
-                    text-sm
-                    leading-7
-                    text-muted-foreground
-                  "
-                >
-                  記録を重ねるほど、新しいバッジが解放されます。
-                  次の整いを目指してみましょう。
-                </p>
-              </div>
+          <ScrollReveal
+            delay={40}
+            duration="normal"
+            distance="subtle"
+          >
+            <SaunaPersonaCard
+              persona={saunaPersona}
+            />
+          </ScrollReveal>
 
-              <div
-                className="
-                  grid
-                  gap-4
-                  p-5
-                  sm:grid-cols-2
-                  sm:p-8
-                  lg:grid-cols-4
-                  lg:p-10
-                "
-              >
-                <article
-                  className={cn(
-                    `
-                      relative
-                      overflow-hidden
-                      rounded-[1.75rem]
-                      border
-                      p-5
-                      transition-transform
-                      duration-300
-                      sm:p-6
-                    `,
-                    hasFirstSteam
-                      ? `
-                          border-accent/35
-                          bg-accent/10
-                          hover:-translate-y-1
-                        `
-                      : `
-                          border-border/50
-                          bg-background/35
-                        `
-                  )}
-                >
-                  <div
-                    aria-hidden="true"
-                    className={cn(
-                      `
-                        absolute -right-8 -top-8
-                        size-24
-                        rounded-full
-                        blur-2xl
-                      `,
-                      hasFirstSteam
-                        ? "bg-accent/25"
-                        : "bg-muted/60"
-                    )}
-                  />
+          <ScrollReveal
+            delay={60}
+            duration="normal"
+            distance="subtle"
+          >
+            <NextAchievementCard
+              achievement={
+                nextAchievement
+              }
+            />
+          </ScrollReveal>
 
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        flex
-                        size-11
-                        items-center
-                        justify-center
-                        rounded-2xl
-                      `,
-                      hasFirstSteam
-                        ? "bg-accent/25 text-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <Sparkles
-                      className="size-5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
+          <ScrollReveal
+            duration="slow"
+            distance="normal"
+          >
+            <AchievementCard
+              report={
+                profileInsights.annualReport
+              }
+            />
+          </ScrollReveal>
 
-                  <p
-                    className="
-                      relative
-                      mt-5
-                      text-[0.6875rem]
-                      font-semibold
-                      uppercase
-                      tracking-[0.18em]
-                      text-muted-foreground
-                    "
-                  >
-                    First Steam
-                  </p>
+          <ScrollReveal
+            delay={40}
+            duration="normal"
+            distance="subtle"
+          >
+            <XpStatusCard xp={xp} />
+          </ScrollReveal>
 
-                  <h3
-                    className="
-                      relative
-                      mt-2
-                      text-lg
-                      font-semibold
-                      tracking-[-0.025em]
-                      text-foreground
-                    "
-                  >
-                    はじめての整い
-                  </h3>
+          <ScrollReveal
+            duration="slow"
+            distance="normal"
+          >
+            <MonthlyActivityChart
+              activities={
+                profileInsights.monthlyActivities
+              }
+            />
+          </ScrollReveal>
 
-                  <p
-                    className="
-                      relative
-                      mt-3
-                      min-h-12
-                      text-sm
-                      leading-6
-                      text-muted-foreground
-                    "
-                  >
-                    最初のサ活を記録すると獲得できます。
-                  </p>
+          <ScrollReveal
+            delay={40}
+            duration="slow"
+            distance="normal"
+          >
+            <TopVisitedSaunas
+              saunas={
+                profileInsights.topVisitedSaunas
+              }
+            />
+          </ScrollReveal>
 
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        mt-5
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-semibold
-                      `,
-                      hasFirstSteam
-                        ? `
-                            bg-success/15
-                            text-success
-                          `
-                        : `
-                            bg-muted
-                            text-muted-foreground
-                          `
-                    )}
-                  >
-                    {hasFirstSteam ? (
-                      <>
-                        <BadgeCheck
-                          className="size-3.5"
-                          strokeWidth={2}
-                        />
-                        達成済み
-                      </>
-                    ) : (
-                      <>
-                        <LockKeyhole
-                          className="size-3.5"
-                          strokeWidth={1.8}
-                        />
-                        あと1投稿
-                      </>
-                    )}
-                  </div>
-                </article>
+          <ScrollReveal
+            duration="normal"
+            distance="subtle"
+          >
+            <AchievementBadges
+              insights={
+                profileInsights
+              }
+            />
+          </ScrollReveal>
 
-                <article
-                  className={cn(
-                    `
-                      relative
-                      overflow-hidden
-                      rounded-[1.75rem]
-                      border
-                      p-5
-                      transition-transform
-                      duration-300
-                      sm:p-6
-                    `,
-                    hasSaunaLover
-                      ? `
-                          border-accent/35
-                          bg-accent/10
-                          hover:-translate-y-1
-                        `
-                      : `
-                          border-border/50
-                          bg-background/35
-                        `
-                  )}
-                >
-                  <div
-                    aria-hidden="true"
-                    className={cn(
-                      `
-                        absolute -right-8 -top-8
-                        size-24
-                        rounded-full
-                        blur-2xl
-                      `,
-                      hasSaunaLover
-                        ? "bg-accent/25"
-                        : "bg-muted/60"
-                    )}
-                  />
+          <ScrollReveal
+            delay={40}
+            duration="slow"
+            distance="normal"
+          >
+            <FavoriteSaunasSection
+              userId={user.id}
+            />
+          </ScrollReveal>
 
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        flex
-                        size-11
-                        items-center
-                        justify-center
-                        rounded-2xl
-                      `,
-                      hasSaunaLover
-                        ? "bg-accent/25 text-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <Flame
-                      className="size-5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <p
-                    className="
-                      relative
-                      mt-5
-                      text-[0.6875rem]
-                      font-semibold
-                      uppercase
-                      tracking-[0.18em]
-                      text-muted-foreground
-                    "
-                  >
-                    Sauna Lover
-                  </p>
-
-                  <h3
-                    className="
-                      relative
-                      mt-2
-                      text-lg
-                      font-semibold
-                      tracking-[-0.025em]
-                      text-foreground
-                    "
-                  >
-                    サウナ愛好家
-                  </h3>
-
-                  <p
-                    className="
-                      relative
-                      mt-3
-                      min-h-12
-                      text-sm
-                      leading-6
-                      text-muted-foreground
-                    "
-                  >
-                    サ活を10回記録すると獲得できます。
-                  </p>
-
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        mt-5
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-semibold
-                      `,
-                      hasSaunaLover
-                        ? `
-                            bg-success/15
-                            text-success
-                          `
-                        : `
-                            bg-muted
-                            text-muted-foreground
-                          `
-                    )}
-                  >
-                    {hasSaunaLover ? (
-                      <>
-                        <BadgeCheck
-                          className="size-3.5"
-                          strokeWidth={2}
-                        />
-                        達成済み
-                      </>
-                    ) : (
-                      <>
-                        <LockKeyhole
-                          className="size-3.5"
-                          strokeWidth={1.8}
-                        />
-                        あと{saunaLoverRemaining}投稿
-                      </>
-                    )}
-                  </div>
-                </article>
-
-                <article
-                  className={cn(
-                    `
-                      relative
-                      overflow-hidden
-                      rounded-[1.75rem]
-                      border
-                      p-5
-                      transition-transform
-                      duration-300
-                      sm:p-6
-                    `,
-                    hasExplorer
-                      ? `
-                          border-secondary/45
-                          bg-secondary/10
-                          hover:-translate-y-1
-                        `
-                      : `
-                          border-border/50
-                          bg-background/35
-                        `
-                  )}
-                >
-                  <div
-                    aria-hidden="true"
-                    className={cn(
-                      `
-                        absolute -right-8 -top-8
-                        size-24
-                        rounded-full
-                        blur-2xl
-                      `,
-                      hasExplorer
-                        ? "bg-secondary/30"
-                        : "bg-muted/60"
-                    )}
-                  />
-
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        flex
-                        size-11
-                        items-center
-                        justify-center
-                        rounded-2xl
-                      `,
-                      hasExplorer
-                        ? "bg-secondary/30 text-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <MapIcon
-                      className="size-5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <p
-                    className="
-                      relative
-                      mt-5
-                      text-[0.6875rem]
-                      font-semibold
-                      uppercase
-                      tracking-[0.18em]
-                      text-muted-foreground
-                    "
-                  >
-                    Explorer
-                  </p>
-
-                  <h3
-                    className="
-                      relative
-                      mt-2
-                      text-lg
-                      font-semibold
-                      tracking-[-0.025em]
-                      text-foreground
-                    "
-                  >
-                    サウナ探訪者
-                  </h3>
-
-                  <p
-                    className="
-                      relative
-                      mt-3
-                      min-h-12
-                      text-sm
-                      leading-6
-                      text-muted-foreground
-                    "
-                  >
-                    5つの異なる施設を記録すると獲得できます。
-                  </p>
-
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        mt-5
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-semibold
-                      `,
-                      hasExplorer
-                        ? `
-                            bg-success/15
-                            text-success
-                          `
-                        : `
-                            bg-muted
-                            text-muted-foreground
-                          `
-                    )}
-                  >
-                    {hasExplorer ? (
-                      <>
-                        <BadgeCheck
-                          className="size-3.5"
-                          strokeWidth={2}
-                        />
-                        達成済み
-                      </>
-                    ) : (
-                      <>
-                        <LockKeyhole
-                          className="size-3.5"
-                          strokeWidth={1.8}
-                        />
-                        あと{explorerRemaining}施設
-                      </>
-                    )}
-                  </div>
-                </article>
-
-                <article
-                  className={cn(
-                    `
-                      relative
-                      overflow-hidden
-                      rounded-[1.75rem]
-                      border
-                      p-5
-                      transition-transform
-                      duration-300
-                      sm:p-6
-                    `,
-                    hasPerfection
-                      ? `
-                          border-secondary/45
-                          bg-secondary/10
-                          hover:-translate-y-1
-                        `
-                      : `
-                          border-border/50
-                          bg-background/35
-                        `
-                  )}
-                >
-                  <div
-                    aria-hidden="true"
-                    className={cn(
-                      `
-                        absolute -right-8 -top-8
-                        size-24
-                        rounded-full
-                        blur-2xl
-                      `,
-                      hasPerfection
-                        ? "bg-secondary/30"
-                        : "bg-muted/60"
-                    )}
-                  />
-
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        flex
-                        size-11
-                        items-center
-                        justify-center
-                        rounded-2xl
-                      `,
-                      hasPerfection
-                        ? "bg-secondary/30 text-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <Star
-                      className="size-5"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <p
-                    className="
-                      relative
-                      mt-5
-                      text-[0.6875rem]
-                      font-semibold
-                      uppercase
-                      tracking-[0.18em]
-                      text-muted-foreground
-                    "
-                  >
-                    Perfection
-                  </p>
-
-                  <h3
-                    className="
-                      relative
-                      mt-2
-                      text-lg
-                      font-semibold
-                      tracking-[-0.025em]
-                      text-foreground
-                    "
-                  >
-                    至高の整い
-                  </h3>
-
-                  <p
-                    className="
-                      relative
-                      mt-3
-                      min-h-12
-                      text-sm
-                      leading-6
-                      text-muted-foreground
-                    "
-                  >
-                    評価5.0のサ活を記録すると獲得できます。
-                  </p>
-
-                  <div
-                    className={cn(
-                      `
-                        relative
-                        mt-5
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-semibold
-                      `,
-                      hasPerfection
-                        ? `
-                            bg-success/15
-                            text-success
-                          `
-                        : `
-                            bg-muted
-                            text-muted-foreground
-                          `
-                    )}
-                  >
-                    {hasPerfection ? (
-                      <>
-                        <BadgeCheck
-                          className="size-3.5"
-                          strokeWidth={2}
-                        />
-                        達成済み
-                      </>
-                    ) : (
-                      <>
-                        <LockKeyhole
-                          className="size-3.5"
-                          strokeWidth={1.8}
-                        />
-                        未達成
-                      </>
-                    )}
-                  </div>
-                </article>
-              </div>
-            </div>
-          </section>
-
-          <FavoriteSaunasSection userId={user.id} />
-
-          {/* 自分の投稿 */}
           <section
             aria-labelledby="my-posts-heading"
-            className="mt-14 sm:mt-16 lg:mt-20"
+            className="
+              mt-14
+              sm:mt-16
+              lg:mt-20
+            "
           >
             <div
               className="
@@ -1991,7 +732,8 @@ export default async function ProfilePage() {
                 flex
                 flex-col
                 gap-5
-                border-b border-border/55
+                border-b
+                border-border/55
                 pb-7
                 sm:flex-row
                 sm:items-end
@@ -2000,7 +742,13 @@ export default async function ProfilePage() {
               "
             >
               <div>
-                <div className="flex items-center gap-3">
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                  "
+                >
                   <span
                     className="
                       flex
@@ -2078,87 +826,33 @@ export default async function ProfilePage() {
               </Link>
             </div>
 
-            <div className="mx-auto max-w-4xl">
-              {myPostsWithMeta.length === 0 ? (
+            <div
+              className="
+                mx-auto
+                max-w-4xl
+              "
+            >
+              {myPostsWithMeta.length ===
+              0 ? (
+                <EmptyState
+                  eyebrow="Your First Journal"
+                  icon={PenLine}
+                  title="まだサ活の記録がありません"
+                  description="訪れたサウナの感想やセット数を記録して、自分だけのサウナジャーナルを始めましょう。"
+                  action={{
+                    label:
+                      "最初のサ活を投稿する",
+                    href: "/posts/new",
+                    icon: PenLine,
+                  }}
+                />
+              ) : (
                 <div
                   className="
-                    rounded-[2rem]
-                    border border-border/55
-                    bg-card/90
-                    px-6
-                    py-16
-                    text-center
-                    shadow-sm
-                    backdrop-blur-md
-                    sm:px-10
-                    sm:py-20
+                    space-y-8
+                    sm:space-y-12
                   "
                 >
-                  <div
-                    className="
-                      mx-auto
-                      flex
-                      size-14
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-secondary/25
-                      text-foreground
-                    "
-                  >
-                    <PenLine
-                      className="size-5"
-                      strokeWidth={1.7}
-                    />
-                  </div>
-
-                  <h3
-                    className="
-                      mt-6
-                      text-xl
-                      font-semibold
-                      tracking-tight
-                      text-foreground
-                    "
-                  >
-                    まだサ活の記録がありません
-                  </h3>
-
-                  <p
-                    className="
-                      mx-auto
-                      mt-3
-                      max-w-md
-                      text-sm
-                      leading-7
-                      text-muted-foreground
-                    "
-                  >
-                    訪れたサウナの感想やセット数を記録して、
-                    自分だけのサウナジャーナルを始めましょう。
-                  </p>
-
-                  <Link
-                    href="/posts/new"
-                    className={cn(
-                      buttonVariants({
-                        variant: "totono",
-                        size: "xl",
-                      }),
-                      "mt-8"
-                    )}
-                  >
-                    最初のサ活を投稿する
-
-                    <ArrowRight
-                      className="size-4"
-                      strokeWidth={1.8}
-                      data-icon="inline-end"
-                    />
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-8 sm:space-y-12">
                   {myPostsWithMeta.map(
                     ({
                       post,
@@ -2166,20 +860,31 @@ export default async function ProfilePage() {
                       liked,
                       bookmarked,
                       comments,
+                      images,
                     }) => (
                       <PostCard
                         key={post.id}
                         post={post}
-                        author={profile}
-                        userId={user.id}
-                        initialLiked={liked}
+                        author={
+                          profile
+                        }
+                        userId={
+                          user.id
+                        }
+                        initialLiked={
+                          liked
+                        }
                         initialLikeCount={
                           likeCount
                         }
                         initialBookmarked={
                           bookmarked
                         }
-                        comments={comments}
+                        comments={
+                          comments
+                        }
+                        images={images}
+                        imageDisplayMode="cover"
                       />
                     )
                   )}

@@ -9,15 +9,46 @@ export function PostImage({
   imageUrl,
   saunaName,
 }: Props) {
+  const normalizedSaunaName =
+    saunaName.trim();
+
+  const imageAlt =
+    normalizedSaunaName.length > 0
+      ? `${normalizedSaunaName}の投稿画像`
+      : "サウナ施設の投稿画像";
+
   return (
-    <figure className="relative aspect-16/10 w-full overflow-hidden rounded-[1.75rem] bg-muted">
+    <div
+      className="
+        relative
+        aspect-16/10
+        w-full
+        overflow-hidden
+        rounded-[1.75rem]
+        bg-muted
+      "
+    >
       <Image
         src={imageUrl}
-        alt={`${saunaName}の投稿画像`}
+        alt={imageAlt}
         fill
-        sizes="(max-width: 768px) 100vw, 900px"
-        className="object-cover transition-transform duration-700 ease-out hover:scale-[1.03]"
+        sizes="
+          (max-width: 639px)
+          calc(100vw - 2.5rem),
+          (max-width: 1023px)
+          calc(100vw - 5rem),
+          42rem
+        "
+        className="
+          object-cover
+          transition-transform
+          duration-700
+          ease-out
+          hover:scale-[1.03]
+          motion-reduce:transition-none
+          motion-reduce:hover:scale-100
+        "
       />
-    </figure>
+    </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import type { FormEvent } from "react";
 import {
-  useEffect,
+  type FormEvent,
+  useId,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -27,6 +28,13 @@ export function SearchForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const inputRef =
+    useRef<HTMLInputElement>(null);
+
+  const helpTextId = useId();
+  const characterCountId = useId();
+  const searchStatusId = useId();
+
   const currentQuery =
     searchParams.get("q") ?? "";
 
@@ -36,17 +44,21 @@ export function SearchForm() {
   const [isPending, startTransition] =
     useTransition();
 
-
   const normalizedQuery =
     normalizeSearchQuery(query);
 
-  const isSearchDisabled =
-    isPending || !normalizedQuery;
+  const isNearCharacterLimit =
+    query.length >=
+    MAX_SEARCH_QUERY_LENGTH * 0.8;
 
   const handleSubmit = (
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
+
+    if (isPending) {
+      return;
+    }
 
     if (!normalizedQuery) {
       setQuery("");
@@ -61,7 +73,11 @@ export function SearchForm() {
     setQuery(normalizedQuery);
 
     const params = new URLSearchParams();
-    params.set("q", normalizedQuery);
+
+    params.set(
+      "q",
+      normalizedQuery
+    );
 
     startTransition(() => {
       router.push(
@@ -71,23 +87,28 @@ export function SearchForm() {
   };
 
   const handleClear = () => {
+    if (isPending) {
+      return;
+    }
+
     setQuery("");
 
     startTransition(() => {
       router.push("/search");
     });
-  };
 
-  const isNearCharacterLimit =
-    query.length >=
-    MAX_SEARCH_QUERY_LENGTH * 0.8;
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3"
       role="search"
       aria-label="TOTONO内を検索"
+      aria-busy={isPending}
+      className="space-y-3"
     >
       <div
         className="
@@ -106,29 +127,33 @@ export function SearchForm() {
           "
         >
           <Search
+            aria-hidden="true"
             className="
               pointer-events-none
               absolute
               left-4
               top-1/2
               z-10
-              size-4.5
+              size-[1.125rem]
               -translate-y-1/2
               text-muted-foreground
               transition-colors
               duration-200
               group-focus-within/input:text-foreground
+              motion-reduce:transition-none
             "
             strokeWidth={1.8}
-            aria-hidden="true"
           />
 
           <Input
+            ref={inputRef}
             type="search"
             name="q"
             value={query}
             onChange={(event) =>
-              setQuery(event.target.value)
+              setQuery(
+                event.target.value
+              )
             }
             placeholder="施設名、地域名、サ活を検索"
             maxLength={
@@ -137,26 +162,40 @@ export function SearchForm() {
             autoComplete="off"
             enterKeyHint="search"
             aria-label="サウナ施設やサ活を検索"
+            aria-describedby={[
+              helpTextId,
+              characterCountId,
+              isPending
+                ? searchStatusId
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" ")}
             className="
               h-13
               rounded-2xl
               border-border/60
               bg-background/75
               pl-11
-              pr-12
+              pr-14
               text-base
               shadow-sm
               transition
+              duration-200
               placeholder:text-muted-foreground/70
               hover:border-foreground/15
               focus-visible:border-foreground/25
+              focus-visible:outline-none
               focus-visible:ring-2
-              focus-visible:ring-ring/25
+              focus-visible:ring-ring
+              focus-visible:ring-offset-2
+              focus-visible:ring-offset-background
               sm:h-14
+              motion-reduce:transition-none
             "
           />
 
-          {query.length > 0 && (
+          {query.length > 0 ? (
             <button
               type="button"
               onClick={handleClear}
@@ -164,10 +203,10 @@ export function SearchForm() {
               aria-label="検索キーワードをクリア"
               className="
                 absolute
-                right-2.5
+                right-1.5
                 top-1/2
-                flex
-                size-8
+                inline-flex
+                size-11
                 -translate-y-1/2
                 items-center
                 justify-center
@@ -180,30 +219,36 @@ export function SearchForm() {
                 focus-visible:outline-none
                 focus-visible:ring-2
                 focus-visible:ring-ring
+                focus-visible:ring-offset-2
+                focus-visible:ring-offset-background
                 disabled:cursor-not-allowed
                 disabled:opacity-50
                 motion-reduce:transition-none
               "
             >
               <X
+                aria-hidden="true"
                 className="size-4"
                 strokeWidth={1.8}
-                aria-hidden="true"
               />
             </button>
-          )}
+          ) : null}
         </div>
 
         <Button
           type="submit"
-          disabled={isSearchDisabled}
+          disabled={isPending}
           aria-label={
             isPending
               ? "検索結果を読み込んでいます"
-              : "検索を実行"
+              : normalizedQuery
+                ? "検索を実行"
+                : "検索条件をクリアして検索画面を表示"
           }
+          aria-busy={isPending}
           className="
             h-13
+            min-h-11
             shrink-0
             gap-2
             rounded-2xl
@@ -215,6 +260,11 @@ export function SearchForm() {
             duration-200
             hover:-translate-y-0.5
             hover:shadow-md
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-ring
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-background
             disabled:translate-y-0
             disabled:shadow-none
             sm:h-14
@@ -225,18 +275,19 @@ export function SearchForm() {
         >
           {isPending ? (
             <LoaderCircle
+              aria-hidden="true"
               className="
                 size-4
                 animate-spin
+                motion-reduce:animate-none
               "
               strokeWidth={1.8}
-              aria-hidden="true"
             />
           ) : (
             <Search
+              aria-hidden="true"
               className="size-4"
               strokeWidth={1.8}
-              aria-hidden="true"
             />
           )}
 
@@ -259,6 +310,7 @@ export function SearchForm() {
         "
       >
         <p
+          id={helpTextId}
           className="
             text-xs
             leading-5
@@ -269,11 +321,13 @@ export function SearchForm() {
         </p>
 
         <span
+          id={characterCountId}
           className={`
             shrink-0
             text-xs
             tabular-nums
             transition-colors
+            motion-reduce:transition-none
             ${
               isNearCharacterLimit
                 ? "font-semibold text-error"
@@ -281,12 +335,32 @@ export function SearchForm() {
             }
           `}
           aria-live="polite"
-          aria-label={`${MAX_SEARCH_QUERY_LENGTH}文字中${query.length}文字入力済み`}
+          aria-atomic="true"
         >
-          {query.length} /{" "}
-          {MAX_SEARCH_QUERY_LENGTH}
+          <span aria-hidden="true">
+            {query.length} /{" "}
+            {MAX_SEARCH_QUERY_LENGTH}
+          </span>
+
+          <span className="sr-only">
+            {MAX_SEARCH_QUERY_LENGTH}
+            文字中
+            {query.length}
+            文字入力済み
+          </span>
         </span>
       </div>
+
+      <p
+        id={searchStatusId}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {isPending
+          ? "検索結果を読み込んでいます。"
+          : ""}
+      </p>
     </form>
   );
 }

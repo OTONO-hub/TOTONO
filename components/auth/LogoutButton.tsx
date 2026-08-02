@@ -1,7 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { LoaderCircle, LogOut } from "lucide-react";
+import {
+  useMemo,
+  useState,
+} from "react";
+import {
+  LoaderCircle,
+  LogOut,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -9,9 +15,16 @@ import { createClient } from "@/lib/supabase/client";
 
 export function LogoutButton() {
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
 
-  const [loading, setLoading] = useState(false);
+  const supabase = useMemo(
+    () => createClient(),
+    []
+  );
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
   const handleLogout = async () => {
     if (loading) {
@@ -21,13 +34,20 @@ export function LogoutButton() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signOut();
+      const {
+        error,
+      } =
+        await supabase.auth.signOut();
 
       if (error) {
-        throw new Error(error.message);
+        throw new Error(
+          error.message
+        );
       }
 
-      toast.success("ログアウトしました。");
+      toast.success(
+        "ログアウトしました。"
+      );
 
       router.push("/login");
       router.refresh();
@@ -42,31 +62,57 @@ export function LogoutButton() {
     }
   };
 
+  const accessibleLabel =
+    loading
+      ? "ログアウトしています"
+      : "ログアウト";
+
   return (
     <button
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      aria-label={loading ? "ログアウト中" : "ログアウト"}
-      className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+      aria-label={accessibleLabel}
+      aria-busy={loading}
+      className="
+        inline-flex
+        size-11
+        shrink-0
+        items-center
+        justify-center
+        rounded-full
+        text-muted-foreground
+        transition-colors
+        duration-200
+        hover:bg-muted
+        hover:text-foreground
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-ring
+        focus-visible:ring-offset-2
+        focus-visible:ring-offset-background
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+        motion-reduce:transition-none
+      "
     >
       {loading ? (
         <LoaderCircle
-          className="size-4.5 animate-spin"
-          strokeWidth={1.75}
           aria-hidden="true"
+          className="
+            size-[1.125rem]
+            animate-spin
+            motion-reduce:animate-none
+          "
+          strokeWidth={1.75}
         />
       ) : (
         <LogOut
-          className="size-4.5"
-          strokeWidth={1.75}
           aria-hidden="true"
+          className="size-[1.125rem]"
+          strokeWidth={1.75}
         />
       )}
-
-      <span className="sr-only">
-        {loading ? "ログアウト中" : "ログアウト"}
-      </span>
     </button>
   );
 }
