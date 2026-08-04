@@ -74,8 +74,10 @@ export default function GlobalErrorPage({
           />
 
           <section
-            aria-labelledby="global-error-title"
             role="alert"
+            aria-live="assertive"
+            aria-labelledby="global-error-title"
+            aria-describedby="global-error-description"
             className="
               relative
               w-full
@@ -108,9 +110,9 @@ export default function GlobalErrorPage({
               "
             >
               <AlertTriangle
+                aria-hidden="true"
                 className="size-6"
                 strokeWidth={1.8}
-                aria-hidden="true"
               />
             </div>
 
@@ -142,6 +144,7 @@ export default function GlobalErrorPage({
             </h1>
 
             <p
+              id="global-error-description"
               className="
                 mx-auto
                 mt-4
@@ -150,10 +153,12 @@ export default function GlobalErrorPage({
                 leading-7
                 text-black/55
                 sm:text-base
+                sm:leading-8
               "
             >
               アプリ全体の読み込み中に一時的な問題が発生しました。
-              通信状態を確認し、少し時間をおいてからもう一度お試しください。
+              通信状態を確認し、少し時間をおいてから
+              もう一度お試しください。
             </p>
 
             <div
@@ -193,15 +198,17 @@ export default function GlobalErrorPage({
                   focus-visible:ring-offset-2
                   focus-visible:ring-offset-white
                   active:translate-y-0
+                  motion-reduce:transform-none
+                  motion-reduce:transition-none
                 "
               >
                 <RefreshCw
+                  aria-hidden="true"
                   className="size-4"
                   strokeWidth={1.8}
-                  aria-hidden="true"
                 />
 
-                もう一度読み込む
+                もう一度試す
               </button>
 
               <Link
@@ -230,12 +237,14 @@ export default function GlobalErrorPage({
                   focus-visible:ring-offset-2
                   focus-visible:ring-offset-white
                   active:translate-y-0
+                  motion-reduce:transform-none
+                  motion-reduce:transition-none
                 "
               >
                 <Search
+                  aria-hidden="true"
                   className="size-4"
                   strokeWidth={1.8}
-                  aria-hidden="true"
                 />
 
                 施設を探す
@@ -263,19 +272,19 @@ export default function GlobalErrorPage({
                 focus-visible:ring-[#3e3a3a]
                 focus-visible:ring-offset-2
                 focus-visible:ring-offset-white
+                motion-reduce:transition-none
               "
             >
               <ArrowLeft
+                aria-hidden="true"
                 className="size-4"
                 strokeWidth={1.8}
-                aria-hidden="true"
               />
 
               ホームへ戻る
             </Link>
 
-            {process.env.NODE_ENV ===
-            "development" ? (
+            {process.env.NODE_ENV === "development" ? (
               <details
                 className="
                   mt-8
@@ -290,9 +299,15 @@ export default function GlobalErrorPage({
                 <summary
                   className="
                     cursor-pointer
+                    rounded-sm
                     text-sm
                     font-medium
                     text-black/55
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-[#3e3a3a]
+                    focus-visible:ring-offset-2
+                    focus-visible:ring-offset-white
                   "
                 >
                   開発用エラー情報

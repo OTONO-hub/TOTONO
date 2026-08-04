@@ -6,9 +6,10 @@ export default function ProfileLoading() {
     <>
       <Header />
 
-      <main
+      <div
         aria-busy="true"
         aria-live="polite"
+        aria-label="プロフィールを読み込んでいます"
         className="
           min-h-screen
           bg-muted/25
@@ -19,7 +20,8 @@ export default function ProfileLoading() {
         "
       >
         <span className="sr-only">
-          プロフィールを読み込んでいます
+          プロフィールを読み込んでいます。
+          しばらくお待ちください。
         </span>
 
         <div
@@ -34,7 +36,7 @@ export default function ProfileLoading() {
         >
           <ProfileSkeleton />
         </div>
-      </main>
+      </div>
     </>
   );
 }

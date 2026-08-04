@@ -1,18 +1,27 @@
 import { JsonLd } from "@/components/seo/json-ld";
+import { SITE_URL } from "@/lib/site-metadata";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "http://localhost:3000";
+const SITE_NAME = "TOTONO";
+
+const SITE_DESCRIPTION =
+  "サウナへ行く前から、整い始める。サウナ施設の発見、サ活の記録、ユーザー同士の交流を楽しめるサウナライフプラットフォーム。";
 
 export function SiteJsonLd() {
+  const organizationId =
+    `${SITE_URL}/#organization`;
+
+  const websiteId =
+    `${SITE_URL}/#website`;
+
   return (
     <>
       <JsonLd
         data={{
           "@context": "https://schema.org",
           "@type": "Organization",
-          "@id": `${SITE_URL}/#organization`,
-          name: "TOTONO",
+          "@id": organizationId,
+          name: SITE_NAME,
+          alternateName: "トトノ",
           url: SITE_URL,
           logo: {
             "@type": "ImageObject",
@@ -20,8 +29,7 @@ export function SiteJsonLd() {
             width: 512,
             height: 512,
           },
-          description:
-            "サウナの記録を残し、自分だけのお気に入りサウナを見つけるサウナライフプラットフォーム",
+          description: SITE_DESCRIPTION,
         }}
       />
 
@@ -29,24 +37,15 @@ export function SiteJsonLd() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "@id": `${SITE_URL}/#website`,
+          "@id": websiteId,
           url: SITE_URL,
-          name: "TOTONO",
+          name: SITE_NAME,
           alternateName: "トトノ",
-          description:
-            "サウナへ行く前から、整い始める。サウナの記録と施設探しを楽しめるサウナライフプラットフォーム",
+          description: SITE_DESCRIPTION,
           publisher: {
-            "@id": `${SITE_URL}/#organization`,
+            "@id": organizationId,
           },
           inLanguage: "ja-JP",
-          potentialAction: {
-            "@type": "SearchAction",
-            target: {
-              "@type": "EntryPoint",
-              urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
-            },
-            "query-input": "required name=search_term_string",
-          },
         }}
       />
     </>

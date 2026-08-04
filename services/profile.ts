@@ -12,6 +12,42 @@ export type UpdateProfileInput = {
   avatar_url?: string;
 };
 
+export type UsernameAvailabilityOptions = {
+  excludedUserId?: string | null;
+};
+
+const USERNAME_UNIQUE_CONSTRAINT =
+  "profiles_username_unique_normalized_idx";
+
+function isUsernameAlreadyUsedError(
+  error: {
+    code?: string | null;
+    message?: string | null;
+    details?: string | null;
+    hint?: string | null;
+  } | null
+): boolean {
+  if (!error) {
+    return false;
+  }
+
+  const searchableText = [
+    error.message,
+    error.details,
+    error.hint,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return (
+    error.code === "23505" &&
+    searchableText.includes(
+      USERNAME_UNIQUE_CONSTRAINT
+    )
+  );
+}
+
 /**
  * ユーザーのプロフィールを取得します。
  */
@@ -77,6 +113,48 @@ export async function getProfilesByUserIds(
 }
 
 /**
+ * 指定したユーザー名が使用可能か確認します。
+ *
+ * excludedUserIdを指定すると、そのユーザー自身の
+ * 現在のプロフィール名は重複として扱いません。
+ */
+export async function isUsernameAvailable(
+  supabase: SupabaseClient,
+  username: string,
+  options: UsernameAvailabilityOptions = {}
+): Promise<boolean> {
+  const normalizedUsername =
+    assertRequiredText(
+      username,
+      "ユーザー名"
+    );
+
+  const normalizedExcludedUserId =
+    options.excludedUserId?.trim() ||
+    null;
+
+  const { data, error } =
+    await supabase.rpc(
+      "is_username_available",
+      {
+        candidate_username:
+          normalizedUsername,
+        excluded_user_id:
+          normalizedExcludedUserId,
+      }
+    );
+
+  assertSupabaseError(error, {
+    fallbackMessage:
+      "ユーザー名の確認に失敗しました。",
+    context:
+      "isUsernameAvailable",
+  });
+
+  return data === true;
+}
+
+/**
  * プロフィールを更新します。
  *
  * プロフィールが存在しない場合は
@@ -94,7 +172,10 @@ export async function updateProfile(
     );
 
   const username =
-    input.username.trim();
+    assertRequiredText(
+      input.username,
+      "ユーザー名"
+    );
 
   const bio = input.bio.trim();
 
@@ -110,6 +191,14 @@ export async function updateProfile(
       bio,
       avatar_url: avatarUrl,
     });
+
+  if (
+    isUsernameAlreadyUsedError(error)
+  ) {
+    throw new Error(
+      "このユーザー名はすでに使用されています。"
+    );
+  }
 
   assertSupabaseError(error, {
     fallbackMessage:

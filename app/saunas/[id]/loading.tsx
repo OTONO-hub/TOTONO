@@ -6,9 +6,10 @@ export default function SaunaDetailLoading() {
     <>
       <Header />
 
-      <main
+      <div
         aria-busy="true"
         aria-live="polite"
+        aria-label="サウナ施設情報を読み込んでいます"
         className="
           min-h-screen
           bg-[#e6e5ef]/45
@@ -21,7 +22,8 @@ export default function SaunaDetailLoading() {
         "
       >
         <span className="sr-only">
-          サウナ施設情報を読み込んでいます
+          サウナ施設情報を読み込んでいます。
+          しばらくお待ちください。
         </span>
 
         <div
@@ -36,7 +38,7 @@ export default function SaunaDetailLoading() {
         >
           <SaunaSkeleton />
         </div>
-      </main>
+      </div>
     </>
   );
 }

@@ -11,12 +11,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Camera,
+  Check,
   LoaderCircle,
   Save,
   UserRound,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,18 +33,38 @@ import {
 } from "@/services/avatar";
 import {
   getProfile,
+  isUsernameAvailable,
   updateProfile,
 } from "@/services/profile";
 
+const MIN_USERNAME_LENGTH = 2;
 const MAX_USERNAME_LENGTH = 30;
 const MAX_BIO_LENGTH = 160;
+
+type UsernameAvailabilityState =
+  | "idle"
+  | "checking"
+  | "available"
+  | "unavailable";
+
+function normalizeUsername(value: string): string {
+  return value.trim();
+}
 
 export default function EditProfilePage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(
+    null
+  );
+  const [initialUsername, setInitialUsername] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
+
+  const [usernameAvailability, setUsernameAvailability] =
+    useState<UsernameAvailabilityState>("idle");
+  const [checkedUsername, setCheckedUsername] = useState("");
 
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<
     string | null
@@ -71,10 +94,18 @@ export default function EditProfilePage() {
         }
 
         const profile = await getProfile(supabase, user.id);
+        const profileUsername = profile?.username ?? "";
 
-        setUsername(profile?.username ?? "");
+        setCurrentUserId(user.id);
+        setInitialUsername(profileUsername);
+        setUsername(profileUsername);
         setBio(profile?.bio ?? "");
         setCurrentAvatarUrl(profile?.avatar_url ?? null);
+
+        if (profileUsername) {
+          setCheckedUsername(normalizeUsername(profileUsername));
+          setUsernameAvailability("available");
+        }
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -88,7 +119,7 @@ export default function EditProfilePage() {
       }
     };
 
-    fetchProfile();
+    void fetchProfile();
   }, [router, supabase]);
 
   useEffect(() => {
@@ -98,6 +129,93 @@ export default function EditProfilePage() {
       }
     };
   }, [avatarPreviewUrl]);
+
+  const validateUsername = (value: string): string | null => {
+    const normalizedValue = normalizeUsername(value);
+    const usernameLength = Array.from(normalizedValue).length;
+
+    if (!normalizedValue) {
+      return "ユーザー名を入力してください。";
+    }
+
+    if (usernameLength < MIN_USERNAME_LENGTH) {
+      return `ユーザー名は${MIN_USERNAME_LENGTH}文字以上で入力してください。`;
+    }
+
+    if (usernameLength > MAX_USERNAME_LENGTH) {
+      return `ユーザー名は${MAX_USERNAME_LENGTH}文字以内で入力してください。`;
+    }
+
+    if (/[\u0000-\u001f\u007f]/.test(normalizedValue)) {
+      return "ユーザー名に使用できない文字が含まれています。";
+    }
+
+    return null;
+  };
+
+  const resetUsernameAvailability = () => {
+    setUsernameAvailability("idle");
+    setCheckedUsername("");
+  };
+
+  const checkUsernameAvailability = async (): Promise<boolean> => {
+    const normalizedUsername = normalizeUsername(username);
+    const validationMessage = validateUsername(username);
+
+    if (validationMessage) {
+      resetUsernameAvailability();
+      toast.error(validationMessage);
+      return false;
+    }
+
+    if (!currentUserId) {
+      toast.error("ユーザー情報を確認できませんでした。");
+      return false;
+    }
+
+    if (
+      normalizedUsername.toLowerCase() ===
+      normalizeUsername(initialUsername).toLowerCase()
+    ) {
+      setCheckedUsername(normalizedUsername);
+      setUsernameAvailability("available");
+      return true;
+    }
+
+    setUsernameAvailability("checking");
+
+    try {
+      const available = await isUsernameAvailable(
+        supabase,
+        normalizedUsername,
+        {
+          excludedUserId: currentUserId,
+        }
+      );
+
+      setCheckedUsername(normalizedUsername);
+      setUsernameAvailability(
+        available ? "available" : "unavailable"
+      );
+
+      return available;
+    } catch (error) {
+      console.error(
+        "プロフィール名の確認中にエラーが発生しました。",
+        error
+      );
+
+      resetUsernameAvailability();
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "ユーザー名の確認に失敗しました。"
+      );
+
+      return false;
+    }
+  };
 
   const handleAvatarChange = async (
     event: ChangeEvent<HTMLInputElement>
@@ -150,22 +268,20 @@ export default function EditProfilePage() {
   ) => {
     event.preventDefault();
 
-    const trimmedUsername = username.trim();
+    if (saving) {
+      return;
+    }
+
+    const trimmedUsername = normalizeUsername(username);
     const trimmedBio = bio.trim();
+    const usernameValidationMessage = validateUsername(username);
 
-    if (!trimmedUsername) {
-      toast.error("ユーザー名を入力してください。");
+    if (usernameValidationMessage) {
+      toast.error(usernameValidationMessage);
       return;
     }
 
-    if (trimmedUsername.length > MAX_USERNAME_LENGTH) {
-      toast.error(
-        `ユーザー名は${MAX_USERNAME_LENGTH}文字以内で入力してください。`
-      );
-      return;
-    }
-
-    if (trimmedBio.length > MAX_BIO_LENGTH) {
+    if (Array.from(trimmedBio).length > MAX_BIO_LENGTH) {
       toast.error(
         `自己紹介は${MAX_BIO_LENGTH}文字以内で入力してください。`
       );
@@ -179,19 +295,34 @@ export default function EditProfilePage() {
       return;
     }
 
+    if (!currentUserId) {
+      toast.error("ユーザー情報を確認できませんでした。");
+      router.push("/login");
+      return;
+    }
+
     setSaving(true);
 
     let newUploadedAvatarPath: string | null = null;
 
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const hasValidAvailabilityCheck =
+        usernameAvailability === "available" &&
+        checkedUsername === trimmedUsername;
 
-      if (userError || !user) {
-        toast.error("ログインしてください。");
-        router.push("/login");
+      const available = hasValidAvailabilityCheck
+        ? true
+        : await checkUsernameAvailability();
+
+      if (!available) {
+        if (usernameAvailability !== "unavailable") {
+          setUsernameAvailability("unavailable");
+          setCheckedUsername(trimmedUsername);
+        }
+
+        toast.error(
+          "このユーザー名はすでに使用されています。"
+        );
         return;
       }
 
@@ -200,7 +331,7 @@ export default function EditProfilePage() {
       if (avatarFile) {
         const uploadedAvatar = await uploadAvatarImage(
           supabase,
-          user.id,
+          currentUserId,
           avatarFile
         );
 
@@ -208,7 +339,7 @@ export default function EditProfilePage() {
         newUploadedAvatarPath = uploadedAvatar.filePath;
       }
 
-      await updateProfile(supabase, user.id, {
+      await updateProfile(supabase, currentUserId, {
         username: trimmedUsername,
         bio: trimmedBio,
         avatar_url: avatarUrl,
@@ -252,11 +383,20 @@ export default function EditProfilePage() {
         }
       }
 
-      toast.error(
+      const message =
         error instanceof Error
           ? error.message
-          : "プロフィールの更新に失敗しました。"
-      );
+          : "プロフィールの更新に失敗しました。";
+
+      if (
+        message ===
+        "このユーザー名はすでに使用されています。"
+      ) {
+        setUsernameAvailability("unavailable");
+        setCheckedUsername(trimmedUsername);
+      }
+
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -265,19 +405,39 @@ export default function EditProfilePage() {
   const displayedAvatarUrl =
     avatarPreviewUrl ?? currentAvatarUrl;
 
+  const usernameLength = Array.from(username).length;
+
   if (initialLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-muted/40">
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        className="
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-muted/40
+        "
+      >
         <div className="flex items-center gap-2 text-muted-foreground">
-          <LoaderCircle className="size-5 animate-spin" />
+          <LoaderCircle
+            aria-hidden="true"
+            className="
+              size-5
+              animate-spin
+              motion-reduce:animate-none
+            "
+          />
+
           プロフィールを読み込んでいます...
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-muted/40 px-4 py-10">
+    <div className="min-h-screen bg-muted/40 px-4 py-10">
       <div className="mx-auto w-full max-w-xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -291,14 +451,41 @@ export default function EditProfilePage() {
 
         <form
           onSubmit={handleUpdateProfile}
-          className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm"
+          aria-busy={saving}
+          className="
+            space-y-6
+            rounded-2xl
+            border
+            bg-card
+            p-6
+            shadow-sm
+          "
         >
-          <section className="flex flex-col items-center">
-            <div className="relative size-32 overflow-hidden rounded-full border bg-muted">
+          <section
+            aria-labelledby="profile-image-heading"
+            className="flex flex-col items-center"
+          >
+            <h2
+              id="profile-image-heading"
+              className="sr-only"
+            >
+              プロフィール画像
+            </h2>
+
+            <div
+              className="
+                relative
+                size-32
+                overflow-hidden
+                rounded-full
+                border
+                bg-muted
+              "
+            >
               {displayedAvatarUrl ? (
                 <Image
                   src={displayedAvatarUrl}
-                  alt="プロフィール画像"
+                  alt="現在のプロフィール画像"
                   fill
                   className="object-cover"
                   sizes="128px"
@@ -306,19 +493,51 @@ export default function EditProfilePage() {
                 />
               ) : (
                 <div className="flex size-full items-center justify-center">
-                  <UserRound className="size-14 text-muted-foreground" />
+                  <UserRound
+                    aria-hidden="true"
+                    className="size-14 text-muted-foreground"
+                  />
                 </div>
               )}
             </div>
 
             <label
               htmlFor="avatar"
-              className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted"
+              className="
+                mt-4
+                inline-flex
+                min-h-11
+                cursor-pointer
+                items-center
+                gap-2
+                rounded-full
+                border
+                px-4
+                py-2
+                text-sm
+                font-medium
+                transition
+                hover:bg-muted
+                focus-within:ring-2
+                focus-within:ring-ring
+                focus-within:ring-offset-2
+                motion-reduce:transition-none
+              "
             >
               {processingImage ? (
-                <LoaderCircle className="size-4 animate-spin" />
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="
+                    size-4
+                    animate-spin
+                    motion-reduce:animate-none
+                  "
+                />
               ) : (
-                <Camera className="size-4" />
+                <Camera
+                  aria-hidden="true"
+                  className="size-4"
+                />
               )}
 
               {processingImage
@@ -328,6 +547,7 @@ export default function EditProfilePage() {
 
             <Input
               id="avatar"
+              name="avatar"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={handleAvatarChange}
@@ -343,7 +563,7 @@ export default function EditProfilePage() {
           </section>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <label
                 htmlFor="username"
                 className="text-sm font-medium"
@@ -352,25 +572,104 @@ export default function EditProfilePage() {
               </label>
 
               <span className="text-xs text-muted-foreground">
-                {username.length} / {MAX_USERNAME_LENGTH}
+                {usernameLength} / {MAX_USERNAME_LENGTH}
               </span>
             </div>
 
-            <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(event) =>
-                setUsername(event.target.value)
+            <div className="relative">
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                value={username}
+                onChange={(event) => {
+                  setUsername(event.target.value);
+                  resetUsernameAvailability();
+                }}
+                onBlur={() => {
+                  if (
+                    normalizeUsername(username) &&
+                    usernameAvailability === "idle"
+                  ) {
+                    void checkUsernameAvailability();
+                  }
+                }}
+                placeholder="例：kazuya"
+                minLength={MIN_USERNAME_LENGTH}
+                maxLength={MAX_USERNAME_LENGTH}
+                required
+                disabled={saving}
+                aria-invalid={
+                  usernameAvailability === "unavailable"
+                    ? true
+                    : undefined
+                }
+                aria-describedby="username-help username-status"
+                className="pr-11"
+              />
+
+              <div
+                aria-hidden="true"
+                className="
+                  pointer-events-none
+                  absolute
+                  right-3
+                  top-1/2
+                  -translate-y-1/2
+                "
+              >
+                {usernameAvailability === "checking" ? (
+                  <LoaderCircle
+                    className="
+                      size-4
+                      animate-spin
+                      text-muted-foreground
+                      motion-reduce:animate-none
+                    "
+                  />
+                ) : null}
+
+                {usernameAvailability === "available" ? (
+                  <Check className="size-4 text-success" />
+                ) : null}
+
+                {usernameAvailability === "unavailable" ? (
+                  <X className="size-4 text-destructive" />
+                ) : null}
+              </div>
+            </div>
+
+            <p
+              id="username-help"
+              className="text-xs leading-5 text-muted-foreground"
+            >
+              {MIN_USERNAME_LENGTH}〜{MAX_USERNAME_LENGTH}
+              文字で入力してください。大文字・小文字や前後の空白だけが
+              異なる名前も同じ名前として扱われます。
+            </p>
+
+            <p
+              id="username-status"
+              aria-live="polite"
+              className={
+                usernameAvailability === "available"
+                  ? "text-xs font-medium text-success"
+                  : usernameAvailability === "unavailable"
+                    ? "text-xs font-medium text-destructive"
+                    : "sr-only"
               }
-              placeholder="例：kazuya"
-              maxLength={MAX_USERNAME_LENGTH}
-              disabled={saving}
-            />
+            >
+              {usernameAvailability === "available"
+                ? "このユーザー名は使用できます。"
+                : usernameAvailability === "unavailable"
+                  ? "このユーザー名はすでに使用されています。"
+                  : ""}
+            </p>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <label
                 htmlFor="bio"
                 className="text-sm font-medium"
@@ -379,12 +678,13 @@ export default function EditProfilePage() {
               </label>
 
               <span className="text-xs text-muted-foreground">
-                {bio.length} / {MAX_BIO_LENGTH}
+                {Array.from(bio).length} / {MAX_BIO_LENGTH}
               </span>
             </div>
 
             <Textarea
               id="bio"
+              name="bio"
               value={bio}
               onChange={(event) => setBio(event.target.value)}
               placeholder="好きなサウナやサウナ歴を書いてみましょう。"
@@ -398,22 +698,38 @@ export default function EditProfilePage() {
             type="submit"
             size="lg"
             className="w-full"
-            disabled={saving || processingImage}
+            disabled={
+              saving ||
+              processingImage ||
+              usernameAvailability === "checking" ||
+              usernameAvailability === "unavailable"
+            }
           >
             {saving ? (
               <>
-                <LoaderCircle className="animate-spin" />
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="
+                    animate-spin
+                    motion-reduce:animate-none
+                  "
+                />
+
                 保存中...
               </>
             ) : (
               <>
-                <Save />
+                <Save aria-hidden="true" />
                 プロフィールを保存
               </>
             )}
           </Button>
         </form>
+
+        <div className="mt-10">
+          <DeleteAccountDialog />
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

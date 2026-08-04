@@ -7,9 +7,10 @@ export default function BookmarksLoading() {
     <>
       <Header />
 
-      <main
+      <div
         aria-busy="true"
         aria-live="polite"
+        aria-label="保存済み投稿を読み込んでいます"
         className="
           min-h-screen
           bg-muted/25
@@ -20,7 +21,8 @@ export default function BookmarksLoading() {
         "
       >
         <span className="sr-only">
-          保存済み投稿を読み込んでいます
+          保存済み投稿を読み込んでいます。
+          しばらくお待ちください。
         </span>
 
         <div
@@ -47,9 +49,9 @@ export default function BookmarksLoading() {
             "
           >
             <Skeleton className="h-4 w-28 rounded-full" />
-            <Skeleton className="mt-5 h-10 w-64 max-w-full" />
-            <Skeleton className="mt-4 h-4 w-full max-w-xl" />
-            <Skeleton className="mt-3 h-4 w-4/5 max-w-lg" />
+            <Skeleton className="mt-5 h-10 w-64 max-w-full rounded-xl" />
+            <Skeleton className="mt-4 h-4 w-full max-w-xl rounded-full" />
+            <Skeleton className="mt-3 h-4 w-4/5 max-w-lg rounded-full" />
           </section>
 
           <div className="mt-10">
@@ -59,7 +61,7 @@ export default function BookmarksLoading() {
             />
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

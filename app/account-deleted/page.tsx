@@ -1,12 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowLeft,
-  Compass,
+  CheckCircle2,
   Home,
   Search,
 } from "lucide-react";
 
-export default function NotFoundPage() {
+export const metadata: Metadata = {
+  title: "アカウントを削除しました",
+  description:
+    "TOTONOのアカウント削除が完了しました。",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
+export default function AccountDeletedPage() {
   return (
     <div
       className="
@@ -27,11 +37,11 @@ export default function NotFoundPage() {
         className="
           pointer-events-none
           absolute
-          -left-32
-          -top-32
+          -left-36
+          -top-36
           size-96
           rounded-full
-          bg-secondary/15
+          bg-secondary/20
           blur-3xl
         "
       />
@@ -45,30 +55,30 @@ export default function NotFoundPage() {
           -right-28
           size-96
           rounded-full
-          bg-accent/10
+          bg-accent/12
           blur-3xl
         "
       />
 
       <section
-        aria-labelledby="not-found-title"
+        aria-labelledby="account-deleted-title"
+        aria-describedby="account-deleted-description"
         className="
           relative
           w-full
-          max-w-2xl
+          max-w-lg
           overflow-hidden
           rounded-[2rem]
           border
           border-border/60
           bg-card/90
-          p-6
+          p-7
           text-center
           shadow-xl
           shadow-black/5
           backdrop-blur-xl
           sm:rounded-[2.5rem]
           sm:p-10
-          lg:p-12
         "
       >
         <div
@@ -79,17 +89,14 @@ export default function NotFoundPage() {
             items-center
             justify-center
             rounded-full
-            border
-            border-border/55
-            bg-secondary/15
-            text-foreground
-            shadow-sm
+            bg-success/10
+            text-success
           "
         >
-          <Compass
+          <CheckCircle2
             aria-hidden="true"
             className="size-7"
-            strokeWidth={1.7}
+            strokeWidth={1.8}
           />
         </div>
 
@@ -99,34 +106,31 @@ export default function NotFoundPage() {
             text-xs
             font-semibold
             uppercase
-            tracking-[0.25em]
+            tracking-[0.22em]
             text-muted-foreground
           "
         >
-          Lost in the steam
+          Account deleted
         </p>
 
         <h1
-          id="not-found-title"
+          id="account-deleted-title"
           className="
             mt-3
-            text-3xl
+            text-2xl
             font-semibold
-            tracking-[-0.045em]
+            tracking-[-0.04em]
             text-foreground
-            sm:text-4xl
+            sm:text-3xl
           "
         >
-          お探しのページは
-          <br className="hidden sm:block" />
-          見つかりませんでした
+          アカウントを削除しました
         </h1>
 
         <p
+          id="account-deleted-description"
           className="
-            mx-auto
             mt-5
-            max-w-lg
             text-sm
             leading-7
             text-muted-foreground
@@ -134,10 +138,28 @@ export default function NotFoundPage() {
             sm:leading-8
           "
         >
-          URLが変更されたか、投稿・施設・ユーザー情報が
-          削除された可能性があります。
-          ホームや検索から、もう一度目的の場所を探してみてください。
+          TOTONOをご利用いただき、ありがとうございました。
+          アカウントと関連するデータの削除手続きが完了しました。
         </p>
+
+        <div
+          className="
+            mt-6
+            rounded-2xl
+            border
+            border-border/60
+            bg-muted/35
+            p-4
+            text-left
+            text-sm
+            leading-7
+            text-muted-foreground
+          "
+        >
+          ブラウザや配信環境のキャッシュによって、
+          削除済みの情報が一時的に表示される場合があります。
+          その場合は、ページを再読み込みしてください。
+        </div>
 
         <div
           className="
@@ -163,15 +185,12 @@ export default function NotFoundPage() {
               text-primary-foreground
               shadow-sm
               transition
-              duration-200
               hover:-translate-y-0.5
               hover:shadow-md
               focus-visible:outline-none
               focus-visible:ring-2
               focus-visible:ring-ring
               focus-visible:ring-offset-2
-              focus-visible:ring-offset-background
-              active:translate-y-0
               motion-reduce:transform-none
               motion-reduce:transition-none
             "
@@ -196,21 +215,18 @@ export default function NotFoundPage() {
               rounded-full
               border
               border-border
-              bg-background/80
+              bg-background
               px-6
               text-sm
               font-semibold
               text-foreground
               transition
-              duration-200
               hover:-translate-y-0.5
               hover:bg-muted
               focus-visible:outline-none
               focus-visible:ring-2
               focus-visible:ring-ring
               focus-visible:ring-offset-2
-              focus-visible:ring-offset-background
-              active:translate-y-0
               motion-reduce:transform-none
               motion-reduce:transition-none
             "
@@ -225,49 +241,15 @@ export default function NotFoundPage() {
           </Link>
         </div>
 
-        <Link
-          href="/community"
-          className="
-            mt-5
-            inline-flex
-            min-h-10
-            items-center
-            justify-center
-            gap-2
-            rounded-full
-            px-4
-            text-sm
-            font-medium
-            text-muted-foreground
-            transition
-            hover:text-foreground
-            focus-visible:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-ring
-            focus-visible:ring-offset-2
-            focus-visible:ring-offset-background
-            motion-reduce:transition-none
-          "
-        >
-          <ArrowLeft
-            aria-hidden="true"
-            className="size-4"
-            strokeWidth={1.8}
-          />
-
-          Communityを見る
-        </Link>
-
         <p
           className="
-            mt-8
+            mt-7
             text-xs
-            font-medium
-            tracking-[0.18em]
-            text-muted-foreground/60
+            leading-6
+            text-muted-foreground
           "
         >
-          ERROR 404
+          再び利用する場合は、新しいアカウントを作成できます。
         </p>
       </section>
     </div>

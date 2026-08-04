@@ -8,9 +8,10 @@ export default function SearchLoading() {
     <>
       <Header />
 
-      <main
+      <div
         aria-busy="true"
         aria-live="polite"
+        aria-label="検索画面を読み込んでいます"
         className="
           relative
           min-h-screen
@@ -23,7 +24,8 @@ export default function SearchLoading() {
         "
       >
         <span className="sr-only">
-          検索画面を読み込んでいます
+          検索画面を読み込んでいます。
+          しばらくお待ちください。
         </span>
 
         <div
@@ -95,7 +97,7 @@ export default function SearchLoading() {
           <section aria-hidden="true">
             <div className="mb-7 space-y-3">
               <Skeleton className="h-4 w-32 rounded-full" />
-              <Skeleton className="h-8 w-56" />
+              <Skeleton className="h-8 w-56 rounded-xl" />
             </div>
 
             <ListSkeleton
@@ -107,7 +109,7 @@ export default function SearchLoading() {
           <section aria-hidden="true">
             <div className="mb-7 space-y-3">
               <Skeleton className="h-4 w-28 rounded-full" />
-              <Skeleton className="h-8 w-52" />
+              <Skeleton className="h-8 w-52 rounded-xl" />
             </div>
 
             <ListSkeleton
@@ -116,7 +118,7 @@ export default function SearchLoading() {
             />
           </section>
         </div>
-      </main>
+      </div>
     </>
   );
 }

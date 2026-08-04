@@ -28,7 +28,7 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <main
+    <div
       className="
         relative
         flex
@@ -71,14 +71,18 @@ export default function ErrorPage({
       />
 
       <section
+        role="alert"
+        aria-live="assertive"
         aria-labelledby="error-title"
+        aria-describedby="error-description"
         className="
           relative
           w-full
           max-w-2xl
           overflow-hidden
           rounded-[2rem]
-          border border-border/60
+          border
+          border-border/60
           bg-card/90
           p-6
           text-center
@@ -103,9 +107,9 @@ export default function ErrorPage({
           "
         >
           <AlertCircle
+            aria-hidden="true"
             className="size-6"
             strokeWidth={1.8}
-            aria-hidden="true"
           />
         </div>
 
@@ -133,10 +137,11 @@ export default function ErrorPage({
             sm:text-3xl
           "
         >
-          ホーム画面を表示できませんでした
+          ページを表示できませんでした
         </h1>
 
         <p
+          id="error-description"
           className="
             mx-auto
             mt-4
@@ -145,9 +150,11 @@ export default function ErrorPage({
             leading-7
             text-muted-foreground
             sm:text-base
+            sm:leading-8
           "
         >
-          通信状況や一時的な問題により、情報の取得に失敗しました。
+          通信状況や一時的な問題により、
+          情報の取得または画面の表示に失敗しました。
           しばらく待ってから、もう一度お試しください。
         </p>
 
@@ -187,15 +194,17 @@ export default function ErrorPage({
               focus-visible:ring-offset-2
               focus-visible:ring-offset-background
               active:translate-y-0
+              motion-reduce:transform-none
+              motion-reduce:transition-none
             "
           >
             <RefreshCw
+              aria-hidden="true"
               className="size-4"
               strokeWidth={1.8}
-              aria-hidden="true"
             />
 
-            もう一度読み込む
+            もう一度試す
           </button>
 
           <Link
@@ -207,7 +216,8 @@ export default function ErrorPage({
               justify-center
               gap-2
               rounded-full
-              border border-border
+              border
+              border-border
               bg-background/80
               px-6
               text-sm
@@ -223,12 +233,14 @@ export default function ErrorPage({
               focus-visible:ring-offset-2
               focus-visible:ring-offset-background
               active:translate-y-0
+              motion-reduce:transform-none
+              motion-reduce:transition-none
             "
           >
             <Search
+              aria-hidden="true"
               className="size-4"
               strokeWidth={1.8}
-              aria-hidden="true"
             />
 
             施設を探す
@@ -256,24 +268,25 @@ export default function ErrorPage({
             focus-visible:ring-ring
             focus-visible:ring-offset-2
             focus-visible:ring-offset-background
+            motion-reduce:transition-none
           "
         >
           <ArrowLeft
+            aria-hidden="true"
             className="size-4"
             strokeWidth={1.8}
-            aria-hidden="true"
           />
 
           ホームへ戻る
         </Link>
 
-        {process.env.NODE_ENV ===
-        "development" ? (
+        {process.env.NODE_ENV === "development" ? (
           <details
             className="
               mt-8
               rounded-2xl
-              border border-border/60
+              border
+              border-border/60
               bg-muted/35
               p-4
               text-left
@@ -282,9 +295,14 @@ export default function ErrorPage({
             <summary
               className="
                 cursor-pointer
+                rounded-sm
                 text-sm
                 font-medium
                 text-muted-foreground
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-ring
+                focus-visible:ring-offset-2
               "
             >
               開発用エラー情報
@@ -311,6 +329,6 @@ export default function ErrorPage({
           </details>
         ) : null}
       </section>
-    </main>
+    </div>
   );
 }

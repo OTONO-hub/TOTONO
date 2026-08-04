@@ -13,8 +13,12 @@ type JsonLdProps = {
 };
 
 function serializeJsonLd(data: JsonLdValue): string {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
 }
+
 
 export function JsonLd({ data }: JsonLdProps) {
   return (

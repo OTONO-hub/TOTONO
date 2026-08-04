@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SkipNavigation } from "@/components/layout/SkipNavigation";
 import { SiteJsonLd } from "@/components/seo/site-json-ld";
 import { Toaster } from "@/components/ui/sonner";
@@ -23,7 +25,16 @@ export default function RootLayout({
       lang="ja"
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body
+        className="
+          flex
+          min-h-screen
+          flex-col
+          bg-background
+          text-foreground
+          antialiased
+        "
+      >
         <SiteJsonLd />
 
         <SkipNavigation />
@@ -31,12 +42,16 @@ export default function RootLayout({
         <main
           id="main-content"
           tabIndex={-1}
-          className="min-h-screen"
+          className="min-h-screen flex-1"
         >
           {children}
         </main>
 
+        <SiteFooter />
+
         <Toaster />
+
+        <AnalyticsProvider />
       </body>
     </html>
   );

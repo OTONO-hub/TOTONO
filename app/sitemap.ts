@@ -1,10 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { SITE_URL } from "@/lib/site-metadata";
 import { createClient } from "@/lib/supabase/server";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "http://localhost:3000";
 
 type SitemapPost = {
   id: string;
@@ -23,20 +20,36 @@ type SitemapSauna = {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
 
-  const now = new Date();
-
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${SITE_URL}/search`,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/community`,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/privacy`,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/terms`,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
   ];
 
@@ -56,11 +69,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase
       .from("profiles")
       .select("id")
+      .order("id", {
+        ascending: true,
+      })
       .limit(1000),
 
     supabase
       .from("saunas")
       .select("id")
+      .order("id", {
+        ascending: true,
+      })
       .limit(1000),
   ]);
 
@@ -85,30 +104,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
   }
 
-  const posts = (postsResult.data ?? []) as SitemapPost[];
-  const profiles = (profilesResult.data ?? []) as SitemapProfile[];
-  const saunas = (saunasResult.data ?? []) as SitemapSauna[];
+  const posts =
+    (postsResult.data ?? []) as SitemapPost[];
 
-  const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${SITE_URL}/posts/${post.id}`,
-    lastModified: post.updated_at ?? post.created_at,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  const profiles =
+    (profilesResult.data ?? []) as SitemapProfile[];
 
-  const profilePages: MetadataRoute.Sitemap = profiles.map(
-    (profile) => ({
+  const saunas =
+    (saunasResult.data ?? []) as SitemapSauna[];
+
+  const saunaPages: MetadataRoute.Sitemap =
+    saunas.map((sauna) => ({
+      url: `${SITE_URL}/saunas/${sauna.id}`,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }));
+
+  const postPages: MetadataRoute.Sitemap =
+    posts.map((post) => ({
+      url: `${SITE_URL}/posts/${post.id}`,
+      lastModified:
+        post.updated_at ?? post.created_at,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
+
+  const profilePages: MetadataRoute.Sitemap =
+    profiles.map((profile) => ({
       url: `${SITE_URL}/users/${profile.id}`,
       changeFrequency: "weekly",
       priority: 0.6,
-    })
-  );
-
-  const saunaPages: MetadataRoute.Sitemap = saunas.map((sauna) => ({
-    url: `${SITE_URL}/saunas/${sauna.id}`,
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+    }));
 
   return [
     ...staticPages,

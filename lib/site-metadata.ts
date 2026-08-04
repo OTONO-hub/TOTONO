@@ -1,21 +1,55 @@
 import type { Metadata } from "next";
 
 const SITE_NAME = "TOTONO";
+
+const DEFAULT_TITLE =
+  "TOTONO｜サウナへ行く前から、整い始める。";
+
 const SITE_DESCRIPTION =
   "サウナへ行く前から、整い始める。サウナ施設の発見、サ活の記録、ユーザー同士の交流を楽しめるサウナライフプラットフォーム。";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(
-    /\/$/,
-    ""
-  ) ?? "http://localhost:3000";
+function normalizeSiteUrl(url: string): string {
+  return url
+    .trim()
+    .replace(/\/+$/, "");
+}
+
+function getSiteUrl(): string {
+  const configuredSiteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (configuredSiteUrl) {
+    return normalizeSiteUrl(configuredSiteUrl);
+  }
+
+  const vercelProductionUrl =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL;
+
+  if (vercelProductionUrl) {
+    return normalizeSiteUrl(
+      `https://${vercelProductionUrl}`
+    );
+  }
+
+  const vercelUrl =
+    process.env.VERCEL_URL;
+
+  if (vercelUrl) {
+    return normalizeSiteUrl(
+      `https://${vercelUrl}`
+    );
+  }
+
+  return "http://localhost:3000";
+}
+
+export const SITE_URL = getSiteUrl();
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default:
-      "TOTONO｜サウナへ行く前から、整い始める。",
+    default: DEFAULT_TITLE,
     template: "%s｜TOTONO",
   },
 
@@ -25,12 +59,12 @@ export const siteMetadata: Metadata = {
 
   authors: [
     {
-      name: "TOTONO",
+      name: SITE_NAME,
     },
   ],
 
-  creator: "TOTONO",
-  publisher: "TOTONO",
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
 
   keywords: [
     "TOTONO",
@@ -48,32 +82,25 @@ export const siteMetadata: Metadata = {
 
   category: "lifestyle",
 
-  alternates: {
-    canonical: "/",
-  },
-
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    url: "/",
     siteName: SITE_NAME,
-    title:
-      "TOTONO｜サウナへ行く前から、整い始める。",
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "TOTONO｜サウナへ行く前から、整い始める。",
+        alt: DEFAULT_TITLE,
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title:
-      "TOTONO｜サウナへ行く前から、整い始める。",
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: ["/opengraph-image"],
   },
@@ -96,9 +123,33 @@ export const siteMetadata: Metadata = {
       {
         url: "/favicon.ico",
       },
+      {
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
     ],
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+
+  manifest: "/manifest.webmanifest",
+
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "default",
   },
 
   formatDetection: {
