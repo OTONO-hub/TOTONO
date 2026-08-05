@@ -1,0 +1,20 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+Zささのゆ,zささのゆ,石川県,,金沢市泉野町3-18-16,,36.5465099,136.6514243,,,Tu-Su 14:00-22:50,openstreetmap,node/11484554469,https://www.openstreetmap.org/node/11484554469
+瓢箪湯,瓢箪湯,石川県,,金沢市瓢箪町1-7,,36.5764946,136.6565077,,,Mo-Fr 14:00-21:00,openstreetmap,node/11484582269,https://www.openstreetmap.org/node/11484582269
+双葉湯,双葉湯,石川県,,金沢市駅西新町1-14-24,,36.5888015,136.6405328,,,Th-Tu 13:00-23:30,openstreetmap,node/11484582369,https://www.openstreetmap.org/node/11484582369
+ヘルシーバス268,ヘルシーバス268,石川県,,金沢市新保本5-115,,36.5554242,136.607391,,,Tu-Su 12:00-00:00,openstreetmap,node/11484595969,https://www.openstreetmap.org/node/11484595969
+松の湯,松の湯,石川県,,金沢市長町1-5-56,,36.5651369,136.6517013,,,Th-Tu 13:00-00:00,openstreetmap,node/11485657869,https://www.openstreetmap.org/node/11485657869
+百乃湯,百乃湯,石川県,,金沢市小坂町中45,,36.5896082,136.6762198,,,Tu-Su 14:00-22:00,openstreetmap,node/11485657969,https://www.openstreetmap.org/node/11485657969
+れもん湯,れもん湯,石川県,,金沢市有松3-11-6,,36.5384198,136.6398807,,,Tu-Su 09:00-22:30,openstreetmap,node/11485658069,https://www.openstreetmap.org/node/11485658069
+今江温泉 元湯,今江温泉元湯,石川県,,小松市今江町7-205,,36.3817622,136.4367402,,,We-Mo 11:00-22:00,openstreetmap,node/11485658169,https://www.openstreetmap.org/node/11485658169
+美川温泉 安産の湯,美川温泉安産の湯,石川県,,白山市平加町ワ6-2,,36.4941994,136.4890184,,,Sa-Th 10:00-22:00,openstreetmap,node/11486112670,https://www.openstreetmap.org/node/11486112670
+千代野温泉,千代野温泉,石川県,,白山市米永町275-1,,36.5157703,136.541391,,,"We-Th, Sa-Mo 11:00-23:00",openstreetmap,node/11486131771,https://www.openstreetmap.org/node/11486131771
+美川温泉元湯ほんだ,美川温泉元湯ほんだ,石川県,,白山市長屋町イ111,,36.486356,136.4976335,,,Th-Tu 10:00-22:30,openstreetmap,node/11486135969,https://www.openstreetmap.org/node/11486135969
+御経塚の湯,御経塚の湯,石川県,野々市市,野々市市御経塚四丁目38,,36.5490108,136.6009748,,,Mo-Su 05:00-00:00,openstreetmap,node/11486138569,https://www.openstreetmap.org/node/11486138569
+弘法湯,弘法湯,石川県,,七尾市北藤橋町ロ部91-1,,37.0439198,136.9624089,,,Fr-We 13:00-22:00,openstreetmap,node/11486362369,https://www.openstreetmap.org/node/11486362369
+宝湯,宝湯,石川県,,七尾市木町28,,37.0489424,136.9619238,,,We-Mo 13:00-21:00,openstreetmap,node/11486362470,https://www.openstreetmap.org/node/11486362470
+海浜あみだ湯,海浜あみだ湯,石川県,,珠州市野々江町ナ部5-3,,37.4395985,137.2734121,,,Fr-We 14:00-22:00,openstreetmap,node/11486362669,https://www.openstreetmap.org/node/11486362669
+末広湯,末広湯,石川県,,輪島市河井町5-236,,37.3945865,136.9084904,,,Fr-We 14:30-21:00,openstreetmap,node/11486513873,https://www.openstreetmap.org/node/11486513873
+常盤湯,常盤湯,石川県,,輪島市鳳至町鳳至丁42-2,,37.3985316,136.8984745,,,Mo-Fr 13:00-20:00,openstreetmap,node/11486513874,https://www.openstreetmap.org/node/11486513874
+ドーミーイン金沢,ドーミーイン金沢,石川県,金沢市,石川県金沢市堀川新町225,920-0849,36.5792186,136.6506194,+81 76 263 9888,https://dormy-hotels.com/dormyinn/hotels/kanazawa/,,openstreetmap,way/320014002,https://www.openstreetmap.org/way/320014002
+御宿野乃金沢,御宿野乃金沢,石川県,,1,,36.5699975,136.6550129,+81 76 223 5489,https://www.hotespa.net/dormyinn/nono/,,openstreetmap,way/926711265,https://www.openstreetmap.org/way/926711265

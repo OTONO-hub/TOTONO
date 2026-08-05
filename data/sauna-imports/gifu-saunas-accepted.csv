@@ -1,0 +1,4 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+田辺温熱保養所,田辺温熱保養所,岐阜県,,,,35.3650677,136.6531279,,,,openstreetmap,node/11447964669,https://www.openstreetmap.org/node/11447964669
+大垣サウナ,大垣サウナ,岐阜県,,,,35.3631745,136.6333217,,,,openstreetmap,node/11447964769,https://www.openstreetmap.org/node/11447964769
+白川郷の湯,白川郷の湯,岐阜県,,,,36.2611262,136.906305,,,Mo-Su 07:00-21:00,openstreetmap,way/236248626,https://www.openstreetmap.org/way/236248626

@@ -1,0 +1,70 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+白山湯,白山湯,京都府,,,,34.9941741,135.7567564,,,,openstreetmap,node/2990581133,https://www.openstreetmap.org/node/2990581133
+京極湯,京極湯,京都府,,,,35.0261502,135.7437083,,,Mo-Su 15:00-00:00,openstreetmap,node/5549765523,https://www.openstreetmap.org/node/5549765523
+寿湯,寿湯,京都府,,,,35.0167488,135.6878801,,,,openstreetmap,node/5583884627,https://www.openstreetmap.org/node/5583884627
+桜湯,桜湯,京都府,,,,35.0177833,135.769568,+81 75 231 0491,,Tu-Su 16:30-23:00,openstreetmap,node/9843014774,https://www.openstreetmap.org/node/9843014774
+松湯,松湯,京都府,,,,34.9777013,135.7645563,,,,openstreetmap,node/10316133710,https://www.openstreetmap.org/node/10316133710
+鶴の湯,鶴の湯,京都府,,,,34.9436427,135.7575886,,,,openstreetmap,node/10746294142,https://www.openstreetmap.org/node/10746294142
+上野湯,上野湯,京都府,,京都市北区紫野東泉堂町35,,35.047924,135.7422675,,,We-Mo 15:30-00:30,openstreetmap,node/10980676907,https://www.openstreetmap.org/node/10980676907
+加茂温泉,加茂温泉,京都府,,京都市北区小山西元町45,,35.0491816,135.7548862,,,Th-Mo 09:00-18:00,openstreetmap,node/10980867705,https://www.openstreetmap.org/node/10980867705
+金閣寺湯,金閣寺湯,京都府,,京都市北区衣笠北天神森町34-1,,35.0376504,135.7331564,,,Tu-Su 14:00-01:00,openstreetmap,node/10980872206,https://www.openstreetmap.org/node/10980872206
+大徳寺温泉,大徳寺温泉,京都府,,京都市北区紫竹西高縄町58,,35.0466841,135.7480529,,,,openstreetmap,node/10980957306,https://www.openstreetmap.org/node/10980957306
+紫野温泉,紫野温泉,京都府,,京都市北区紫野上門前町16-1,,35.0445616,135.7478004,,,Th-Tu 15:00-02:00,openstreetmap,node/10980978605,https://www.openstreetmap.org/node/10980978605
+むらさき湯,むらさき湯,京都府,,,,35.0402199,135.7522184,,,Tu-Su 15:00-00:30,openstreetmap,node/10980988105,https://www.openstreetmap.org/node/10980988105
+門前温泉,門前温泉,京都府,,,,35.0428491,135.7484203,,,,openstreetmap,node/10981056905,https://www.openstreetmap.org/node/10981056905
+大宮温泉,大宮温泉,京都府,,,,35.0366322,135.7490584,,,Fr-We 16:00-23:00,openstreetmap,node/10981057006,https://www.openstreetmap.org/node/10981057006
+笠の湯,笠の湯,京都府,,,,35.0201805,135.7435059,,,,openstreetmap,node/10981057105,https://www.openstreetmap.org/node/10981057105
+松葉湯,松葉湯,京都府,,,,35.0203246,135.7370882,,,Mo-Sa 15:00-00:00,openstreetmap,node/10981119106,https://www.openstreetmap.org/node/10981119106
+白山湯,白山湯,京都府,,,,35.0262649,135.7499297,,,Sa-Th 16:00-23:00,openstreetmap,node/10981123305,https://www.openstreetmap.org/node/10981123305
+山城温泉,山城温泉,京都府,,,,35.0240696,135.7346929,,,Fr-We 15:00-01:00,openstreetmap,node/10981141905,https://www.openstreetmap.org/node/10981141905
+龍宮温泉,龍宮温泉,京都府,,,,35.0176049,135.7444157,,,Fr-We 15:00-23:00,openstreetmap,node/10981146705,https://www.openstreetmap.org/node/10981146705
+銀座湯,銀座湯,京都府,,,,35.0206159,135.7799061,,,Th-Tu 15:00-01:00,openstreetmap,node/10981307407,https://www.openstreetmap.org/node/10981307407
+雲母湯,雲母湯,京都府,,,,35.0416658,135.7714041,,,Mo-Su 14:30-00:00,openstreetmap,node/10981334005,https://www.openstreetmap.org/node/10981334005
+東雲湯,東雲湯,京都府,,,,35.0331295,135.7801446,,,,openstreetmap,node/10981918905,https://www.openstreetmap.org/node/10981918905
+鈴成湯,鈴成湯,京都府,,,,35.0470201,135.7864501,,,,openstreetmap,node/10981930305,https://www.openstreetmap.org/node/10981930305
+大黒湯,大黒湯,京都府,,京都市左京区山端柳ケ坪町16-3,,35.0489369,135.7894517,,,Th-Tu 15:00-23:30,openstreetmap,node/10981938705,https://www.openstreetmap.org/node/10981938705
+平安湯,平安湯,京都府,,,,35.0211105,135.7826003,,,Fr-We 15:00-24:00,openstreetmap,node/10981947505,https://www.openstreetmap.org/node/10981947505
+孫橋湯,孫橋湯,京都府,,,,35.0100871,135.7738655,,,,openstreetmap,node/10981956405,https://www.openstreetmap.org/node/10981956405
+銀水湯,銀水湯,京都府,,,,35.0241844,135.7949946,,,,openstreetmap,node/10981960205,https://www.openstreetmap.org/node/10981960205
+京都市立錦林浴場,京都市立錦林浴場,京都府,,京都市左京区鹿ケ谷高岸町2-1,,35.0162439,135.793218,,,,openstreetmap,node/10981963707,https://www.openstreetmap.org/node/10981963707
+鴨川湯,鴨川湯,京都府,,,,35.0435661,135.7645852,,,,openstreetmap,node/10981969205,https://www.openstreetmap.org/node/10981969205
+錦生湯,錦生湯,京都府,,,,35.0042115,135.7470743,,,,openstreetmap,node/10982023606,https://www.openstreetmap.org/node/10982023606
+井筒湯,井筒湯,京都府,,,,35.0161507,135.7564653,,,,openstreetmap,node/10982026105,https://www.openstreetmap.org/node/10982026105
+弥生湯,弥生湯,京都府,,,,35.0031026,135.7334003,,,,openstreetmap,node/10982041106,https://www.openstreetmap.org/node/10982041106
+若松湯,若松湯,京都府,,,,35.0160964,135.7363689,,,,openstreetmap,node/10982041107,https://www.openstreetmap.org/node/10982041107
+京都 玉の湯,京都玉の湯,京都府,,,,35.0120702,135.7663531,,,,openstreetmap,node/10982043405,https://www.openstreetmap.org/node/10982043405
+金山湯,金山湯,京都府,,,,35.0011115,135.7335621,,,,openstreetmap,node/10982043605,https://www.openstreetmap.org/node/10982043605
+花の湯,花の湯,京都府,,,,35.013683,135.737814,,,,openstreetmap,node/10982044906,https://www.openstreetmap.org/node/10982044906
+五色湯,五色湯,京都府,,,,35.0060286,135.7347412,,,,openstreetmap,node/10982047305,https://www.openstreetmap.org/node/10982047305
+長池湯,長池湯,京都府,,,,35.0103414,135.7450818,,,,openstreetmap,node/10982052705,https://www.openstreetmap.org/node/10982052705
+壬生湯,壬生湯,京都府,,,,35.0009788,135.744214,,,,openstreetmap,node/10982064605,https://www.openstreetmap.org/node/10982064605
+新シ湯,新シ湯,京都府,,,,35.0070084,135.7766468,,,,openstreetmap,node/10982184206,https://www.openstreetmap.org/node/10982184206
+旭湯,旭湯,京都府,,,,34.9960039,135.7729545,,,,openstreetmap,node/10982186405,https://www.openstreetmap.org/node/10982186405
+大正湯,大正湯,京都府,,,,34.9893474,135.7375335,,,,openstreetmap,node/10982261406,https://www.openstreetmap.org/node/10982261406
+小町湯,小町湯,京都府,,,,34.9912412,135.7343275,+81 75-3132-889,https://komachiyu.com/,Mo-Sa 15:00-01:00; Su 07:00-01:00,openstreetmap,node/10982267805,https://www.openstreetmap.org/node/10982267805
+島原温泉,島原温泉,京都府,,,,34.9929271,135.7441605,,,,openstreetmap,node/10982277605,https://www.openstreetmap.org/node/10982277605
+名倉湯,名倉湯,京都府,,,,34.9924593,135.7306584,,,,openstreetmap,node/10982284205,https://www.openstreetmap.org/node/10982284205
+明田湯,明田湯,京都府,,,,34.9763737,135.759447,,,,openstreetmap,node/10982358905,https://www.openstreetmap.org/node/10982358905
+旭湯,旭湯,京都府,,,,34.9782451,135.7403605,,,,openstreetmap,node/10982358906,https://www.openstreetmap.org/node/10982358906
+石田湯,石田湯,京都府,,,,34.9726055,135.7605485,,,,openstreetmap,node/10982363905,https://www.openstreetmap.org/node/10982363905
+船戸湯,船戸湯,京都府,,,,34.974093,135.7336934,,,,openstreetmap,node/10982374705,https://www.openstreetmap.org/node/10982374705
+洛陽湯,洛陽湯,京都府,,,,34.9806914,135.7354254,,,,openstreetmap,node/10982376605,https://www.openstreetmap.org/node/10982376605
+京都市立久世浴場,京都市立久世浴場,京都府,,,,34.9603599,135.7222989,,,,openstreetmap,node/10982386705,https://www.openstreetmap.org/node/10982386705
+太秦温泉,太秦温泉,京都府,,,,35.0136316,135.7036734,,,,openstreetmap,node/10982412706,https://www.openstreetmap.org/node/10982412706
+旭湯,旭湯,京都府,,,,35.0064465,135.7316461,,,,openstreetmap,node/10982431805,https://www.openstreetmap.org/node/10982431805
+梅の宮湯,梅の宮湯,京都府,,,,35.0040747,135.6988533,,,,openstreetmap,node/10982455805,https://www.openstreetmap.org/node/10982455805
+京極湯,京極湯,京都府,,,,34.988796,135.7184758,,,,openstreetmap,node/10982463305,https://www.openstreetmap.org/node/10982463305
+寿湯,寿湯,京都府,,,,35.0111833,135.724027,,,,openstreetmap,node/10982463307,https://www.openstreetmap.org/node/10982463307
+天翔の湯 大門,天翔の湯大門,京都府,,,,34.9891736,135.7265268,,,,openstreetmap,node/10982506705,https://www.openstreetmap.org/node/10982506705
+社湯,社湯,京都府,,,,35.0108055,135.7131192,,,,openstreetmap,node/10982520005,https://www.openstreetmap.org/node/10982520005
+山ノ内湯,山ノ内湯,京都府,,,,35.0060619,135.7224965,,,,openstreetmap,node/10982520105,https://www.openstreetmap.org/node/10982520105
+京乃湯,京乃湯,京都府,,,,35.0028139,135.7051039,,,,openstreetmap,node/10982553805,https://www.openstreetmap.org/node/10982553805
+桂湯,桂湯,京都府,,,,34.9793422,135.7071723,,,,openstreetmap,node/10982591505,https://www.openstreetmap.org/node/10982591505
+鞍馬湯,鞍馬湯,京都府,,,,34.9367767,135.7559678,,,,openstreetmap,node/10982654947,https://www.openstreetmap.org/node/10982654947
+宝湯,宝湯,京都府,,,,34.9540389,135.7768751,,,,openstreetmap,node/10982718305,https://www.openstreetmap.org/node/10982718305
+伏見温泉,伏見温泉,京都府,,,,34.9637848,135.7634814,,,,openstreetmap,node/10982737006,https://www.openstreetmap.org/node/10982737006
+京都市立改新浴場,京都市立改新浴場,京都府,,,,34.9485096,135.756346,,,,openstreetmap,node/10982741507,https://www.openstreetmap.org/node/10982741507
+ぎょうざ湯,ぎょうざ湯,京都府,,,,35.0020179,135.7719881,,,,openstreetmap,node/11449018870,https://www.openstreetmap.org/node/11449018870
+SASAUNA,sasauna,京都府,,,,34.9950879,135.7693568,,,,openstreetmap,node/11576322471,https://www.openstreetmap.org/node/11576322471
+サウナ&カプセルホテル ルーマプラザ,サウナ&カプセルホテルルーマプラザ,京都府,,,,35.0036053,135.7742053,,https://rumor-plaza.jp/,,openstreetmap,node/13860438801,https://www.openstreetmap.org/node/13860438801
+御宿 野乃 京都七条,御宿野乃京都七条,京都府,,,,34.9886535,135.762361,+81 75 365 5489,,,openstreetmap,way/534587129,https://www.openstreetmap.org/way/534587129

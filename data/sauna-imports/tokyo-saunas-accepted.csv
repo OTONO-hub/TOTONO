@@ -1,0 +1,275 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+久の湯,久の湯,東京都,,,,35.7557723,139.8268281,,,Fr-We 15:30-24:00,openstreetmap,node/2290237204,https://www.openstreetmap.org/node/2290237204
+観音湯,観音湯,東京都,,,,35.5540204,139.73576,,,Mo-Su 16:00-23:30,openstreetmap,node/3794330089,https://www.openstreetmap.org/node/3794330089
+稲荷湯,稲荷湯,東京都,,,,35.6528149,139.3411829,042-642-2825,https://www.city.hachioji.tokyo.jp/seikatsu/ofuro/001783.html,Th-Tu 14:00-23:30,openstreetmap,node/4511460990,https://www.openstreetmap.org/node/4511460990
+京王高尾山温泉 極楽湯,京王高尾山温泉極楽湯,東京都,,,,35.6321158,139.2692724,+81 42 663 4126,https://www.takaosan-onsen.jp/,"Mo-Su,PH 08:00-22:30",openstreetmap,node/4554760789,https://www.openstreetmap.org/node/4554760789
+ふれあいの湯,ふれあいの湯,東京都,,,,33.0758082,139.790307,,,,openstreetmap,node/4840930622,https://www.openstreetmap.org/node/4840930622
+イーストランド,イーストランド,東京都,江戸川区,東京都江戸川区西篠崎二丁目231,,35.7112146,139.8970407,+81-3-3670-0945,https://eastland.jp/,Tu-Su 14:30-23:00,openstreetmap,node/4887485021,https://www.openstreetmap.org/node/4887485021
+上野サウナ風呂,上野サウナ風呂,東京都,,,,35.7102901,139.7761144,,,,openstreetmap,node/5114812100,https://www.openstreetmap.org/node/5114812100
+桜館,桜館,東京都,,,,35.5684999,139.7032184,,http://sakurakan.biz/bath/,Mo-Su 12:00-01:00,openstreetmap,node/5262948482,https://www.openstreetmap.org/node/5262948482
+宮下湯,宮下湯,東京都,,,,35.7318745,139.73774,,,Fr-We 15:00-00:00,openstreetmap,node/5310036380,https://www.openstreetmap.org/node/5310036380
+サウナ大番,サウナ大番,東京都,,,,35.7116088,139.7785362,,,,openstreetmap,node/5444813481,https://www.openstreetmap.org/node/5444813481
+巣鴨湯,巣鴨湯,東京都,,,,35.7384329,139.7301167,,,Sa-Th 16:00-00:30,openstreetmap,node/5925538486,https://www.openstreetmap.org/node/5925538486
+弁天湯,弁天湯,東京都,,,,35.7053301,139.575745,,,Fr-We 15:40-23:00,openstreetmap,node/5948514986,https://www.openstreetmap.org/node/5948514986
+ゆラックス,ゆラックス,東京都,,,,35.7355452,139.7165688,,,Su-Fr 15:00-22:00,openstreetmap,node/5999499586,https://www.openstreetmap.org/node/5999499586
+松見湯,松見湯,東京都,,,,35.6964962,139.4257636,,,,openstreetmap,node/6053951950,https://www.openstreetmap.org/node/6053951950
+立川湯屋敷・梅の湯,立川湯屋敷・梅の湯,東京都,,,,35.7033038,139.4164374,,,,openstreetmap,node/6053959457,https://www.openstreetmap.org/node/6053959457
+旭湯,旭湯,東京都,,,,35.6718647,139.4741495,,,Tu-Su 16:00-23:00,openstreetmap,node/6053977544,https://www.openstreetmap.org/node/6053977544
+鶴の湯,鶴の湯,東京都,,,,35.6573324,139.5353381,,,,openstreetmap,node/6124507698,https://www.openstreetmap.org/node/6124507698
+塩湯,塩湯,東京都,,,,35.6873657,139.727293,,,,openstreetmap,node/6124532271,https://www.openstreetmap.org/node/6124532271
+境南浴場,境南浴場,東京都,,,,35.7001819,139.5412396,,,,openstreetmap,node/6127473246,https://www.openstreetmap.org/node/6127473246
+飛鳥山温泉,飛鳥山温泉,東京都,北区,東京都北区滝野川二丁目432,,35.7492713,139.7341366,,,We-Mo 14:30-00:30,openstreetmap,node/6344060185,https://www.openstreetmap.org/node/6344060185
+松本湯,松本湯,東京都,,,,35.7108272,139.6897265,,,,openstreetmap,node/6344060187,https://www.openstreetmap.org/node/6344060187
+ゆ〜ポッポ,ゆ〜ポッポ,東京都,,,,35.7600429,139.6558346,,,Tu-Su 15:00-23:00,openstreetmap,node/6344060188,https://www.openstreetmap.org/node/6344060188
+三の輪湯,三の輪湯,東京都,,,,35.7137604,139.6819739,,,Tu-Su 15:30-01:00,openstreetmap,node/6344060189,https://www.openstreetmap.org/node/6344060189
+上越泉,上越泉,東京都,,,,35.7109852,139.6549054,,,Sa-Th 15:30-23:00,openstreetmap,node/6344060190,https://www.openstreetmap.org/node/6344060190
+富士の湯,富士の湯,東京都,,台東区橋場2-21-7,,35.727673,139.8053201,,,Sa-Th 14:00-23:00,openstreetmap,node/6344060192,https://www.openstreetmap.org/node/6344060192
+小松湯,小松湯,東京都,,,,35.6998625,139.8634581,,,Th-Tu 15:00-23:00,openstreetmap,node/6344060194,https://www.openstreetmap.org/node/6344060194
+君の湯,君の湯,東京都,,,,35.7258641,139.7271449,,,Su-Fr 15:00-23:30,openstreetmap,node/6344060195,https://www.openstreetmap.org/node/6344060195
+パブリバ八光,パブリバ八光,東京都,,,,35.7532875,139.6832817,,,Th-Tu 15:30-23:30,openstreetmap,node/6344060285,https://www.openstreetmap.org/node/6344060285
+ゆ〜らんど,ゆ〜らんど,東京都,,,,35.7489463,139.715349,,,Tu-Su 13:30-01:00,openstreetmap,node/6344060485,https://www.openstreetmap.org/node/6344060485
+アクア東中野,アクア東中野,東京都,,,,35.707479,139.6857349,,,,openstreetmap,node/6344060486,https://www.openstreetmap.org/node/6344060486
+健康浴泉,健康浴泉,東京都,,,,35.7084647,139.6814245,,,Th-Tu 15:00-00:30,openstreetmap,node/6344060785,https://www.openstreetmap.org/node/6344060785
+金成湯,金成湯,東京都,,,,35.7054545,139.7321748,,,Sa-Th 15:00-01:30,openstreetmap,node/6344060788,https://www.openstreetmap.org/node/6344060788
+昭和湯,昭和湯,東京都,,,,35.7121335,139.6579267,,,Su-Fr 15:00-23:00,openstreetmap,node/6344060789,https://www.openstreetmap.org/node/6344060789
+小杉湯,小杉湯,東京都,,,,35.7081108,139.648811,,,Fr-We 15:30-01:45,openstreetmap,node/6344060790,https://www.openstreetmap.org/node/6344060790
+平和湯,平和湯,東京都,,,,35.7123212,139.6385968,,,Tu-Su 15:00-23:00,openstreetmap,node/6344060791,https://www.openstreetmap.org/node/6344060791
+川場湯,川場湯,東京都,,,,35.7472946,139.6670179,,,Tu-Su 15:00-00:00,openstreetmap,node/6344722286,https://www.openstreetmap.org/node/6344722286
+井草湯,井草湯,東京都,,,,35.7194845,139.6148287,,,Tu-Su 14:35-22:30,openstreetmap,node/6347419690,https://www.openstreetmap.org/node/6347419690
+喜久の湯(小川バスマンション),喜久の湯(小川バスマンション),東京都,,,,35.7686744,139.6452099,,,"Sa-Th 17:30-23:00, Su 15:30-23:30",openstreetmap,node/6347419691,https://www.openstreetmap.org/node/6347419691
+庚申湯,庚申湯,東京都,,,,35.7227513,139.5284694,,,Tu-Su 15:00-23:00,openstreetmap,node/6347419692,https://www.openstreetmap.org/node/6347419692
+松の湯,松の湯,東京都,,,,35.6924592,139.4877478,,,Tu-Su 15:00-22:45,openstreetmap,node/6347419693,https://www.openstreetmap.org/node/6347419693
+アクアセゾン,アクアセゾン,東京都,,,,35.7616585,139.6843348,,,Sa-Th 13:30-23:30,openstreetmap,node/6347425785,https://www.openstreetmap.org/node/6347425785
+アクアガーデン三越湯,アクアガーデン三越湯,東京都,,,,35.6447725,139.7242692,,,"Mo, We-Th, Sa 15:30-22:00",openstreetmap,node/6359681787,https://www.openstreetmap.org/node/6359681787
+月光泉,月光泉,東京都,,,,35.6224699,139.6976488,,,Mo-Su 14:30-01:00,openstreetmap,node/6383650090,https://www.openstreetmap.org/node/6383650090
+第二久の湯,第二久の湯,東京都,,,,35.6873121,139.8259907,,,Fr-We 15:00-23:00,openstreetmap,node/6389438985,https://www.openstreetmap.org/node/6389438985
+ときわ健康温泉,ときわ健康温泉,東京都,,,,35.7666933,139.6792674,,,Tu-Su 14:00-23:30,openstreetmap,node/6395734985,https://www.openstreetmap.org/node/6395734985
+クアパレスゆうゆう,クアパレスゆうゆう,東京都,,,,35.7447504,139.7210477,,,Sa-Th 14:00-00:00,openstreetmap,node/6413353891,https://www.openstreetmap.org/node/6413353891
+湯処じんのび,湯処じんのび,東京都,,,,35.7823619,139.7769179,,,Tu-Su 14:00-00:00,openstreetmap,node/6435129285,https://www.openstreetmap.org/node/6435129285
+岩の湯,岩の湯,東京都,,,,35.7747023,139.6440742,,,Sa-Th 15:30-23:00,openstreetmap,node/6435213685,https://www.openstreetmap.org/node/6435213685
+功泉湯,功泉湯,東京都,,,,35.7794344,139.6730881,,,Th-Tu 15:00-23:30,openstreetmap,node/6435316485,https://www.openstreetmap.org/node/6435316485
+寿湯,寿湯,東京都,,,,35.761897,139.6754381,,,We-Mo 15:45-00:00,openstreetmap,node/6435316685,https://www.openstreetmap.org/node/6435316685
+十條湯,十條湯,東京都,,,,35.7628039,139.7200935,,,Sa-Th 15:15-23:30,openstreetmap,node/6436146385,https://www.openstreetmap.org/node/6436146385
+若松湯,若松湯,東京都,,,,35.7704228,139.8101583,,,Sa-Th 15:00-00:00,openstreetmap,node/6436146686,https://www.openstreetmap.org/node/6436146686
+曙湯,曙湯,東京都,,,,35.7657133,139.8052761,,,Fr-We 15:00-00:00,openstreetmap,node/6436146987,https://www.openstreetmap.org/node/6436146987
+平和湯,平和湯,東京都,,,,35.7261062,139.6410089,,,Sa-Th 15:30-00:00,openstreetmap,node/6437674586,https://www.openstreetmap.org/node/6437674586
+たからゆ,たからゆ,東京都,,,,35.7201209,139.6480471,,,Tu-Su 16:00-00:30,openstreetmap,node/6437674587,https://www.openstreetmap.org/node/6437674587
+辰巳湯,辰巳湯,東京都,,,,35.7407043,139.6567591,,,Th-Tu 14:30-22:00,openstreetmap,node/6437773185,https://www.openstreetmap.org/node/6437773185
+浅間湯,浅間湯,東京都,,,,35.739051,139.6719173,,,Sa-Th 16:00-23:50,openstreetmap,node/6437773186,https://www.openstreetmap.org/node/6437773186
+栄湯,栄湯,東京都,,,,35.720639,139.678255,,,"Tu-Th, Sa-Su 15:00-00:00",openstreetmap,node/6438290785,https://www.openstreetmap.org/node/6438290785
+クアパレス藤,クアパレス藤,東京都,,,,35.7408231,139.6995213,,,Th-Tu 15:30-00:00,openstreetmap,node/6445666990,https://www.openstreetmap.org/node/6445666990
+第二富士の湯,第二富士の湯,東京都,,,,35.7467347,139.691926,,,"Tu-Th, Sa-Su 15:30-23:30",openstreetmap,node/6445673287,https://www.openstreetmap.org/node/6445673287
+第二富士見湯,第二富士見湯,東京都,,,,35.7441825,139.6996951,,,Su-Fr 16:00-00:00,openstreetmap,node/6445673288,https://www.openstreetmap.org/node/6445673288
+山の湯,山の湯,東京都,,,,35.7365752,139.6965142,,,Tu-Su 15:30-00:00,openstreetmap,node/6445673794,https://www.openstreetmap.org/node/6445673794
+健康ランド末広湯,健康ランド末広湯,東京都,,,,35.7327662,139.6923205,,,Sa-Th 16:00-00:30,openstreetmap,node/6445673795,https://www.openstreetmap.org/node/6445673795
+みやこ湯,みやこ湯,東京都,,,,35.7431309,139.7049062,,,Sa-Th 15:30-00:00,openstreetmap,node/6445673798,https://www.openstreetmap.org/node/6445673798
+尾久ゆ〜らんど,尾久ゆ〜らんど,東京都,,,,35.7453054,139.7671909,,,Th-Mo 15:00-01:00,openstreetmap,node/6457265004,https://www.openstreetmap.org/node/6457265004
+タイムリゾート,タイムリゾート,東京都,,,,35.7457521,139.777131,,,Sa-Th 15:00-00:00,openstreetmap,node/6457265006,https://www.openstreetmap.org/node/6457265006
+喜楽湯,喜楽湯,東京都,,,,35.7341428,139.7792254,,,Tu-Su 15:00-00:00,openstreetmap,node/6457265007,https://www.openstreetmap.org/node/6457265007
+やすらぎの湯 ニュー椿,やすらぎの湯ニュー椿,東京都,,,,35.7414017,139.7310071,,,Fr-We 15:00-00:00,openstreetmap,node/6457265891,https://www.openstreetmap.org/node/6457265891
+鶴の湯,鶴の湯,東京都,,,,35.7472382,139.7368787,,,Sa-Th 15:00-00:00,openstreetmap,node/6457265988,https://www.openstreetmap.org/node/6457265988
+香取湯,香取湯,東京都,,,,35.7400294,139.7429971,,,Sa-Th 14:00-00:00,openstreetmap,node/6457265989,https://www.openstreetmap.org/node/6457265989
+ゆ〜ザ中井,ゆ〜ザ中井,東京都,,,,35.7160673,139.6889903,,,Fr-We 15:00-01:00,openstreetmap,node/6457506385,https://www.openstreetmap.org/node/6457506385
+妙法湯,妙法湯,東京都,,,,35.7270976,139.697089,,,Tu-Su 15:00-01:00,openstreetmap,node/6457506386,https://www.openstreetmap.org/node/6457506386
+大塚記念湯,大塚記念湯,東京都,,,,35.7299394,139.7269121,,,Sa-Th 14:00-01:00,openstreetmap,node/6457506387,https://www.openstreetmap.org/node/6457506387
+大黒湯,大黒湯,東京都,,,,35.7209003,139.7326234,,,Tu-Su 15:30-23:30,openstreetmap,node/6457506388,https://www.openstreetmap.org/node/6457506388
+湯〜ゆランドあずま,湯〜ゆランドあずま,東京都,,,,35.7285604,139.6993425,,,We-Mo 15:30-01:30,openstreetmap,node/6457506785,https://www.openstreetmap.org/node/6457506785
+改栄湯,改栄湯,東京都,,,,35.7298892,139.7941249,03-3807-8405,http://taito1010.com/component/mtree/sento-list/kaiei.html,Sa-Th 14:00-23:00,openstreetmap,node/6458132385,https://www.openstreetmap.org/node/6458132385
+堤柳泉,堤柳泉,東京都,,,,35.7236894,139.7974721,,,Tu-Su 13:00-23:00,openstreetmap,node/6458133085,https://www.openstreetmap.org/node/6458133085
+電気湯,電気湯,東京都,,,,35.7163957,139.8225689,,,Su-Fr 15:00-23:00,openstreetmap,node/6458194389,https://www.openstreetmap.org/node/6458194389
+秀の湯,秀の湯,東京都,,,,35.7124192,139.6027588,,,Fr-We 15:30-01:30,openstreetmap,node/6458632587,https://www.openstreetmap.org/node/6458632587
+第二宝湯,第二宝湯,東京都,,,,35.71169,139.6245834,,,Sa-Th 15:30-00:00,openstreetmap,node/6458645388,https://www.openstreetmap.org/node/6458645388
+春の湯,春の湯,東京都,,,,35.6996274,139.560296,,,Fr-We 16:00-00:00,openstreetmap,node/6458646185,https://www.openstreetmap.org/node/6458646185
+天徳泉,天徳泉,東京都,,,,35.7058456,139.6321124,,,Su-Fr 15:00-02:00,openstreetmap,node/6461687006,https://www.openstreetmap.org/node/6461687006
+杉並湯,杉並湯,東京都,,,,35.697265,139.6503831,,,Tu-Su 15:45-00:00,openstreetmap,node/6461687011,https://www.openstreetmap.org/node/6461687011
+香藤湯,香藤湯,東京都,,,,35.7018719,139.660673,,,Sa-Th 16:00-01:00,openstreetmap,node/6461687023,https://www.openstreetmap.org/node/6461687023
+昭和浴場,昭和浴場,東京都,,,,35.6994433,139.6621729,,,Th-Tu 15:30-01:30,openstreetmap,node/6461687025,https://www.openstreetmap.org/node/6461687025
+千代の湯,千代の湯,東京都,,,,35.7013529,139.6733225,,,Su-Fr 15:45-00:00,openstreetmap,node/6461687026,https://www.openstreetmap.org/node/6461687026
+照の湯,照の湯,東京都,,,,35.6986021,139.672582,,,Su-Fr 15:30-00:00,openstreetmap,node/6461687027,https://www.openstreetmap.org/node/6461687027
+清春湯,清春湯,東京都,,,,35.6902619,139.6769087,,,Mo-Su 15:30-02:00,openstreetmap,node/6461687028,https://www.openstreetmap.org/node/6461687028
+松の湯,松の湯,東京都,,,,35.710878,139.6839168,,,Su-Fr 15:30-00:00,openstreetmap,node/6461697398,https://www.openstreetmap.org/node/6461697398
+大黒湯,大黒湯,東京都,,,,35.6948431,139.6694892,,,Tu-Su 16:00-01:00,openstreetmap,node/6461697402,https://www.openstreetmap.org/node/6461697402
+大和湯,大和湯,東京都,,,,35.6935161,139.6593646,,,Tu-Su 16:00-00:30,openstreetmap,node/6461697690,https://www.openstreetmap.org/node/6461697690
+桜湯,桜湯,東京都,,,,35.6926927,139.6560535,,,Fr-We 15:00-00:00,openstreetmap,node/6461697691,https://www.openstreetmap.org/node/6461697691
+玉の湯,玉の湯,東京都,,,,35.7072087,139.6396169,,,We-Su 15:00-01:00,openstreetmap,node/6461708085,https://www.openstreetmap.org/node/6461708085
+月の湯,月の湯,東京都,,,,35.6840865,139.6701567,,,We-Su 15:00-23:00,openstreetmap,node/6461885785,https://www.openstreetmap.org/node/6461885785
+世界湯,世界湯,東京都,,,,35.714708,139.6996548,,,Fr-We 15:00-01:00,openstreetmap,node/6461929586,https://www.openstreetmap.org/node/6461929586
+松の湯,松の湯,東京都,,,,35.7091495,139.7170166,,,Tu-Su 15:00-01:00,openstreetmap,node/6462150686,https://www.openstreetmap.org/node/6462150686
+柳湯,柳湯,東京都,,,,35.6989888,139.726534,,,Sa-Th 15:00-00:00,openstreetmap,node/6462191187,https://www.openstreetmap.org/node/6462191187
+第三玉の湯,第三玉の湯,東京都,,,,35.7028516,139.7385237,,,Th-Tu 15:00-01:30,openstreetmap,node/6462193185,https://www.openstreetmap.org/node/6462193185
+薬師湯,薬師湯,東京都,,,,35.7113389,139.8092206,,,Th-Tu 15:30-02:00,openstreetmap,node/6462534686,https://www.openstreetmap.org/node/6462534686
+大星湯,大星湯,東京都,,,,35.6945105,139.7173324,,,Tu-Su 15:00-00:00,openstreetmap,node/6462534687,https://www.openstreetmap.org/node/6462534687
+弁天湯,弁天湯,東京都,,,,35.6954789,139.7149043,,,Th-Tu 14:30-01:00,openstreetmap,node/6462549585,https://www.openstreetmap.org/node/6462549585
+十思湯,十思湯,東京都,,,,35.6908374,139.7774506,,,Mo-Sa 15:00-23:00,openstreetmap,node/6463426487,https://www.openstreetmap.org/node/6463426487
+らかん湯,らかん湯,東京都,,,,35.6913369,139.8257532,,,Tu-Su 15:00-23:00,openstreetmap,node/6463446288,https://www.openstreetmap.org/node/6463446288
+黄金湯,黄金湯,東京都,,,,35.7023032,139.81531,,,Tu-Su 10:00-00:30,openstreetmap,node/6463446290,https://www.openstreetmap.org/node/6463446290
+さくら湯,さくら湯,東京都,,,,35.7074044,139.8150804,,,Mo-Su 15:30-00:00,openstreetmap,node/6463446291,https://www.openstreetmap.org/node/6463446291
+神代湯,神代湯,東京都,,,,35.654551,139.5662897,,,Th-Tu 15:00-00:00,openstreetmap,node/6463675190,https://www.openstreetmap.org/node/6463675190
+給田湯,給田湯,東京都,,,157-0064,35.6669506,139.5962156,03-3300-2871,https://www.setagaya1010.tokyo/guide/kyuden-yu/,Fr-Tu 16:00-21:00,openstreetmap,node/6463675191,https://www.openstreetmap.org/node/6463675191
+増穂湯,増穂湯,東京都,,,,35.6661915,139.6022224,,,Sa-Th 14:45-22:45,openstreetmap,node/6463675192,https://www.openstreetmap.org/node/6463675192
+仁岸湯,仁岸湯,東京都,,,,35.7079551,139.8724011,,,We-Mo 14:30-23:00,openstreetmap,node/6463675686,https://www.openstreetmap.org/node/6463675686
+あづま浴泉,あづま浴泉,東京都,,,,35.7087336,139.8756978,,,Th-Tu 14:00-21:00,openstreetmap,node/6463676585,https://www.openstreetmap.org/node/6463676585
+湯の楽代田橋,湯の楽代田橋,東京都,,,,35.6725862,139.6597336,,,Fr-We 15:00-00:30,openstreetmap,node/6463734489,https://www.openstreetmap.org/node/6463734489
+渋谷笹塚温泉 栄湯,渋谷笹塚温泉栄湯,東京都,,,,35.6756647,139.668679,,,"Mo-Tu,Fr-Sa 15:00-24:00; We-Th off; Su 14:00-24:00",openstreetmap,node/6463830785,https://www.openstreetmap.org/node/6463830785
+大黒湯,大黒湯,東京都,,,,35.6709752,139.6831229,,,Th-Tu 15:00-01:30,openstreetmap,node/6464013786,https://www.openstreetmap.org/node/6464013786
+仙石湯,仙石湯,東京都,,,,35.6750878,139.6784934,,,Tu-Su 16:00-00:00,openstreetmap,node/6464014085,https://www.openstreetmap.org/node/6464014085
+湊湯,湊湯,東京都,,,,35.6726012,139.7794959,,,Su-Fr 15:00-00:30,openstreetmap,node/6464014885,https://www.openstreetmap.org/node/6464014885
+改良湯,改良湯,東京都,,,,35.6530514,139.709518,,,Su-Fr 15:00-00:30,openstreetmap,node/6464014886,https://www.openstreetmap.org/node/6464014886
+辰巳湯,辰巳湯,東京都,,,,35.6799172,139.7996963,,,Tu-Su 15:00-00:00,openstreetmap,node/6464015686,https://www.openstreetmap.org/node/6464015686
+光明泉,光明泉,東京都,,,,35.6455485,139.7003059,,,Mo-Su 15:00-01:00,openstreetmap,node/6464016185,https://www.openstreetmap.org/node/6464016185
+勝どき湯,勝どき湯,東京都,,,,35.6579151,139.7741588,,,Mo-Sa 15:30-22:00,openstreetmap,node/6464086186,https://www.openstreetmap.org/node/6464086186
+月島温泉,月島温泉,東京都,,,,35.6636408,139.7811934,,,Mo-Su 14:30-23:40,openstreetmap,node/6464701386,https://www.openstreetmap.org/node/6464701386
+栄湯,栄湯,東京都,,,,35.6290854,139.6342544,,,We-Su 16:00-23:30,openstreetmap,node/6464701391,https://www.openstreetmap.org/node/6464701391
+旭湯,旭湯,東京都,,,,35.6171672,139.6772426,,,Tu-Su 15:30-00:00,openstreetmap,node/6464701393,https://www.openstreetmap.org/node/6464701393
+八幡湯,八幡湯,東京都,,,,35.647959,139.6663115,,,Su-Th 15:00-23:00,openstreetmap,node/6464701397,https://www.openstreetmap.org/node/6464701397
+千代の湯,千代の湯,東京都,,,,35.6426128,139.669569,,,Sa-Th 16:00-01:00,openstreetmap,node/6464748990,https://www.openstreetmap.org/node/6464748990
+そしがや温泉21,そしがや温泉21,東京都,,,,35.6456191,139.6077084,,,Mo-Su 14:00-00:00,openstreetmap,node/6464749286,https://www.openstreetmap.org/node/6464749286
+富の湯,富の湯,東京都,,,,35.6466351,139.5696683,,,Tu-Su 14:00-00:00,openstreetmap,node/6464749385,https://www.openstreetmap.org/node/6464749385
+世田谷温泉 四季の湯,世田谷温泉四季の湯,東京都,,,,35.6453693,139.6249724,,,Tu-Su 15:00-00:00,openstreetmap,node/6464749390,https://www.openstreetmap.org/node/6464749390
+駒の湯,駒の湯,東京都,,,,35.6428504,139.6670676,,,We-Su 15:30-23:30,openstreetmap,node/6464749392,https://www.openstreetmap.org/node/6464749392
+宝来湯,宝来湯,東京都,,,,35.6438031,139.7208584,,,Su-Fr 16:00-23:00,openstreetmap,node/6464749393,https://www.openstreetmap.org/node/6464749393
+みどり湯,みどり湯,東京都,,,,35.6090381,139.6740899,,,Fr-We 13:00-22:00,openstreetmap,node/6466080890,https://www.openstreetmap.org/node/6466080890
+第二栗の湯,第二栗の湯,東京都,,,,35.5730512,139.6788483,,,Sa-Th 15:00-00:00,openstreetmap,node/6466185187,https://www.openstreetmap.org/node/6466185187
+草津湯,草津湯,東京都,,,,35.5652631,139.6998968,,,Mo-Su 12:00-00:00,openstreetmap,node/6466185188,https://www.openstreetmap.org/node/6466185188
+アサヒトレンド21,アサヒトレンド21,東京都,,,,35.7009537,139.5583196,,,Sa-Th 15:30-23:30,openstreetmap,node/6466185194,https://www.openstreetmap.org/node/6466185194
+富士見湯,富士見湯,東京都,,,,35.7098121,139.3809096,,,Mo off; Tu-Sa 12:00-09:00; Su 12:00-24:00,openstreetmap,node/6466192186,https://www.openstreetmap.org/node/6466192186
+桜湯,桜湯,東京都,,,,35.7458376,139.4725428,,,Tu-Su 15:00-23:00,openstreetmap,node/6466192385,https://www.openstreetmap.org/node/6466192385
+千代乃湯,千代乃湯,東京都,,,,35.6872649,139.5493464,,,Mo-Su 15:30-23:30,openstreetmap,node/6466192785,https://www.openstreetmap.org/node/6466192785
+峰の湯,峰の湯,東京都,,,,35.7662584,139.5128177,,,We-Mo 15:00-22:30,openstreetmap,node/6477902285,https://www.openstreetmap.org/node/6477902285
+稲垣浴泉,稲垣浴泉,東京都,,,,35.7567114,139.6946385,,,Tu-Su 16:00-23:00,openstreetmap,node/6515095185,https://www.openstreetmap.org/node/6515095185
+天神湯,天神湯,東京都,,,,35.5594449,139.7271429,,,Fr-We 14:00-00:00,openstreetmap,node/6521225085,https://www.openstreetmap.org/node/6521225085
+はすぬま温泉,はすぬま温泉,東京都,,,,35.5654054,139.7086236,,,We-Mo 15:00-01:00,openstreetmap,node/6524697887,https://www.openstreetmap.org/node/6524697887
+大塚湯,大塚湯,東京都,,,,35.6335983,139.6988142,,,Su-Fr 15:00-23:00,openstreetmap,node/6528423385,https://www.openstreetmap.org/node/6528423385
+湯どんぶり栄湯,湯どんぶり栄湯,東京都,,,,35.7254761,139.7986716,+81 3-3875-2885,https://sakaeyu.com/en/,Th-Tu 14:00-00:00,openstreetmap,node/6547536685,https://www.openstreetmap.org/node/6547536685
+鶴の湯,鶴の湯,東京都,,,,35.7207163,139.7991434,,,Fr-We 14:00-23:00,openstreetmap,node/6551975890,https://www.openstreetmap.org/node/6551975890
+ヌーランドさがみゆ,ヌーランドさがみゆ,東京都,,,,35.550432,139.7136436,,,Mo-Su 10:00-23:00,openstreetmap,node/6581485385,https://www.openstreetmap.org/node/6581485385
+隆の湯,隆の湯,東京都,,,,35.5504448,139.7136346,,,Su-Fr 15:00-00:00,openstreetmap,node/6581983286,https://www.openstreetmap.org/node/6581983286
+HOTランド みどり湯,hotランドみどり湯,東京都,,,,35.7794656,139.7332578,,,Tu-Su 15:00-23:30,openstreetmap,node/6604256586,https://www.openstreetmap.org/node/6604256586
+湯〜ハウス,湯〜ハウス,東京都,,,,35.7653173,139.6731415,,,Sa-Th 15:00-23:30,openstreetmap,node/6620836385,https://www.openstreetmap.org/node/6620836385
+乙女湯,乙女湯,東京都,,,,35.6784043,139.8690067,,,Tu-Su 15:00-00:00,openstreetmap,node/6634676885,https://www.openstreetmap.org/node/6634676885
+丸正浴場,丸正浴場,東京都,,,,35.6324639,139.5918613,,,Th-Tu 15:00-23:00,openstreetmap,node/6652922587,https://www.openstreetmap.org/node/6652922587
+梅の湯,梅の湯,東京都,,,,35.6751737,139.5577249,,,Tu-Su 15:00-23:00,openstreetmap,node/6665260085,https://www.openstreetmap.org/node/6665260085
+タイムズ スパ・レスタ,タイムズスパ・レスタ,東京都,,,,35.7287722,139.7174078,+81 3 5979 8924,https://www.timesspa-resta.jp/,Mo-Su 11:00-08:30,openstreetmap,node/6709542829,https://www.openstreetmap.org/node/6709542829
+美しの湯,美しの湯,東京都,,,,35.6845497,139.6146782,03-3334-0008,http://utsukushi-yu.com/,,openstreetmap,node/6712018870,https://www.openstreetmap.org/node/6712018870
+アクアプレイス旭,アクアプレイス旭,東京都,,,,35.7201356,139.7944587,,,We-Mo 15:00-01:00,openstreetmap,node/6741660285,https://www.openstreetmap.org/node/6741660285
+湯の森 深大湯,湯の森深大湯,東京都,,,,35.6774263,139.5464779,,,Fr-We 15:00-23:00,openstreetmap,node/6742369003,https://www.openstreetmap.org/node/6742369003
+あけぼの湯,あけぼの湯,東京都,,,,35.6807075,139.863763,,,Fr-We 15:30-23:50,openstreetmap,node/6749126185,https://www.openstreetmap.org/node/6749126185
+宝泉湯,宝泉湯,東京都,,,,35.7222623,139.7825206,,,Tu-Su 15:00-00:00,openstreetmap,node/6753230485,https://www.openstreetmap.org/node/6753230485
+黄金湯,黄金湯,東京都,,,,35.7289043,139.7803718,,,We-Mo 15:00-23:00,openstreetmap,node/6759388985,https://www.openstreetmap.org/node/6759388985
+東京健康ランド まねきの湯,東京健康ランドまねきの湯,東京都,,,,35.6868471,139.8616093,,,,openstreetmap,node/6774146088,https://www.openstreetmap.org/node/6774146088
+松の湯,松の湯,東京都,,,,35.7691768,139.7841327,,,Sa-Th 15:45-22:00,openstreetmap,node/6774647885,https://www.openstreetmap.org/node/6774647885
+湯楽の里,湯楽の里,東京都,,美堀町三丁目1410,190-0001,35.7218798,139.3551688,+81-42-500-2615,http://yurakirari.com,24/7,openstreetmap,node/6794057585,https://www.openstreetmap.org/node/6794057585
+塩湯,塩湯,東京都,,,,35.6873498,139.7273063,,,Tu-Su 15:00-23:00,openstreetmap,node/6813261785,https://www.openstreetmap.org/node/6813261785
+大蔵湯,大蔵湯,東京都,,,,35.5617553,139.4299392,,,Sa-Th 14:00-23:00,openstreetmap,node/6837536386,https://www.openstreetmap.org/node/6837536386
+金春湯,金春湯,東京都,,,,35.6173698,139.7216147,,,We-Mo 15:30-00:00,openstreetmap,node/6855301788,https://www.openstreetmap.org/node/6855301788
+竹の湯,竹の湯,東京都,,,,35.7337667,139.8356915,,,Th-Tu 15:30-00:00,openstreetmap,node/6857117585,https://www.openstreetmap.org/node/6857117585
+寺島浴場,寺島浴場,東京都,,,,35.7245026,139.8210757,,,Tu-Su 15:00-00:30,openstreetmap,node/6874672187,https://www.openstreetmap.org/node/6874672187
+幸の湯,幸の湯,東京都,,,,35.5576069,139.7326149,,,Tu-Su 14:00-23:00,openstreetmap,node/6905690485,https://www.openstreetmap.org/node/6905690485
+紀の国湯,紀の国湯,東京都,,,,35.7844142,139.6798972,,,Tu-Su 15:00-23:00,openstreetmap,node/6933876486,https://www.openstreetmap.org/node/6933876486
+黄金湯,黄金湯,東京都,,,,35.7761128,139.6582223,,,Tu-Su 15:00-22:00,openstreetmap,node/6933877485,https://www.openstreetmap.org/node/6933877485
+竹の湯,竹の湯,東京都,,,,35.764802,139.7885631,,,We-Mo 14:50-23:30,openstreetmap,node/6948392086,https://www.openstreetmap.org/node/6948392086
+ゆ〜シティー蒲田,ゆ〜シティー蒲田,東京都,,,,35.5651137,139.7180786,,,We-Mo 11:00-00:00,openstreetmap,node/7003639585,https://www.openstreetmap.org/node/7003639585
+狛江湯,狛江湯,東京都,,,,35.6325824,139.5794494,,,We-Mo 15:00-00:00,openstreetmap,node/7023765685,https://www.openstreetmap.org/node/7023765685
+白水湯,白水湯,東京都,,,,35.7209193,139.7865924,,,Tu-Su 15:00-01:00,openstreetmap,node/7028576685,https://www.openstreetmap.org/node/7028576685
+ゆパウザひばり,ゆパウザひばり,東京都,,,,35.7482289,139.5433611,,,Fr-We 15:00-23:30,openstreetmap,node/7095275785,https://www.openstreetmap.org/node/7095275785
+光徳湯,光徳湯,東京都,,,,35.770487,139.6553661,,,Mo-Su 15:00-23:30,openstreetmap,node/7106536486,https://www.openstreetmap.org/node/7106536486
+さくら湯,さくら湯,東京都,,,,35.7527792,139.7134784,,,"Tu-We, Fr-Su 15:30-21:00",openstreetmap,node/7134737385,https://www.openstreetmap.org/node/7134737385
+熊野湯,熊野湯,東京都,,,,35.7759127,139.690244,,,Th-Tu 14:00-23:30,openstreetmap,node/7146557585,https://www.openstreetmap.org/node/7146557585
+ピース湯,ピース湯,東京都,,,,35.5998325,139.7159784,,,Tu-Su 15:30-00:00,openstreetmap,node/7171751885,https://www.openstreetmap.org/node/7171751885
+みどり湯,みどり湯,東京都,,,,35.6009125,139.7238893,,,We-Mo 14:45-00:00,openstreetmap,node/7176361386,https://www.openstreetmap.org/node/7176361386
+宮城湯,宮城湯,東京都,,,,35.6114803,139.7261807,,,Th-Tu 15:00-01:00,openstreetmap,node/7179104085,https://www.openstreetmap.org/node/7179104085
+豊島湯,豊島湯,東京都,,,,35.7610816,139.7459598,,,Mo-Su 15:30-23:30,openstreetmap,node/7197434686,https://www.openstreetmap.org/node/7197434686
+柳湯,柳湯,東京都,,,,35.7649608,139.7309169,,,Tu-Su 14:30-00:00,openstreetmap,node/7235360385,https://www.openstreetmap.org/node/7235360385
+松の湯,松の湯,東京都,,,,35.7785267,139.6875711,,,Sa-Th 14:00-23:00,openstreetmap,node/7244382685,https://www.openstreetmap.org/node/7244382685
+中延温泉 松の湯,中延温泉松の湯,東京都,,,,35.6059356,139.7148727,,,Tu-Su 15:00-01:00,openstreetmap,node/7254916485,https://www.openstreetmap.org/node/7254916485
+神明湯,神明湯,東京都,,,,35.7399896,139.449683,,,Sa-Th 15:00-23:30,openstreetmap,node/7284841285,https://www.openstreetmap.org/node/7284841285
+アクアガーデン栄湯,アクアガーデン栄湯,東京都,,,,35.73046,139.8401097,,,We-Su 16:00-22:00,openstreetmap,node/7292150885,https://www.openstreetmap.org/node/7292150885
+末広湯,末広湯,東京都,,,,35.6040178,139.7322369,,,Th-Tu 15:00-00:00,openstreetmap,node/7309442285,https://www.openstreetmap.org/node/7309442285
+桜湯,桜湯,東京都,,,,35.6708427,139.4819979,,,,openstreetmap,node/7321265881,https://www.openstreetmap.org/node/7321265881
+新生湯,新生湯,東京都,,,,35.6026868,139.7056712,,,Tu-Su 15:30-00:30,openstreetmap,node/7366434685,https://www.openstreetmap.org/node/7366434685
+平和湯,平和湯,東京都,,,,35.7703244,139.7324698,,,Sa-Th 15:00-00:00,openstreetmap,node/7380022785,https://www.openstreetmap.org/node/7380022785
+金星湯,金星湯,東京都,,,,35.7608853,139.733147,,,Sa-Th 15:00-01:00,openstreetmap,node/7394744485,https://www.openstreetmap.org/node/7394744485
+入間湯,入間湯,東京都,,,,35.6221146,139.7016505,,,Th-Tu 15:00-00:00,openstreetmap,node/7418154185,https://www.openstreetmap.org/node/7418154185
+藤ランド,藤ランド,東京都,,,,35.762536,139.731037,,,Th-Tu 15:30-24:00,openstreetmap,node/7470752085,https://www.openstreetmap.org/node/7470752085
+大黒湯,大黒湯,東京都,,,,35.7476134,139.7479405,,,We-Mo 15:00-24:00,openstreetmap,node/7480434486,https://www.openstreetmap.org/node/7480434486
+八幡湯,八幡湯,東京都,,,,35.606299,139.7084177,,,Th-Mo 15:00-23:00,openstreetmap,node/7494686385,https://www.openstreetmap.org/node/7494686385
+宝泉湯,宝泉湯,東京都,,,,35.7663707,139.7402533,,,Th-Tu 15:00-23:30,openstreetmap,node/7518460385,https://www.openstreetmap.org/node/7518460385
+美寿々湯,美寿々湯,東京都,,,,35.7561413,139.5948725,,,"Tu-Th, Sa-Su 16:00-22:30",openstreetmap,node/7554123290,https://www.openstreetmap.org/node/7554123290
+COCOFURO ますの湯,cocofuroますの湯,東京都,,,,35.5798546,139.68586,,,Mo-Su 06:00-00:00,openstreetmap,node/7609171986,https://www.openstreetmap.org/node/7609171986
+ニュー恵美須,ニュー恵美須,東京都,,,,35.7435313,139.7676175,,,Tu-Su 14:30-22:00,openstreetmap,node/7617757592,https://www.openstreetmap.org/node/7617757592
+戸越銀座温泉,戸越銀座温泉,東京都,,,,35.6147422,139.7186284,,,Sa-Th 15:00-01:00,openstreetmap,node/7649338787,https://www.openstreetmap.org/node/7649338787
+第二喜多の湯,第二喜多の湯,東京都,,,,35.7599067,139.5261804,,,Mo-Su 15:00-22:00,openstreetmap,node/7666565985,https://www.openstreetmap.org/node/7666565985
+お玉湯,お玉湯,東京都,,,,35.7867533,139.7144815,,,Th-Tu 15:35-23:00,openstreetmap,node/7691694085,https://www.openstreetmap.org/node/7691694085
+岡田湯,岡田湯,東京都,,,,35.7711368,139.7852683,,,Tu-Su 15:00-23:30,openstreetmap,node/7717201585,https://www.openstreetmap.org/node/7717201585
+新田浴場,新田浴場,東京都,,,,35.564109,139.6914071,,,Th-Tu 14:00-23:30,openstreetmap,node/7724330686,https://www.openstreetmap.org/node/7724330686
+藤の湯,藤の湯,東京都,,,,35.7724072,139.7303394,,,Fr-We 16:00-00:00,openstreetmap,node/7744050386,https://www.openstreetmap.org/node/7744050386
+日の出湯,日の出湯,東京都,,,,35.7659278,139.8411383,,,Th-Tu 15:50-22:30,openstreetmap,node/7815147385,https://www.openstreetmap.org/node/7815147385
+大森湯,大森湯,東京都,,,,35.5735267,139.7303081,,,We-Mo 15:00-23:00,openstreetmap,node/7877117285,https://www.openstreetmap.org/node/7877117285
+新呑川湯,新呑川湯,東京都,,,,35.5617959,139.7385008,,,Sa-Th 11:00-00:00,openstreetmap,node/7884004085,https://www.openstreetmap.org/node/7884004085
+尾久ゆ〜ランド,尾久ゆ〜ランド,東京都,,,,35.7453157,139.7671873,,,Th-Mo 15:00-01:00,openstreetmap,node/7899997985,https://www.openstreetmap.org/node/7899997985
+照の湯,照の湯,東京都,,,,35.5458289,139.7111336,,,Fr-We 15:00-23:30,openstreetmap,node/7936266985,https://www.openstreetmap.org/node/7936266985
+調布弁天湯,調布弁天湯,東京都,,,,35.586278,139.6821599,,,We-Su 15:30-23:30,openstreetmap,node/7942006087,https://www.openstreetmap.org/node/7942006087
+さつき湯,さつき湯,東京都,,,,35.7533195,139.8390733,,,Tu-Su 15:15-23:00,openstreetmap,node/7965698485,https://www.openstreetmap.org/node/7965698485
+富士の湯,富士の湯,東京都,,,,35.7578229,139.8498698,,,Fr-We 15:30-22:00,openstreetmap,node/7977395185,https://www.openstreetmap.org/node/7977395185
+桜湯,桜湯,東京都,,,,35.6707341,139.4820405,,,Mo-Su 16:00-22:00,openstreetmap,node/7988810485,https://www.openstreetmap.org/node/7988810485
+第五相模湯,第五相模湯,東京都,,,,35.5478877,139.7199034,,,Tu-Su 15:30-00:00,openstreetmap,node/8006757285,https://www.openstreetmap.org/node/8006757285
+寿湯,寿湯,東京都,,,,35.5640842,139.7241914,,,Tu-Su 15:30-23:45,openstreetmap,node/8021902785,https://www.openstreetmap.org/node/8021902785
+竹の湯,竹の湯,東京都,,,,35.5503492,139.7428131,,,Th-Tu 16:00-23:00,openstreetmap,node/8074912719,https://www.openstreetmap.org/node/8074912719
+太平湯,太平湯,東京都,,,,35.5504429,139.7215612,,,Th-Tu 15:30-23:00,openstreetmap,node/8140831017,https://www.openstreetmap.org/node/8140831017
+宝湯,宝湯,東京都,大田区,東京都大田区東糀谷三丁目48,144-0033,35.5535145,139.741652,,,"Tu-Sa 15:30-23:00; Su,PH 15:00-23:00",openstreetmap,node/8148416417,https://www.openstreetmap.org/node/8148416417
+あたり湯,あたり湯,東京都,,,,35.5738827,139.7255383,,,Tu-Su 15:30-23:30,openstreetmap,node/8194364768,https://www.openstreetmap.org/node/8194364768
+富士見湯,富士見湯,東京都,,,,35.647089,139.6721294,,,Fr-We 14:00-00:00,openstreetmap,node/8247778217,https://www.openstreetmap.org/node/8247778217
+鳩の湯,鳩の湯,東京都,,,,35.6948868,139.4521316,,,Tu-Su 13:00-23:00,openstreetmap,node/8282904017,https://www.openstreetmap.org/node/8282904017
+旭湯,旭湯,東京都,,,,35.6744586,139.840331,,,Mo-Su 15:00-23:00,openstreetmap,node/8347664017,https://www.openstreetmap.org/node/8347664017
+武蔵小山温泉 清水湯,武蔵小山温泉清水湯,東京都,,,,35.6202046,139.7076851,,,Tu-Su 12:00-00:00,openstreetmap,node/8347734817,https://www.openstreetmap.org/node/8347734817
+中延記念湯,中延記念湯,東京都,,,,35.6016877,139.7029738,,,Mo-Su 14:00-01:00,openstreetmap,node/8348077218,https://www.openstreetmap.org/node/8348077218
+文化浴泉,文化浴泉,東京都,,,,35.6497797,139.6872808,,,Mo-Su 15:30-01:00,openstreetmap,node/8348184717,https://www.openstreetmap.org/node/8348184717
+都湯,都湯,東京都,,,,35.5720387,139.6829551,,,Tu-Su 14:30-00:00,openstreetmap,node/8348835417,https://www.openstreetmap.org/node/8348835417
+久が原湯,久が原湯,東京都,,,,35.5822044,139.6975858,,,Tu-Su 14:00-00:00,openstreetmap,node/8349093219,https://www.openstreetmap.org/node/8349093219
+第二天狗湯,第二天狗湯,東京都,,,,35.5777513,139.7302422,,,Fr-We 14:30-23:00,openstreetmap,node/8349093318,https://www.openstreetmap.org/node/8349093318
+久松温泉,久松温泉,東京都,,,,35.573769,139.7027037,,,We-Mo 10:00-00:00,openstreetmap,node/8349168517,https://www.openstreetmap.org/node/8349168517
+月見湯温泉,月見湯温泉,東京都,,,,35.6654589,139.6359546,,,We-Su 15:30-00:00,openstreetmap,node/8359448817,https://www.openstreetmap.org/node/8359448817
+羽衣湯,羽衣湯,東京都,,,,35.6920014,139.684338,,,Sa-Th 14:00-01:30,openstreetmap,node/8359536817,https://www.openstreetmap.org/node/8359536817
+観音湯,観音湯,東京都,,,,35.6790617,139.6765091,,,Mo-Su 14:00-00:00,openstreetmap,node/8359602917,https://www.openstreetmap.org/node/8359602917
+八幡湯,八幡湯,東京都,,,,35.6696952,139.6894222,,,Sa-Th 15:30-00:00,openstreetmap,node/8359708718,https://www.openstreetmap.org/node/8359708718
+新越泉,新越泉,東京都,,,,35.7153082,139.670088,,,Tu-Su 15:00-00:00,openstreetmap,node/8360225717,https://www.openstreetmap.org/node/8360225717
+中野寿湯温泉,中野寿湯温泉,東京都,,,,35.7112011,139.6670731,,,We-Mo 16:00-01:30,openstreetmap,node/8360225817,https://www.openstreetmap.org/node/8360225817
+高砂湯,高砂湯,東京都,,,,35.7017663,139.6696125,,,Tu-Su 15:00-00:30,openstreetmap,node/8360769117,https://www.openstreetmap.org/node/8360769117
+テルメ末広,テルメ末広,東京都,,,,35.782484,139.7311072,,,Sa-Th 14:00-23:00,openstreetmap,node/8363739117,https://www.openstreetmap.org/node/8363739117
+橘湯,橘湯,東京都,,,,35.7525916,139.7493894,,,Tu-Su 14:00-00:00,openstreetmap,node/8364248417,https://www.openstreetmap.org/node/8364248417
+中村浴場,中村浴場,東京都,,,,35.7365053,139.6410361,,,Tu-Su 15:30-00:00,openstreetmap,node/8378447217,https://www.openstreetmap.org/node/8378447217
+貫井浴場,貫井浴場,東京都,,,,35.7401304,139.6327023,,,Tu-Su 15:00-00:00,openstreetmap,node/8378802217,https://www.openstreetmap.org/node/8378802217
+堀田湯,堀田湯,東京都,,,,35.7717564,139.7890002,,,Sa-Th 14:50-23:00,openstreetmap,node/8380552517,https://www.openstreetmap.org/node/8380552517
+鶴の湯,鶴の湯,東京都,,,,35.6833423,139.8597751,,,Th-Tu 15:30-00:00,openstreetmap,node/8384746117,https://www.openstreetmap.org/node/8384746117
+富士見湯健康セントー,富士見湯健康セントー,東京都,,,,35.7372486,139.4300652,,,We-Mo 13:00-00:00,openstreetmap,node/8386446217,https://www.openstreetmap.org/node/8386446217
+鶴の湯,鶴の湯,東京都,,,,35.6573202,139.5353374,,,Th-Tu 15:00-23:00,openstreetmap,node/8386730919,https://www.openstreetmap.org/node/8386730919
+お湯どころ野川,お湯どころ野川,東京都,,,,35.6413247,139.5830406,,,Tu-Su 16:30-00:00,openstreetmap,node/8386730920,https://www.openstreetmap.org/node/8386730920
+境南浴場,境南浴場,東京都,,,,35.7001867,139.5412433,,,Sa-Th 16:00-00:00,openstreetmap,node/8387653217,https://www.openstreetmap.org/node/8387653217
+松の湯,松の湯,東京都,,,,35.6595626,139.3252089,,,We-Mo 14:00-23:30,openstreetmap,node/8387910160,https://www.openstreetmap.org/node/8387910160
+松の湯,松の湯,東京都,,,,35.7300958,139.5793949,,,We-Su 14:00-21:00,openstreetmap,node/8584512317,https://www.openstreetmap.org/node/8584512317
+PARADISE,paradise,東京都,,港区芝5-23-16,,35.6481013,139.745673,,,Mo-Su 06:00-04:00,openstreetmap,node/9845740117,https://www.openstreetmap.org/node/9845740117
+南青山 清水湯,南青山清水湯,東京都,港区,東京都港区南青山三丁目123,,35.6660749,139.7140158,,,Sa-Th 12:00-00:00,openstreetmap,node/10196219817,https://www.openstreetmap.org/node/10196219817
+Kotobikuyu,kotobikuyu,東京都,,,,35.7122499,139.782742,,http://plala.or.jp,,openstreetmap,node/11035415205,https://www.openstreetmap.org/node/11035415205
+サウナ東京,サウナ東京,東京都,,,,35.6732737,139.7376429,,,,openstreetmap,node/11104446124,https://www.openstreetmap.org/node/11104446124
+生姜サウナ金の亀,生姜サウナ金の亀,東京都,,,,35.6757461,139.7357526,,,,openstreetmap,node/11135968383,https://www.openstreetmap.org/node/11135968383
+渋谷SAUNAS,渋谷saunas,東京都,,,,35.6560536,139.7007824,,,,openstreetmap,node/11436588769,https://www.openstreetmap.org/node/11436588769
+SaunaLab Kanda,saunalabkanda,東京都,,,,35.6922544,139.7596057,,,,openstreetmap,node/11452062069,https://www.openstreetmap.org/node/11452062069
+サウナ&カプセルホテル北欧,サウナ&カプセルホテル北欧,東京都,,,,35.7130874,139.777939,,,,openstreetmap,node/11459051870,https://www.openstreetmap.org/node/11459051870
+サウナ道場,サウナ道場,東京都,,,,35.6606677,139.6983829,,,,openstreetmap,node/11462888869,https://www.openstreetmap.org/node/11462888869
+生姜サウナ 金の亀,生姜サウナ金の亀,東京都,,,,35.6757738,139.7357872,,,,openstreetmap,node/11462904369,https://www.openstreetmap.org/node/11462904369
+HUBHUB,hubhub,東京都,,,,35.7046631,139.7742506,,,,openstreetmap,node/12141554396,https://www.openstreetmap.org/node/12141554396
+かるまる,かるまる,東京都,,,,35.7323993,139.7085201,,,,openstreetmap,node/13208732539,https://www.openstreetmap.org/node/13208732539
+Raku SPA,rakuspa,東京都,,,,35.7011315,139.5073955,,https://rakuspa.com/musashi/,,openstreetmap,node/13356632101,https://www.openstreetmap.org/node/13356632101
+高輪Saunas,高輪saunas,東京都,,,,35.6364588,139.7399258,,,,openstreetmap,node/13663939294,https://www.openstreetmap.org/node/13663939294
+すごいサウナ,すごいサウナ,東京都,,,,35.6565806,139.7383304,,,,openstreetmap,node/13723006617,https://www.openstreetmap.org/node/13723006617
+サウナアンドカプセル ミナミ,サウナアンドカプセルミナミ,東京都,,,,35.660047,139.6689185,,,,openstreetmap,node/13730161772,https://www.openstreetmap.org/node/13730161772
+FLOBA,floba,東京都,三鷹市,東京都三鷹市下連雀三丁目452,,35.7022505,139.5602053,,https://floba-mitaka.jp/,08:00-24:00,openstreetmap,node/13795581295,https://www.openstreetmap.org/node/13795581295
+センチュリオンホテル グランド,センチュリオンホテルグランド,東京都,,193,107-0052,35.6757589,139.7364946,03-6435-5226,https://www.centurion-hotel.com/grand/,,openstreetmap,way/145665305,https://www.openstreetmap.org/way/145665305
+Sauna Verse,saunaverse,東京都,千代田区,東京都千代田区外神田六丁目10,,35.704677,139.7710487,,,,openstreetmap,way/174393136,https://www.openstreetmap.org/way/174393136
+ドーミーイン池袋,ドーミーイン池袋,東京都,豊島区,東京都豊島区東池袋3丁目11,170-0013,35.7318857,139.7189998,+81 3 5956 5489,,,openstreetmap,way/204907988,https://www.openstreetmap.org/way/204907988
+国立温泉 湯楽の里,国立温泉湯楽の里,東京都,国立市,東京都国立市谷保31431,,35.6760268,139.4271416,+81 42-580-1726,https://www.yurakirari.com/kunitachi/,09:00-01:00,openstreetmap,way/275462766,https://www.openstreetmap.org/way/275462766
+青ヶ島村 ふれあいサウナ,青ヶ島村ふれあいサウナ,東京都,,,,32.4525748,139.7646415,,,"Mo-Fr 16:00-20:00; Sa-Su 14:00-20:00 || ""休館日　毎週第1・3・5・水曜日""",openstreetmap,way/456786337,https://www.openstreetmap.org/way/456786337
+ドーミーイン東京八丁堀,ドーミーイン東京八丁堀,東京都,中央区,東京都中央区新川2丁目204,104-0033,35.674424,139.7807581,+81-3-5541-6700,https://dormy-hotels.com/dormyinn/hotels/tokyohatchobori/,,openstreetmap,way/653105339,https://www.openstreetmap.org/way/653105339
+大黒湯,大黒湯,東京都,,,,35.6948375,139.6695393,,,,openstreetmap,way/844668201,https://www.openstreetmap.org/way/844668201
+えびす湯,えびす湯,東京都,北区,東京都北区滝野川一丁目120,114-0023,35.7487406,139.7386805,,,Tu-Su 15:00-24:00,openstreetmap,way/860728039,https://www.openstreetmap.org/way/860728039
+御宿 野乃浅草別邸,御宿野乃浅草別邸,東京都,大東区,東京都大東区浅草2丁目726,111-0032,35.714869,139.7948483,+81 3 5830 0130,https://dormy-hotels.com/dormyinn/hotels/nono_asakusabettei/,,openstreetmap,way/1275234387,https://www.openstreetmap.org/way/1275234387

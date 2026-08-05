@@ -1,0 +1,15 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+リフレ,リフレ,北海道,,,,43.0790856,144.2305718,,,,openstreetmap,node/3495068105,https://www.openstreetmap.org/node/3495068105
+養老牛温泉,養老牛温泉,北海道,,,,43.5883961,144.7227919,,,,openstreetmap,node/5110240121,https://www.openstreetmap.org/node/5110240121
+Obihiro Konan Onsen,obihirokonanonsen,北海道,,,,42.9103297,143.2097739,,,,openstreetmap,node/5700651321,https://www.openstreetmap.org/node/5700651321
+貝取澗温泉,貝取澗温泉,北海道,,,,42.1888367,139.898208,0139845522,http://awabisanso.com,Mo-Su 06:30-20:00,openstreetmap,node/5727067421,https://www.openstreetmap.org/node/5727067421
+Onsen,onsen,北海道,,,,42.5841578,140.7055879,,,,openstreetmap,node/5976906386,https://www.openstreetmap.org/node/5976906386
+Koruruko Onsen,korurukoonsen,北海道,,,,42.5183658,141.1077849,,,,openstreetmap,node/6285337993,https://www.openstreetmap.org/node/6285337993
+丹頂の里温泉,丹頂の里温泉,北海道,,,,43.1444427,144.1448585,,,Mo-Su 10:00-22:00,openstreetmap,node/7012335986,https://www.openstreetmap.org/node/7012335986
+五月湯,五月湯,北海道,,,,43.2061007,141.7684571,,,,openstreetmap,node/7709423185,https://www.openstreetmap.org/node/7709423185
+ヘルシーシャトー,ヘルシーシャトー,北海道,,,,43.8334231,142.5303975,,,,openstreetmap,node/9876462118,https://www.openstreetmap.org/node/9876462118
+ドーミーイン稚内,ドーミーイン稚内,北海道,,,,45.4183338,141.6748606,,,,openstreetmap,way/304795006,https://www.openstreetmap.org/way/304795006
+高栄湯,高栄湯,北海道,,,,43.8145382,143.8601474,,,,openstreetmap,way/455233190,https://www.openstreetmap.org/way/455233190
+ドーミーイン苫小牧,ドーミーイン苫小牧,北海道,苫小牧市,北海道苫小牧市錦町2122,053-0023,42.6337717,141.5995011,+81 144 32 5489,https://dormy-hotels.com/dormyinn/hotels/tomakomai/,,openstreetmap,way/556195335,https://www.openstreetmap.org/way/556195335
+ドーミーイン千歳,ドーミーイン千歳,北海道,千歳市,北海道千歳市幸町4丁目201,066-0063,42.8249754,141.6490357,+81 123 29 6050,https://dormy-hotels.com/dormyinn/hotels/chitose/,,openstreetmap,way/585539470,https://www.openstreetmap.org/way/585539470
+ドーミーイン網走,ドーミーイン網走,北海道,,,,44.0219314,144.2637238,+81 152 45 5489,,,openstreetmap,way/1028372912,https://www.openstreetmap.org/way/1028372912

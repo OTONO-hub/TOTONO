@@ -1,0 +1,5 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+ホテル松本楼,ホテル松本楼,群馬県,,,,36.4997599,138.9243494,+81 279 72 3306,http://www.matsumotoro.com/,,openstreetmap,node/6403414524,https://www.openstreetmap.org/node/6403414524
+温窟サウナかま蔵,温窟サウナかま蔵,群馬県,,,,36.3382978,139.1540152,,,,openstreetmap,node/13167292179,https://www.openstreetmap.org/node/13167292179
+南郷温泉 しゃくなげの湯,南郷温泉しゃくなげの湯,群馬県,,,,36.6328158,139.1839243,,https://syakunage.jp/,,openstreetmap,way/247623409,https://www.openstreetmap.org/way/247623409
+ドーミーイン前橋,ドーミーイン前橋,群馬県,前橋市,群馬県前橋市表町2丁目247,371-0024,36.3850933,139.0723203,+81 27-220-5489,https://dormy-hotels.com/dormyinn/hotels/maebashi/,,openstreetmap,way/721575992,https://www.openstreetmap.org/way/721575992

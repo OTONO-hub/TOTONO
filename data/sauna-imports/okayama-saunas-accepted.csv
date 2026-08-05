@@ -1,0 +1,5 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+牛窓サウナ オンザビーチ,牛窓サウナオンザビーチ,岡山県,,,,34.619343,134.1722829,,,,openstreetmap,node/13811208934,https://www.openstreetmap.org/node/13811208934
+ドーミーイン倉敷,ドーミーイン倉敷,岡山県,,岡山県倉敷市阿知3-21-11,710-0055,34.5969604,133.768917,+81 86 426 5489,https://www.hotespa.net/hotels/kurashiki/,,openstreetmap,way/276236715,https://www.openstreetmap.org/way/276236715
+ドーミーイン岡山,ドーミーイン岡山,岡山県,,,,34.6629956,133.9216462,,,,openstreetmap,way/1414956580,https://www.openstreetmap.org/way/1414956580
+健幸プラザ 西大寺,健幸プラザ西大寺,岡山県,,,,34.6464323,134.0493937,,,,openstreetmap,relation/21027750,https://www.openstreetmap.org/relation/21027750

@@ -1,0 +1,4 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+ほてい湯,ほてい湯,奈良県,,,,34.6708275,135.8295251,,,,openstreetmap,node/11652985469,https://www.openstreetmap.org/node/11652985469
+五光温泉,五光温泉,奈良県,,,,34.557716,135.7872426,,,,openstreetmap,node/11653005569,https://www.openstreetmap.org/node/11653005569
+栄温泉,栄温泉,奈良県,,,,34.4853657,135.7933224,,,,openstreetmap,node/11653093469,https://www.openstreetmap.org/node/11653093469

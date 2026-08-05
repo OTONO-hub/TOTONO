@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "import:saunas": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts",
+    "import:saunas:write": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --write",
+    "import:saunas:all": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --all",
+    "import:saunas:all:write": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --all --write"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -40,6 +44,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
+    "tsx": "^4.23.5",
     "typescript": "^5",
     "vitest": "^4.1.10"
   }

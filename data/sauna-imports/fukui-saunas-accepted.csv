@@ -1,0 +1,3 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+松乃湯,松乃湯,福井県,,坂井市春江町為国幸4-5,,36.1280626,136.2280998,,,Tu-Su 14:30-23:30,openstreetmap,node/11482512170,https://www.openstreetmap.org/node/11482512170
+やしろ湯,やしろ湯,福井県,,福井市下江守町22-19,,36.0493611,136.1774411,,,Tu-Su 13:00-23:00,openstreetmap,node/11482512569,https://www.openstreetmap.org/node/11482512569

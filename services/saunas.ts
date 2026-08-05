@@ -321,6 +321,43 @@ async function searchSaunasNormally(
   prefecture: string,
   resultLimit?: number
 ): Promise<Sauna[]> {
+  const safeLimit = normalizeSaunaSearchLimit(
+    resultLimit ?? SAUNA_SEARCH_LIMIT
+  );
+
+  if (keyword) {
+    const { data, error } = await supabase.rpc(
+      "search_saunas_ranked",
+      {
+        search_keyword: keyword,
+        search_prefecture:
+          prefecture || null,
+        result_limit: Math.min(
+          safeLimit * 3,
+          MAX_SAUNA_SEARCH_LIMIT
+        ),
+      }
+    );
+
+    if (error) {
+      throw new Error(
+        `施設の検索に失敗しました: ${error.message}`
+      );
+    }
+
+    const rankedSaunas =
+      (data ?? []) as Sauna[];
+
+    return rankedSaunas
+      .filter((sauna) =>
+        matchesSaunaFeatures(
+          sauna,
+          features
+        )
+      )
+      .slice(0, safeLimit);
+  }
+
   let query = supabase
     .from("saunas")
     .select(
@@ -352,20 +389,6 @@ async function searchSaunasNormally(
       `
     );
 
-  /**
-   * キーワードが入力されている場合だけ、
-   * 施設名の部分一致検索を追加します。
-   */
-  if (keyword) {
-    query = query.or(
-      `name.ilike.%${keyword}%,normalized_name.ilike.%${keyword}%`
-    );
-  }
-
-  /**
-   * 都道府県が選択されている場合は、
-   * 完全一致条件を追加します。
-   */
   if (prefecture) {
     query = query.eq(
       "prefecture",
@@ -373,9 +396,6 @@ async function searchSaunasNormally(
     );
   }
 
-  /**
-   * 選択された設備条件を追加します。
-   */
   for (const feature of features) {
     switch (feature) {
       case "sauna":
@@ -429,11 +449,7 @@ async function searchSaunasNormally(
     .order("name", {
       ascending: true,
     })
-    .limit(
-      normalizeSaunaSearchLimit(
-        resultLimit ?? SAUNA_SEARCH_LIMIT
-      )
-    );
+    .limit(safeLimit);
 
   if (error) {
     throw new Error(
@@ -507,6 +523,40 @@ function normalizeSaunaFeatures(
       )
     )
   );
+}
+
+/**
+ * 指定された設備条件を
+ * 施設がすべて満たしているか判定します。
+ */
+function matchesSaunaFeatures(
+  sauna: Sauna,
+  features: SaunaFeature[]
+): boolean {
+  return features.every((feature) => {
+    switch (feature) {
+      case "sauna":
+        return sauna.has_sauna_room;
+
+      case "cold-bath":
+        return sauna.has_cold_bath;
+
+      case "outdoor":
+        return sauna.has_outdoor_air_bath;
+
+      case "rest-area":
+        return sauna.has_rest_area;
+
+      case "restaurant":
+        return sauna.has_restaurant;
+
+      case "parking":
+        return sauna.has_parking;
+
+      default:
+        return true;
+    }
+  });
 }
 
 /**

@@ -1,0 +1,5 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+天然温泉さしきの猿人の湯,天然温泉さしきの猿人の湯,沖縄県,,,,26.1645936,127.7706525,0989470112,https://www.yuinchi.jp/hotspring/index.php,Mo-Su 07:00-23:00,openstreetmap,node/5598415124,https://www.openstreetmap.org/node/5598415124
+亜熱帯サウナ,亜熱帯サウナ,沖縄県,,,,26.6415904,127.9520204,,,,openstreetmap,node/11467533870,https://www.openstreetmap.org/node/11467533870
+BUNA SAUNA,bunasauna,沖縄県,,,,26.7064831,128.1528105,,,,openstreetmap,node/12632549114,https://www.openstreetmap.org/node/12632549114
+大山サウナ,大山サウナ,沖縄県,,,,26.2841811,127.7537523,,,,openstreetmap,way/710503727,https://www.openstreetmap.org/way/710503727

@@ -1,0 +1,3 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+niko and ... BASE,nikoand...base,茨城県,,,,36.3716069,140.4540709,,https://www.nikoand.jp/base/,Mo-Su 08:30-21:00,openstreetmap,node/13844018054,https://www.openstreetmap.org/node/13844018054
+潮騒の湯,潮騒の湯,茨城県,,,,36.2976087,140.5608611,,,,openstreetmap,way/431898505,https://www.openstreetmap.org/way/431898505

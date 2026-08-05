@@ -1,0 +1,5 @@
+﻿name,normalized_name,prefecture,city,address,postal_code,latitude,longitude,phone_number,website_url,opening_hours,source,source_id,source_url
+田屋の湯,田屋の湯,秋田県,,,,39.866967,140.0701397,,,,openstreetmap,node/5498126735,https://www.openstreetmap.org/node/5498126735
+MUSIRO SAUNA,musirosauna,秋田県,,,,39.2212651,140.5231793,,,,openstreetmap,node/11070491103,https://www.openstreetmap.org/node/11070491103
+かみのゆ温泉,かみのゆ温泉,秋田県,,,,39.2934474,139.9653844,,,,openstreetmap,node/11657098469,https://www.openstreetmap.org/node/11657098469
+プラザの湯,プラザの湯,秋田県,,,,39.8693543,140.0583887,,,,openstreetmap,way/813409639,https://www.openstreetmap.org/way/813409639
