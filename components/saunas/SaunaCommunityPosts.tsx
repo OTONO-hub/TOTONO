@@ -35,7 +35,7 @@ export function SaunaCommunityPosts({
     <section
       aria-labelledby="sauna-community-heading"
       className="
-        mt-10
+        mt-8
         overflow-hidden
         rounded-[2rem]
         border
@@ -55,7 +55,7 @@ export function SaunaCommunityPosts({
           gap-6
           border-b
           border-[#3e3a3a]/8
-          pb-7
+          pb-6
           sm:flex-row
           sm:items-end
           sm:justify-between
@@ -182,9 +182,9 @@ export function SaunaCommunityPosts({
             role="list"
             aria-label="この施設のサ活一覧"
             className="
-              mt-8
+              mt-7
               grid
-              gap-5
+              gap-4
               md:grid-cols-2
               xl:grid-cols-3
             "
@@ -320,7 +320,7 @@ function CommunityPostCard({
           h-full
           flex-col
           overflow-hidden
-          rounded-[1.6rem]
+          rounded-[1.5rem]
           border
           border-[#3e3a3a]/7
           bg-white/90

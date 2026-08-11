@@ -136,11 +136,11 @@ export function SaunaRatingSummary({
       {hasRatings ? (
         <div
           className="
-            mt-7
+            mt-6
             flex
             flex-1
             flex-col
-            gap-7
+            gap-6
           "
         >
           <AverageRatingCard
@@ -231,6 +231,7 @@ function AverageRatingCard({
         via-[#fdd000]/5
         to-[#e6e5ef]/55
         p-5
+        sm:p-6
         shadow-[0_14px_32px_rgba(62,58,58,0.06)]
         transition-all
         duration-300
@@ -468,7 +469,7 @@ function RatingDistributionChart({
         </span>
       </div>
 
-      <div className="mt-5 space-y-4">
+      <div className="mt-5 space-y-3.5">
         {ratings.map((rating) => {
           const count = distribution[rating];
 

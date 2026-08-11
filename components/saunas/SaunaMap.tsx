@@ -86,7 +86,7 @@ export function SaunaMap({
     <section
       aria-labelledby="sauna-map-heading"
       className="
-        mt-10
+        mt-8
         overflow-hidden
         rounded-[2rem]
         border
@@ -108,7 +108,7 @@ export function SaunaMap({
             flex-col
             p-6
             sm:p-8
-            lg:p-10
+            lg:p-9
           "
         >
           <div>
@@ -153,7 +153,7 @@ export function SaunaMap({
 
           <div
             className="
-              mt-7
+              mt-6
               rounded-[1.5rem]
               border
               border-[#3e3a3a]/7
@@ -332,7 +332,7 @@ export function SaunaMap({
             border-t
             border-[#3e3a3a]/8
             bg-[#e6e5ef]/40
-            lg:min-h-[34rem]
+            lg:min-h-[30rem]
             lg:border-l
             lg:border-t-0
           "
@@ -353,7 +353,7 @@ export function SaunaMap({
                   w-full
                   border-0
                   bg-[#e6e5ef]/40
-                  lg:min-h-[34rem]
+                  lg:min-h-[30rem]
                 "
               />
 
@@ -406,7 +406,7 @@ function MapUnavailableState({
         px-6
         py-12
         text-center
-        lg:min-h-[34rem]
+        lg:min-h-[30rem]
       "
     >
       <div

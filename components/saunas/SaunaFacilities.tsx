@@ -241,7 +241,7 @@ export function SaunaFacilities({
       <aside
         aria-labelledby="facility-introduction-heading"
         className="
-          mt-7
+          mt-6
           overflow-hidden
           rounded-[1.5rem]
           border
@@ -323,7 +323,7 @@ export function SaunaFacilities({
         role="list"
         aria-label="施設の設備一覧"
         className="
-          mt-7
+          mt-6
           grid
           gap-3
           sm:grid-cols-2
@@ -340,7 +340,7 @@ export function SaunaFacilities({
       <p
         className="
           mt-auto
-          pt-6
+          pt-5
           text-xs
           leading-6
           text-[#3e3a3a]/45
@@ -444,13 +444,14 @@ function FacilityFeatureCard({
         group
         relative
         flex
-        min-h-32
+        min-h-28
         items-start
         gap-4
         overflow-hidden
         rounded-[1.35rem]
         border
         p-4
+        sm:p-5
         transition-all
         duration-300
         ease-out

@@ -78,16 +78,16 @@ export function SaunaDetailHeaderCard({
         id="sauna-visit-panel"
         aria-label={`${name}の施設概要と訪問メニュー`}
         className="
-          mt-5
+          mt-4
           scroll-mt-24
           overflow-hidden
           rounded-[2rem]
           border
           border-white/70
           bg-white/85
-          shadow-[0_22px_70px_rgba(62,58,58,0.09)]
+          shadow-[0_26px_80px_rgba(62,58,58,0.1)]
           backdrop-blur-xl
-          sm:mt-6
+          sm:mt-5
           sm:rounded-[2.5rem]
         "
       >

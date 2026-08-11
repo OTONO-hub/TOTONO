@@ -72,7 +72,8 @@ export function SaunaHero({
         sm:aspect-[16/9]
         lg:aspect-auto
         lg:h-full
-        lg:min-h-[44rem]
+        lg:min-h-[42rem]
+        xl:min-h-[46rem]
       "
     >
       {imageUrl ? (
@@ -204,9 +205,9 @@ export function SaunaHero({
           absolute
           inset-0
           bg-linear-to-t
-          from-black/85
-          via-black/20
-          to-black/15
+          from-black/90
+          via-black/28
+          to-black/10
         "
       />
 
@@ -218,8 +219,8 @@ export function SaunaHero({
           bottom-0
           h-4/5
           bg-linear-to-t
-          from-black/70
-          via-black/20
+          from-black/78
+          via-black/26
           to-transparent
         "
       />
@@ -376,7 +377,7 @@ export function SaunaHero({
               break-words
               text-3xl
               font-semibold
-              leading-tight
+              leading-[1.08]
               tracking-[-0.04em]
               text-white
               drop-shadow-sm
@@ -398,7 +399,7 @@ export function SaunaHero({
                 gap-2
                 text-sm
                 leading-6
-                text-white/75
+                text-white/80
                 sm:mt-4
                 sm:text-base
               "

@@ -50,10 +50,13 @@ export function SaunaOverview({
   websiteUrl,
   postalCode,
 }: SaunaOverviewProps) {
+  const normalizedWebsiteUrl =
+    normalizeExternalUrl(websiteUrl);
+
   const hasFacilityInformation =
     Boolean(openingHours) ||
     Boolean(phoneNumber) ||
-    Boolean(websiteUrl) ||
+    Boolean(normalizedWebsiteUrl) ||
     Boolean(postalCode);
 
   const googleMapsUrl = createGoogleMapsUrl({
@@ -125,7 +128,12 @@ export function SaunaOverview({
           施設に関する操作
         </h3>
 
-        <div className="flex flex-col gap-3">
+        <div className="
+            grid
+            gap-3
+            sm:grid-cols-2
+            lg:grid-cols-1
+          ">
           {googleMapsUrl && (
             <a
               href={googleMapsUrl}
@@ -175,11 +183,13 @@ export function SaunaOverview({
             </a>
           )}
 
-          <FavoriteSaunaButton
-            saunaId={saunaId}
-            userId={userId}
-            initialFavorite={initialFavorite}
-          />
+          <div className="sm:col-span-2 lg:col-span-1">
+            <FavoriteSaunaButton
+              saunaId={saunaId}
+              userId={userId}
+              initialFavorite={initialFavorite}
+            />
+          </div>
 
           <Link
             href={`/posts/new?sauna_id=${saunaId}`}
@@ -265,7 +275,7 @@ export function SaunaOverview({
             mt-5
             grid
             grid-cols-3
-            gap-2
+            gap-3
           "
         >
           <CompactMetricCard
@@ -383,7 +393,7 @@ export function SaunaOverview({
               />
             )}
 
-            {websiteUrl && (
+            {normalizedWebsiteUrl && (
               <FacilityInformation
                 icon={
                   <Globe2
@@ -394,7 +404,7 @@ export function SaunaOverview({
                 }
                 label="公式サイト"
                 value="公式サイトを見る"
-                href={websiteUrl}
+                href={normalizedWebsiteUrl}
                 external
               />
             )}
@@ -514,9 +524,12 @@ function CompactMetricCard({
         rounded-[1.25rem]
         border
         border-[#3e3a3a]/6
-        bg-[#e6e5ef]/38
+        bg-linear-to-br
+        from-white
+        to-[#e6e5ef]/45
         px-3
         py-4
+        shadow-[0_10px_24px_rgba(62,58,58,0.04)]
         text-center
       "
     >
@@ -647,8 +660,11 @@ function FacilityInformation({
     rounded-[1.25rem]
     border
     border-[#3e3a3a]/6
-    bg-[#e6e5ef]/30
+    bg-linear-to-br
+    from-white
+    to-[#e6e5ef]/38
     p-4
+    shadow-[0_8px_20px_rgba(62,58,58,0.035)]
   `;
 
   if (href) {
@@ -682,4 +698,24 @@ function FacilityInformation({
   }
 
   return <div className={className}>{content}</div>;
+}
+
+
+function normalizeExternalUrl(
+  value: string | null
+): string | null {
+  const trimmedValue = value?.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
+  if (
+    trimmedValue.startsWith("https://") ||
+    trimmedValue.startsWith("http://")
+  ) {
+    return trimmedValue;
+  }
+
+  return `https://${trimmedValue}`;
 }
