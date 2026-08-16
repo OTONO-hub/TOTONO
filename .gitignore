@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -12,13 +13,19 @@
 
 # testing
 /coverage
+**/coverage/
 
 # next.js
 /.next/
 /out/
 
-# production
+# production builds
 /build
+**/dist/
+
+# Supabase local files
+supabase/.temp/
+supabase/.branches/
 
 # misc
 .DS_Store
@@ -30,12 +37,18 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+**/.env*
+!**/.env.example
 
 # vercel
 .vercel
+**/.vercel/
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# generated Vite config files
+mobile/vite.config.js
+mobile/vite.config.d.ts
