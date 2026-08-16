@@ -3,17 +3,24 @@ import {
   useState,
 } from "react";
 import {
+  Award,
+  BarChart3,
   Bookmark,
-  CalendarDays,
   ChevronRight,
   Flame,
+  Gauge,
   LogOut,
   MapPin,
   Pencil,
   RefreshCw,
+  Sparkles,
   Star,
+  Target,
+  Trophy,
   UserRound,
   UserRoundX,
+  Users,
+  Waves,
 } from "lucide-react";
 
 import {
@@ -26,10 +33,37 @@ import {
   supabase,
 } from "../lib/supabase";
 import {
+  getFollowerCount,
+  getFollowingCount,
+} from "../services/follows";
+import {
+  getJournalPosts,
+  type JournalPost,
+} from "../services/journal";
+import {
+  calculateNextAchievement,
+  type NextAchievement,
+} from "../services/profile-next-achievement";
+import {
+  calculateSaunaPersona,
+  type SaunaPersona,
+} from "../services/profile-persona";
+import {
+  getProfileInsights,
+  type ProfileInsights,
+} from "../services/profile-insights";
+import {
+  calculateSaunaRhythm,
+  type SaunaRhythm,
+} from "../services/profile-rhythm";
+import {
   getProfileData,
   type ProfileData,
-  type RecentSaunaActivity,
 } from "../services/profile";
+import {
+  calculateSaunaXp,
+  type SaunaXpResult,
+} from "../services/profile-xp";
 
 type ProfileScreenProps = {
   userId: string;
@@ -44,47 +78,28 @@ type ProfileScreenProps = {
   onOpenBlockedUsers?: () => void;
 };
 
-function formatVisitDate(
-  visitDate: string
-): string {
-  const date =
-    new Date(
-      `${visitDate}T00:00:00`
-    );
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return visitDate;
-  }
-
-  return new Intl.DateTimeFormat(
-    "ja-JP",
-    {
-      year:
-        "numeric",
-      month:
-        "long",
-      day:
-        "numeric",
-    }
-  ).format(
-    date
-  );
-}
+type ProfileViewData = {
+  profile: ProfileData;
+  posts: JournalPost[];
+  followerCount: number;
+  followingCount: number;
+  insights: ProfileInsights;
+  xp: SaunaXpResult;
+  persona: SaunaPersona;
+  rhythm: SaunaRhythm;
+  nextAchievement:
+    NextAchievement;
+};
 
 function getDisplayName(
   profile:
-    | ProfileData
-    | null,
+    ProfileData,
   email:
     | string
     | null
 ): string {
   const username =
-    profile?.username
+    profile.username
       ?.trim();
 
   if (username) {
@@ -162,27 +177,33 @@ function ProfileErrorState({
 }
 
 function ProfileHero({
-  profile,
+  data,
   email,
+  onEditProfile,
 }: {
-  profile: ProfileData;
+  data:
+    ProfileViewData;
   email:
     | string
     | null;
+  onEditProfile?:
+    () => void;
 }) {
   const displayName =
     getDisplayName(
-      profile,
+      data.profile,
       email
     );
 
   return (
-    <header className="profile-hero">
-      <div className="profile-avatar">
-        {profile.avatarUrl ? (
+    <header className="profile-rich-hero">
+      <div className="profile-rich-avatar">
+        {data.profile
+          .avatarUrl ? (
           <img
             src={
-              profile.avatarUrl
+              data.profile
+                .avatarUrl
             }
             alt={`${displayName}のプロフィール画像`}
           />
@@ -193,121 +214,353 @@ function ProfileHero({
         )}
       </div>
 
-      <div className="profile-identity">
+      <div className="profile-rich-identity">
         <p className="eyebrow">
-          Sauna Life
+          My Lounge
         </p>
 
         <h1>
           {displayName}
         </h1>
 
-        {email ? (
-          <p className="profile-email">
-            {email}
+        {data.profile.bio ? (
+          <p>
+            {data.profile.bio}
           </p>
-        ) : null}
+        ) : (
+          <p className="profile-rich-bio-empty">
+            あなたのサウナライフが、
+            ここに積み重なっていきます。
+          </p>
+        )}
       </div>
 
-      {profile.bio ? (
-        <p className="profile-bio">
-          {profile.bio}
-        </p>
-      ) : (
-        <p className="profile-bio profile-bio-empty">
-          あなたのサウナライフが、
-          ここに積み重なっていきます。
-        </p>
-      )}
+      {onEditProfile ? (
+        <button
+          type="button"
+          className="profile-rich-edit-button"
+          onClick={
+            onEditProfile
+          }
+        >
+          <Pencil
+            aria-hidden="true"
+          />
+
+          編集
+        </button>
+      ) : null}
+
+      <dl className="profile-social-summary">
+        <div>
+          <dt>
+            サ活
+          </dt>
+
+          <dd>
+            {data.posts.length}
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            フォロー
+          </dt>
+
+          <dd>
+            {data.followingCount}
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            フォロワー
+          </dt>
+
+          <dd>
+            {data.followerCount}
+          </dd>
+        </div>
+      </dl>
     </header>
   );
 }
 
-function ProfileSummary({
-  profile,
+function XpStatusSection({
+  xp,
 }: {
-  profile: ProfileData;
+  xp: SaunaXpResult;
 }) {
-  const {
-    summary,
-  } =
-    profile;
-
   return (
-    <section
-      className="profile-summary-section"
-      aria-labelledby="profile-summary-heading"
-    >
-      <div className="profile-section-heading">
+    <section className="profile-rich-section profile-xp-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <Gauge
+            aria-hidden="true"
+          />
+        </div>
+
         <div>
           <p className="eyebrow">
-            My Records
+            Sauna Level
           </p>
 
-          <h2 id="profile-summary-heading">
+          <h2>
+            {xp.level}
+          </h2>
+        </div>
+
+        <strong className="profile-xp-total">
+          {xp.currentXp}
+          XP
+        </strong>
+      </div>
+
+      <div className="profile-progress-track">
+        <span
+          style={{
+            width:
+              `${xp.progressPercentage}%`,
+          }}
+        />
+      </div>
+
+      <div className="profile-progress-meta">
+        {xp.nextLevel ? (
+          <>
+            <span>
+              次は
+              {xp.nextLevel}
+            </span>
+
+            <span>
+              あと
+              {xp.xpUntilNextLevel}
+              XP
+            </span>
+          </>
+        ) : (
+          <span>
+            最高レベルに到達しました
+          </span>
+        )}
+      </div>
+
+      <div className="profile-xp-breakdown">
+        <span>
+          訪問
+          <strong>
+            {xp.breakdown
+              .visitXp}
+          </strong>
+          XP
+        </span>
+
+        <span>
+          施設
+          <strong>
+            {xp.breakdown
+              .visitedSaunaXp}
+          </strong>
+          XP
+        </span>
+
+        <span>
+          セット
+          <strong>
+            {xp.breakdown
+              .setXp}
+          </strong>
+          XP
+        </span>
+      </div>
+    </section>
+  );
+}
+
+function PersonaAndRhythm({
+  persona,
+  rhythm,
+}: {
+  persona: SaunaPersona;
+  rhythm: SaunaRhythm;
+}) {
+  return (
+    <div className="profile-personality-grid">
+      <section className="profile-rich-section profile-persona-card">
+        <div className="profile-card-icon">
+          <Sparkles
+            aria-hidden="true"
+          />
+        </div>
+
+        <p className="eyebrow">
+          Sauna Persona
+        </p>
+
+        <h2>
+          {persona.name}
+        </h2>
+
+        <span>
+          {persona.englishName}
+        </span>
+
+        <p>
+          {persona.description}
+        </p>
+
+        <small>
+          {persona.reason}
+        </small>
+      </section>
+
+      <section className="profile-rich-section profile-rhythm-card">
+        <div className="profile-card-icon">
+          <Waves
+            aria-hidden="true"
+          />
+        </div>
+
+        <p className="eyebrow">
+          Sauna Rhythm
+        </p>
+
+        <h2>
+          {rhythm.averagePaceLabel}
+        </h2>
+
+        <dl>
+          <div>
+            <dt>
+              今月
+            </dt>
+
+            <dd>
+              {rhythm.monthlyVisits}
+              回
+            </dd>
+          </div>
+
+          <div>
+            <dt>
+              直近30日
+            </dt>
+
+            <dd>
+              {rhythm
+                .lastThirtyDaysVisits}
+              回
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  );
+}
+
+function ProfileSummarySection({
+  insights,
+}: {
+  insights:
+    ProfileInsights;
+}) {
+  return (
+    <section className="profile-rich-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <BarChart3
+            aria-hidden="true"
+          />
+        </div>
+
+        <div>
+          <p className="eyebrow">
+            Sauna Summary
+          </p>
+
+          <h2>
             サウナライフ
           </h2>
         </div>
       </div>
 
-      <dl className="profile-summary-grid">
-        <div className="profile-summary-card">
+      <dl className="profile-rich-summary-grid">
+        <div>
           <dt>
-            サ活回数
+            累計サ活
           </dt>
 
           <dd>
-            {summary.totalVisits}
-
-            <span>
+            {insights
+              .totalSaunaVisits}
+            <small>
               回
-            </span>
+            </small>
           </dd>
         </div>
 
-        <div className="profile-summary-card">
+        <div>
           <dt>
             訪問施設
           </dt>
 
           <dd>
-            {summary.visitedSaunas}
-
-            <span>
+            {insights
+              .visitedSaunas}
+            <small>
               施設
-            </span>
+            </small>
           </dd>
         </div>
 
-        <div className="profile-summary-card">
+        <div>
           <dt>
-            総セット数
+            総セット
           </dt>
 
           <dd>
-            {summary.totalSets}
-
-            <span>
+            {insights
+              .totalSets}
+            <small>
               セット
-            </span>
+            </small>
           </dd>
         </div>
 
-        <div className="profile-summary-card profile-summary-card-accent">
+        <div>
+          <dt>
+            今月
+          </dt>
+
+          <dd>
+            {insights
+              .monthlyVisits}
+            <small>
+              回
+            </small>
+          </dd>
+        </div>
+
+        <div>
           <dt>
             平均評価
           </dt>
 
           <dd>
-            {summary.averageRating ??
-              "—"}
+            {insights
+              .averageRating}
+          </dd>
+        </div>
 
-            {summary.averageRating !==
-            null ? (
-              <span>
-                / 5
-              </span>
-            ) : null}
+        <div>
+          <dt>
+            最高評価
+          </dt>
+
+          <dd>
+            {insights
+              .highestRating}
           </dd>
         </div>
       </dl>
@@ -315,195 +568,505 @@ function ProfileSummary({
   );
 }
 
-function RecentActivityCard({
-  activity,
-  onSelectPost,
+function AnnualReportSection({
+  insights,
 }: {
-  activity:
-    RecentSaunaActivity;
-  onSelectPost: (
-    postId: string
-  ) => void;
+  insights:
+    ProfileInsights;
 }) {
+  const report =
+    insights.annualReport;
+
   return (
-    <button
-      type="button"
-      className="profile-activity-card profile-activity-button"
-      onClick={() => {
-        onSelectPost(
-          activity.id
-        );
-      }}
-      aria-label={`${activity.saunaName}でのサ活詳細を見る`}
-    >
-      {activity.imageUrl ? (
-        <div className="profile-activity-image">
-          <img
-            src={
-              activity.imageUrl
-            }
-            alt={`${activity.saunaName}でのサ活`}
-            loading="lazy"
+    <section className="profile-rich-section profile-annual-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <Trophy
+            aria-hidden="true"
           />
         </div>
+
+        <div>
+          <p className="eyebrow">
+            Annual Report
+          </p>
+
+          <h2>
+            {report.year}
+            年の記録
+          </h2>
+        </div>
+      </div>
+
+      <dl className="profile-annual-grid">
+        <div>
+          <dt>
+            サ活
+          </dt>
+
+          <dd>
+            {report.visitCount}
+            回
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            訪問施設
+          </dt>
+
+          <dd>
+            {report.visitedSaunas}
+            施設
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            総セット
+          </dt>
+
+          <dd>
+            {report.totalSets}
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            平均評価
+          </dt>
+
+          <dd>
+            {report.averageRating}
+          </dd>
+        </div>
+      </dl>
+
+      {report.topSauna ? (
+        <div className="profile-annual-highlight">
+          <MapPin
+            aria-hidden="true"
+          />
+
+          <div>
+            <span>
+              今年よく訪れた施設
+            </span>
+
+            <strong>
+              {report.topSauna
+                .saunaName}
+            </strong>
+          </div>
+        </div>
+      ) : null}
+
+      {report.busiestMonth ? (
+        <div className="profile-annual-highlight">
+          <Flame
+            aria-hidden="true"
+          />
+
+          <div>
+            <span>
+              最も活発だった月
+            </span>
+
+            <strong>
+              {report.busiestMonth
+                .label}
+              ・
+              {report.busiestMonth
+                .visitCount}
+              回
+            </strong>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function MonthlyActivitySection({
+  insights,
+}: {
+  insights:
+    ProfileInsights;
+}) {
+  const maximumVisits =
+    Math.max(
+      1,
+      ...insights
+        .monthlyActivities
+        .map(
+          (
+            activity
+          ) =>
+            activity.visitCount
+        )
+    );
+
+  return (
+    <section className="profile-rich-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <BarChart3
+            aria-hidden="true"
+          />
+        </div>
+
+        <div>
+          <p className="eyebrow">
+            Activity
+          </p>
+
+          <h2>
+            直近6か月
+          </h2>
+        </div>
+      </div>
+
+      <div className="profile-monthly-chart">
+        {insights
+          .monthlyActivities
+          .map(
+            (
+              activity
+            ) => {
+              const height =
+                Math.max(
+                  activity.visitCount >
+                    0
+                    ? 12
+                    : 4,
+                  Math.round(
+                    (
+                      activity.visitCount /
+                      maximumVisits
+                    ) *
+                      100
+                  )
+                );
+
+              return (
+                <div
+                  key={
+                    activity.yearMonth
+                  }
+                  className="profile-monthly-column"
+                >
+                  <span>
+                    {activity.visitCount}
+                  </span>
+
+                  <div className="profile-monthly-bar-track">
+                    <i
+                      style={{
+                        height:
+                          `${height}%`,
+                      }}
+                    />
+                  </div>
+
+                  <small>
+                    {activity.label}
+                  </small>
+                </div>
+              );
+            }
+          )}
+      </div>
+    </section>
+  );
+}
+
+function TopSaunasSection({
+  insights,
+}: {
+  insights:
+    ProfileInsights;
+}) {
+  return (
+    <section className="profile-rich-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <MapPin
+            aria-hidden="true"
+          />
+        </div>
+
+        <div>
+          <p className="eyebrow">
+            Top Places
+          </p>
+
+          <h2>
+            よく訪れる施設
+          </h2>
+        </div>
+      </div>
+
+      {insights
+        .topVisitedSaunas
+        .length ===
+      0 ? (
+        <p className="profile-rich-empty">
+          サ活を記録すると、
+          よく訪れる施設が表示されます。
+        </p>
       ) : (
-        <div
-          className="profile-activity-image profile-activity-image-placeholder"
-          aria-hidden="true"
-        >
-          <Flame />
+        <div className="profile-top-sauna-list">
+          {insights
+            .topVisitedSaunas
+            .map(
+              (
+                sauna,
+                index
+              ) => (
+                <div
+                  key={
+                    sauna.saunaId ??
+                    sauna.saunaName
+                  }
+                  className="profile-top-sauna-card"
+                >
+                  <span>
+                    {index +
+                      1}
+                  </span>
+
+                  <strong>
+                    {sauna.saunaName}
+                  </strong>
+
+                  <small>
+                    {sauna.visitCount}
+                    回
+                  </small>
+                </div>
+              )
+            )}
         </div>
       )}
+    </section>
+  );
+}
 
-      <div className="profile-activity-content">
-        <div className="profile-activity-heading">
-          <div>
-            <div className="profile-activity-sauna">
-              <MapPin
-                aria-hidden="true"
-              />
+function AchievementsSection({
+  insights,
+  nextAchievement,
+}: {
+  insights:
+    ProfileInsights;
+  nextAchievement:
+    NextAchievement;
+}) {
+  const achievements = [
+    {
+      name:
+        "はじめての整い",
 
-              <h3>
-                {activity.saunaName}
-              </h3>
-            </div>
+      description:
+        "最初のサ活を記録",
 
-            <div className="profile-activity-date">
-              <CalendarDays
-                aria-hidden="true"
-              />
+      unlocked:
+        insights.hasFirstSteam,
+    },
 
-              <time
-                dateTime={
-                  activity.visitDate
-                }
-              >
-                {formatVisitDate(
-                  activity.visitDate
-                )}
-              </time>
-            </div>
-          </div>
+    {
+      name:
+        "サウナラバー",
 
-          <div
-            className="profile-activity-rating"
-            aria-label={`評価 ${activity.rating}点`}
-          >
-            <Star
-              aria-hidden="true"
-            />
+      description:
+        "サ活を10回記録",
 
-            <span>
-              {activity.rating}
-            </span>
-          </div>
+      unlocked:
+        insights.hasSaunaLover,
+    },
+
+    {
+      name:
+        "エクスプローラー",
+
+      description:
+        "5施設を訪問",
+
+      unlocked:
+        insights.hasExplorer,
+    },
+
+    {
+      name:
+        "パーフェクト",
+
+      description:
+        "評価5.0を記録",
+
+      unlocked:
+        insights.hasPerfection,
+    },
+  ];
+
+  return (
+    <section className="profile-rich-section">
+      <div className="profile-rich-section-heading">
+        <div className="profile-rich-section-icon">
+          <Award
+            aria-hidden="true"
+          />
         </div>
 
-        <div className="profile-activity-meta">
-          <span>
-            <Flame
-              aria-hidden="true"
-            />
-
-            {activity.setCount}
-            セット
-          </span>
-        </div>
-
-        {activity.comment ? (
-          <p className="profile-activity-comment">
-            {activity.comment}
+        <div>
+          <p className="eyebrow">
+            Achievements
           </p>
-        ) : null}
 
-        <span className="profile-activity-detail-link">
-          サ活の詳細を見る
+          <h2>
+            実績
+          </h2>
+        </div>
+      </div>
+
+      <div className="profile-achievement-grid">
+        {achievements.map(
+          (
+            achievement
+          ) => (
+            <article
+              key={
+                achievement.name
+              }
+              className={
+                achievement.unlocked
+                  ? "profile-achievement-card unlocked"
+                  : "profile-achievement-card"
+              }
+            >
+              <Award
+                aria-hidden="true"
+              />
+
+              <strong>
+                {achievement.name}
+              </strong>
+
+              <small>
+                {achievement.description}
+              </small>
+            </article>
+          )
+        )}
+      </div>
+
+      <div className="profile-next-achievement">
+        <Target
+          aria-hidden="true"
+        />
+
+        <div>
+          <span>
+            {nextAchievement
+              .isCompleted
+              ? "Complete"
+              : "Next Achievement"}
+          </span>
+
+          <strong>
+            {nextAchievement.name}
+          </strong>
+
+          <p>
+            {nextAchievement.description}
+          </p>
+
+          <div className="profile-progress-track">
+            <span
+              style={{
+                width:
+                  `${nextAchievement.progress}%`,
+              }}
+            />
+          </div>
+
+          <small>
+            {nextAchievement.current}
+            /
+            {nextAchievement.target}
+          </small>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProfileMenu({
+  onOpenSavedPosts,
+  onOpenBlockedUsers,
+}: {
+  onOpenSavedPosts?:
+    () => void;
+  onOpenBlockedUsers?:
+    () => void;
+}) {
+  return (
+    <section className="profile-rich-menu">
+      {onOpenSavedPosts ? (
+        <button
+          type="button"
+          onClick={
+            onOpenSavedPosts
+          }
+        >
+          <span className="profile-rich-menu-icon">
+            <Bookmark
+              aria-hidden="true"
+            />
+          </span>
+
+          <span>
+            <strong>
+              保存済み投稿
+            </strong>
+
+            <small>
+              気になるサ活を見返す
+            </small>
+          </span>
 
           <ChevronRight
             aria-hidden="true"
           />
-        </span>
-      </div>
-    </button>
-  );
-}
+        </button>
+      ) : null}
 
-function RecentActivities({
-  activities,
-  onSelectPost,
-}: {
-  activities:
-    RecentSaunaActivity[];
-  onSelectPost: (
-    postId: string
-  ) => void;
-}) {
-  return (
-    <section
-      className="profile-activities-section"
-      aria-labelledby="recent-activities-heading"
-    >
-      <div className="profile-section-heading">
-        <div>
-          <p className="eyebrow">
-            Recent Activity
-          </p>
-
-          <h2 id="recent-activities-heading">
-            最近のサ活
-          </h2>
-        </div>
-
-        {activities.length >
-        0 ? (
-          <span className="profile-section-count">
-            最新
-            {activities.length}
-            件
-          </span>
-        ) : null}
-      </div>
-
-      {activities.length ===
-      0 ? (
-        <div className="profile-empty-activities">
-          <div className="profile-empty-icon">
-            <Flame
+      {onOpenBlockedUsers ? (
+        <button
+          type="button"
+          onClick={
+            onOpenBlockedUsers
+          }
+        >
+          <span className="profile-rich-menu-icon profile-rich-menu-blocked">
+            <UserRoundX
               aria-hidden="true"
             />
-          </div>
+          </span>
 
-          <strong>
-            最初のサ活を
-            記録してみましょう
-          </strong>
+          <span>
+            <strong>
+              ブロック中のユーザー
+            </strong>
 
-          <p>
-            記録した施設やセット数、
-            写真がここに表示されます。
-          </p>
-        </div>
-      ) : (
-        <div className="profile-activity-list">
-          {activities.map(
-            (
-              activity
-            ) => (
-              <RecentActivityCard
-                key={
-                  activity.id
-                }
-                activity={
-                  activity
-                }
-                onSelectPost={
-                  onSelectPost
-                }
-              />
-            )
-          )}
-        </div>
-      )}
+            <small>
+              ブロックの確認・解除
+            </small>
+          </span>
+
+          <ChevronRight
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
     </section>
   );
 }
@@ -511,17 +1074,17 @@ function RecentActivities({
 export function ProfileScreen({
   userId,
   email,
-  onSelectPost,
+  onSelectPost: _onSelectPost,
   onEditProfile,
   onOpenSavedPosts,
   onOpenBlockedUsers,
 }: ProfileScreenProps) {
   const [
-    profile,
-    setProfile,
+    data,
+    setData,
   ] =
     useState<
-      ProfileData | null
+      ProfileViewData | null
     >(
       null
     );
@@ -561,23 +1124,94 @@ export function ProfileScreen({
     );
 
   useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    const client =
+      supabase;
+
     let cancelled =
       false;
 
     async function loadProfile() {
       try {
-        const nextProfile =
-          await getProfileData(
-            userId
-          );
+        const [
+          profile,
+          posts,
+          followerCount,
+          followingCount,
+        ] =
+          await Promise.all([
+            getProfileData(
+              userId
+            ),
+
+            getJournalPosts(
+              userId
+            ),
+
+            getFollowerCount(
+              client,
+              userId
+            ),
+
+            getFollowingCount(
+              client,
+              userId
+            ),
+          ]);
 
         if (cancelled) {
           return;
         }
 
-        setProfile(
-          nextProfile
-        );
+        const insights =
+          getProfileInsights(
+            posts
+          );
+
+        const xp =
+          calculateSaunaXp({
+            visitCount:
+              insights
+                .totalSaunaVisits,
+
+            visitedSaunaCount:
+              insights
+                .visitedSaunas,
+
+            totalSetCount:
+              insights
+                .totalSets,
+          });
+
+        const persona =
+          calculateSaunaPersona(
+            posts
+          );
+
+        const rhythm =
+          calculateSaunaRhythm(
+            posts
+          );
+
+        const nextAchievement =
+          calculateNextAchievement(
+            insights
+          );
+
+        setData({
+          profile,
+          posts,
+          followerCount,
+          followingCount,
+          insights,
+          xp,
+          persona,
+          rhythm,
+          nextAchievement,
+        });
 
         setError(
           null
@@ -651,7 +1285,7 @@ export function ProfileScreen({
 
   if (loading) {
     return (
-      <section className="profile-screen">
+      <section className="profile-screen profile-rich-screen">
         <ProfileLoadingState />
       </section>
     );
@@ -659,10 +1293,10 @@ export function ProfileScreen({
 
   if (
     error ||
-    !profile
+    !data
   ) {
     return (
-      <section className="profile-screen">
+      <section className="profile-screen profile-rich-screen">
         <ProfileErrorState
           message={
             error ??
@@ -706,106 +1340,73 @@ export function ProfileScreen({
   }
 
   return (
-    <section className="profile-screen">
+    <section className="profile-screen profile-rich-screen">
       <ProfileHero
-        profile={
-          profile
+        data={
+          data
         }
         email={
           email
         }
-      />
-
-      {onEditProfile ? (
-        <button
-          type="button"
-          className="profile-edit-button"
-          onClick={
-            onEditProfile
-          }
-        >
-          <Pencil
-            aria-hidden="true"
-          />
-
-          プロフィールを編集
-        </button>
-      ) : null}
-
-      {onOpenSavedPosts ? (
-        <button
-          type="button"
-          className="profile-saved-posts-button"
-          onClick={
-            onOpenSavedPosts
-          }
-        >
-          <span className="profile-saved-posts-icon">
-            <Bookmark
-              aria-hidden="true"
-            />
-          </span>
-
-          <span className="profile-saved-posts-content">
-            <strong>
-              保存済み投稿
-            </strong>
-
-            <small>
-              気になるサ活を見返す
-            </small>
-          </span>
-
-          <ChevronRight
-            className="profile-saved-posts-arrow"
-            aria-hidden="true"
-          />
-        </button>
-      ) : null}
-
-      {onOpenBlockedUsers ? (
-        <button
-          type="button"
-          className="profile-saved-posts-button profile-blocked-users-button"
-          onClick={
-            onOpenBlockedUsers
-          }
-        >
-          <span className="profile-saved-posts-icon profile-blocked-users-icon">
-            <UserRoundX
-              aria-hidden="true"
-            />
-          </span>
-
-          <span className="profile-saved-posts-content">
-            <strong>
-              ブロック中のユーザー
-            </strong>
-
-            <small>
-              ブロックの確認・解除
-            </small>
-          </span>
-
-          <ChevronRight
-            className="profile-saved-posts-arrow"
-            aria-hidden="true"
-          />
-        </button>
-      ) : null}
-
-      <ProfileSummary
-        profile={
-          profile
+        onEditProfile={
+          onEditProfile
         }
       />
 
-      <RecentActivities
-        activities={
-          profile.recentActivities
+      <XpStatusSection
+        xp={
+          data.xp
         }
-        onSelectPost={
-          onSelectPost
+      />
+
+      <PersonaAndRhythm
+        persona={
+          data.persona
+        }
+        rhythm={
+          data.rhythm
+        }
+      />
+
+      <ProfileSummarySection
+        insights={
+          data.insights
+        }
+      />
+
+      <AnnualReportSection
+        insights={
+          data.insights
+        }
+      />
+
+      <MonthlyActivitySection
+        insights={
+          data.insights
+        }
+      />
+
+      <TopSaunasSection
+        insights={
+          data.insights
+        }
+      />
+
+      <AchievementsSection
+        insights={
+          data.insights
+        }
+        nextAchievement={
+          data.nextAchievement
+        }
+      />
+
+      <ProfileMenu
+        onOpenSavedPosts={
+          onOpenSavedPosts
+        }
+        onOpenBlockedUsers={
+          onOpenBlockedUsers
         }
       />
 

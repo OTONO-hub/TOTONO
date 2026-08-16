@@ -28,6 +28,12 @@ export type ProfileData = {
   recentActivities: RecentSaunaActivity[];
 };
 
+export type JournalPage = {
+  activities:
+    RecentSaunaActivity[];
+  hasMore: boolean;
+};
+
 type ProfileRow = {
   username: string | null;
   avatar_url: string | null;
@@ -48,6 +54,7 @@ type ProfilePostRow = {
   rating: number;
   comment: string | null;
   image_url: string | null;
+  created_at: string;
   post_images:
     | PostImageRow[]
     | null;
@@ -55,6 +62,69 @@ type ProfilePostRow = {
 
 const RECENT_ACTIVITY_LIMIT =
   5;
+
+const DEFAULT_JOURNAL_PAGE_SIZE =
+  20;
+
+const MAX_JOURNAL_PAGE_SIZE =
+  30;
+
+function assertRequiredText(
+  value: string,
+  label: string
+): string {
+  const normalizedValue =
+    value.trim();
+
+  if (!normalizedValue) {
+    throw new Error(
+      `${label}が指定されていません。`
+    );
+  }
+
+  return normalizedValue;
+}
+
+function normalizePageSize(
+  pageSize: number
+): number {
+  if (
+    !Number.isFinite(
+      pageSize
+    )
+  ) {
+    return DEFAULT_JOURNAL_PAGE_SIZE;
+  }
+
+  return Math.min(
+    MAX_JOURNAL_PAGE_SIZE,
+    Math.max(
+      1,
+      Math.floor(
+        pageSize
+      )
+    )
+  );
+}
+
+function normalizeOffset(
+  offset: number
+): number {
+  if (
+    !Number.isFinite(
+      offset
+    )
+  ) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    Math.floor(
+      offset
+    )
+  );
+}
 
 function getPrimaryImageUrl(
   post: ProfilePostRow
@@ -77,6 +147,38 @@ function getPrimaryImageUrl(
     post.image_url ??
     null
   );
+}
+
+function mapActivity(
+  post: ProfilePostRow
+): RecentSaunaActivity {
+  return {
+    id:
+      post.id,
+
+    saunaId:
+      post.sauna_id,
+
+    saunaName:
+      post.sauna_name,
+
+    visitDate:
+      post.visit_date,
+
+    setCount:
+      post.set_count,
+
+    rating:
+      post.rating,
+
+    comment:
+      post.comment,
+
+    imageUrl:
+      getPrimaryImageUrl(
+        post
+      ),
+  };
 }
 
 function countVisitedSaunas(
@@ -153,6 +255,12 @@ export async function getProfileData(
     );
   }
 
+  const normalizedUserId =
+    assertRequiredText(
+      userId,
+      "ユーザーID"
+    );
+
   const [
     profileResult,
     postsResult,
@@ -171,7 +279,7 @@ export async function getProfileData(
         )
         .eq(
           "id",
-          userId
+          normalizedUserId
         )
         .maybeSingle<
           ProfileRow
@@ -191,6 +299,7 @@ export async function getProfileData(
             rating,
             comment,
             image_url,
+            created_at,
             post_images (
               image_url,
               sort_order
@@ -199,7 +308,7 @@ export async function getProfileData(
         )
         .eq(
           "user_id",
-          userId
+          normalizedUserId
         )
         .order(
           "visit_date",
@@ -261,35 +370,7 @@ export async function getProfileData(
         RECENT_ACTIVITY_LIMIT
       )
       .map(
-        (
-          post
-        ): RecentSaunaActivity => ({
-          id:
-            post.id,
-
-          saunaId:
-            post.sauna_id,
-
-          saunaName:
-            post.sauna_name,
-
-          visitDate:
-            post.visit_date,
-
-          setCount:
-            post.set_count,
-
-          rating:
-            post.rating,
-
-          comment:
-            post.comment,
-
-          imageUrl:
-            getPrimaryImageUrl(
-              post
-            ),
-        })
+        mapActivity
       );
 
   return {
@@ -323,5 +404,117 @@ export async function getProfileData(
     },
 
     recentActivities,
+  };
+}
+
+export async function getJournalPage(
+  userId: string,
+  options?: {
+    pageSize?: number;
+    offset?: number;
+  }
+): Promise<JournalPage> {
+  if (!supabase) {
+    throw new Error(
+      "Supabaseの設定が見つかりません。"
+    );
+  }
+
+  const normalizedUserId =
+    assertRequiredText(
+      userId,
+      "ユーザーID"
+    );
+
+  const pageSize =
+    normalizePageSize(
+      options?.pageSize ??
+        DEFAULT_JOURNAL_PAGE_SIZE
+    );
+
+  const offset =
+    normalizeOffset(
+      options?.offset ??
+        0
+    );
+
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from(
+        "posts"
+      )
+      .select(
+        `
+          id,
+          sauna_id,
+          sauna_name,
+          visit_date,
+          set_count,
+          rating,
+          comment,
+          image_url,
+          created_at,
+          post_images (
+            image_url,
+            sort_order
+          )
+        `
+      )
+      .eq(
+        "user_id",
+        normalizedUserId
+      )
+      .order(
+        "visit_date",
+        {
+          ascending:
+            false,
+        }
+      )
+      .order(
+        "created_at",
+        {
+          ascending:
+            false,
+        }
+      )
+      .range(
+        offset,
+        offset +
+          pageSize
+      )
+      .returns<
+        ProfilePostRow[]
+      >();
+
+  if (error) {
+    throw new Error(
+      `ジャーナルを取得できませんでした: ${error.message}`
+    );
+  }
+
+  const fetchedPosts =
+    data ??
+    [];
+
+  const hasMore =
+    fetchedPosts.length >
+    pageSize;
+
+  return {
+    activities:
+      fetchedPosts
+        .slice(
+          0,
+          pageSize
+        )
+        .map(
+          mapActivity
+        ),
+
+    hasMore,
   };
 }

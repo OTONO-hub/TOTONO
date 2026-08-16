@@ -1,17 +1,15 @@
 import {
   useMemo,
+  useRef,
   useState,
+  type ChangeEvent,
 } from "react";
-import {
-  Camera,
-} from "@capacitor/camera";
 import {
   ArrowLeft,
   Check,
   ImagePlus,
   Minus,
   Plus,
-  Star,
   X,
 } from "lucide-react";
 
@@ -49,9 +47,41 @@ type SelectedImage = {
   webPath: string;
 };
 
-const MIN_SET_COUNT = 1;
-const MAX_SET_COUNT = 20;
-const MAX_IMAGE_COUNT = 5;
+const MIN_SET_COUNT =
+  1;
+
+const MAX_SET_COUNT =
+  20;
+
+const MIN_RATING =
+  1;
+
+const MAX_RATING =
+  5;
+
+const RATING_STEP =
+  0.1;
+
+const MAX_IMAGE_COUNT =
+  5;
+
+const MAX_COMMENT_LENGTH =
+  1000;
+
+function normalizeRating(
+  rating: number
+): number {
+  return Math.min(
+    MAX_RATING,
+    Math.max(
+      MIN_RATING,
+      Math.round(
+        rating *
+          10
+      ) / 10
+    )
+  );
+}
 
 export function CreatePostScreen({
   sauna,
@@ -59,6 +89,11 @@ export function CreatePostScreen({
   onBack,
   onCreated,
 }: CreatePostScreenProps) {
+  const imageInputRef =
+    useRef<HTMLInputElement>(
+      null
+    );
+
   const [
     visitDate,
     setVisitDate,
@@ -124,26 +159,57 @@ export function CreatePostScreen({
             visitDate &&
             setCount >=
               MIN_SET_COUNT &&
-            rating >= 1 &&
-            rating <= 5
+            setCount <=
+              MAX_SET_COUNT &&
+            rating >=
+              MIN_RATING &&
+            rating <=
+              MAX_RATING &&
+            comment.length <=
+              MAX_COMMENT_LENGTH
         ),
       [
         sauna.id,
         sauna.name,
         setCount,
         rating,
+        comment.length,
         userId,
         visitDate,
       ]
     );
 
-  async function handleSelectImages() {
+  function handleSelectImage() {
     if (
       selectingImages ||
       submitting ||
       images.length >=
         MAX_IMAGE_COUNT
     ) {
+      return;
+    }
+
+    imageInputRef.current
+      ?.click();
+  }
+
+  function handleImageInputChange(
+    event:
+      ChangeEvent<HTMLInputElement>
+  ) {
+    const selectedFiles =
+      Array.from(
+        event.target.files ??
+          []
+      );
+
+    if (
+      selectedFiles.length ===
+      0
+    ) {
+      event.target.value =
+        "";
+
       return;
     }
 
@@ -156,47 +222,55 @@ export function CreatePostScreen({
     );
 
     try {
-      const remaining =
+      const remainingCount =
         MAX_IMAGE_COUNT -
         images.length;
 
-      const result =
-        await Camera.pickImages(
-          {
-            quality: 85,
-            limit:
-              remaining,
-          }
-        );
-
-      const nextImages =
-        result.photos
+      const acceptedFiles =
+        selectedFiles
           .filter(
             (
-              photo
+              file
             ) =>
-              Boolean(
-                photo.webPath
+              file.type.startsWith(
+                "image/"
               )
           )
-          .map(
-            (
-              photo
-            ) => ({
-              id:
-                crypto.randomUUID(),
-
-              webPath:
-                photo.webPath!,
-            })
+          .slice(
+            0,
+            remainingCount
           );
+
+      if (
+        acceptedFiles.length ===
+        0
+      ) {
+        throw new Error(
+          "画像ファイルを選択してください。"
+        );
+      }
+
+      const selectedImages =
+        acceptedFiles.map(
+          (
+            file
+          ): SelectedImage => ({
+            id:
+              crypto.randomUUID(),
+
+            webPath:
+              URL.createObjectURL(
+                file
+              ),
+          })
+        );
 
       setImages(
         (
           current
         ) => [
           ...current,
-          ...nextImages,
+          ...selectedImages,
         ].slice(
           0,
           MAX_IMAGE_COUNT
@@ -205,36 +279,24 @@ export function CreatePostScreen({
     } catch (
       selectError
     ) {
-      /*
-       * iOSでユーザーが
-       * 写真選択をキャンセルした場合は
-       * エラー表示しません。
-       */
-      const message =
+      console.error(
+        "写真の選択に失敗しました。",
+        selectError
+      );
+
+      setError(
         selectError instanceof
-        Error
+          Error
           ? selectError.message
-          : "";
-
-      if (
-        !message
-          .toLowerCase()
-          .includes(
-            "cancel"
-          )
-      ) {
-        console.error(
-          selectError
-        );
-
-        setError(
-          "写真を選択できませんでした。"
-        );
-      }
+          : "写真を選択できませんでした。"
+      );
     } finally {
       setSelectingImages(
         false
       );
+
+      event.target.value =
+        "";
     }
   }
 
@@ -248,14 +310,35 @@ export function CreatePostScreen({
     setImages(
       (
         current
-      ) =>
-        current.filter(
+      ) => {
+        const removedImage =
+          current.find(
+            (
+              image
+            ) =>
+              image.id ===
+              id
+          );
+
+        if (
+          removedImage
+            ?.webPath.startsWith(
+              "blob:"
+            )
+        ) {
+          URL.revokeObjectURL(
+            removedImage.webPath
+          );
+        }
+
+        return current.filter(
           (
             image
           ) =>
             image.id !==
             id
-        )
+        );
+      }
     );
   }
 
@@ -266,7 +349,8 @@ export function CreatePostScreen({
       ) =>
         Math.max(
           MIN_SET_COUNT,
-          current - 1
+          current -
+            1
         )
     );
   }
@@ -278,7 +362,26 @@ export function CreatePostScreen({
       ) =>
         Math.min(
           MAX_SET_COUNT,
-          current + 1
+          current +
+            1
+        )
+    );
+  }
+
+  function changeRating(
+    amount: number
+  ) {
+    if (submitting) {
+      return;
+    }
+
+    setRating(
+      (
+        current
+      ) =>
+        normalizeRating(
+          current +
+            amount
         )
     );
   }
@@ -362,7 +465,10 @@ export function CreatePostScreen({
             set_count:
               setCount,
 
-            rating,
+            rating:
+              normalizeRating(
+                rating
+              ),
 
             comment:
               comment.trim(),
@@ -398,6 +504,21 @@ export function CreatePostScreen({
             })
           )
         );
+      }
+
+      for (
+        const image of
+        images
+      ) {
+        if (
+          image.webPath.startsWith(
+            "blob:"
+          )
+        ) {
+          URL.revokeObjectURL(
+            image.webPath
+          );
+        }
       }
 
       onCreated(
@@ -447,6 +568,7 @@ export function CreatePostScreen({
       >
         <ArrowLeft
           size={18}
+          aria-hidden="true"
         />
 
         <span>
@@ -490,7 +612,7 @@ export function CreatePostScreen({
                     src={
                       image.webPath
                     }
-                    alt=""
+                    alt="選択した投稿写真"
                   />
 
                   <button
@@ -508,6 +630,7 @@ export function CreatePostScreen({
                   >
                     <X
                       size={16}
+                      aria-hidden="true"
                     />
                   </button>
                 </div>
@@ -516,14 +639,32 @@ export function CreatePostScreen({
           </div>
         ) : null}
 
+        <input
+          ref={
+            imageInputRef
+          }
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+          multiple
+          className="post-image-file-input"
+          onChange={
+            handleImageInputChange
+          }
+          disabled={
+            selectingImages ||
+            submitting
+          }
+          aria-label="投稿写真を選択"
+        />
+
         {images.length <
         MAX_IMAGE_COUNT ? (
           <button
             type="button"
             className="post-image-picker"
-            onClick={() => {
-              void handleSelectImages();
-            }}
+            onClick={
+              handleSelectImage
+            }
             disabled={
               selectingImages ||
               submitting
@@ -531,12 +672,16 @@ export function CreatePostScreen({
           >
             <ImagePlus
               size={22}
+              aria-hidden="true"
             />
 
             <span>
               {selectingImages
-                ? "写真を開いています..."
-                : "写真を追加"}
+                ? "写真を読み込んでいます..."
+                : images.length >
+                    0
+                  ? "写真を追加する"
+                  : "写真を追加"}
             </span>
           </button>
         ) : null}
@@ -595,9 +740,11 @@ export function CreatePostScreen({
                 MIN_SET_COUNT ||
               submitting
             }
+            aria-label="セット数を減らす"
           >
             <Minus
               size={20}
+              aria-hidden="true"
             />
           </button>
 
@@ -619,9 +766,11 @@ export function CreatePostScreen({
                 MAX_SET_COUNT ||
               submitting
             }
+            aria-label="セット数を増やす"
           >
             <Plus
               size={20}
+              aria-hidden="true"
             />
           </button>
         </div>
@@ -632,48 +781,103 @@ export function CreatePostScreen({
           評価
         </span>
 
-        <div className="rating-input">
-          {[1, 2, 3, 4, 5].map(
-            (
-              value
-            ) => (
-              <button
-                key={
-                  value
-                }
-                type="button"
-                className={
-                  value <=
-                  rating
-                    ? "rating-star active"
-                    : "rating-star"
-                }
-                onClick={() => {
-                  setRating(
-                    value
-                  );
-                }}
-                disabled={
-                  submitting
-                }
-              >
-                <Star
-                  size={28}
-                  fill={
-                    value <=
-                    rating
-                      ? "currentColor"
-                      : "none"
-                  }
-                />
-              </button>
-            )
-          )}
+        <div className="rating-stepper">
+          <button
+            type="button"
+            onClick={() => {
+              changeRating(
+                -RATING_STEP
+              );
+            }}
+            disabled={
+              rating <=
+                MIN_RATING ||
+              submitting
+            }
+            aria-label="評価を0.1下げる"
+          >
+            <Minus
+              aria-hidden="true"
+            />
+          </button>
+
+          <div className="rating-stepper-value">
+            <strong>
+              {rating.toFixed(
+                1
+              )}
+            </strong>
+
+            <span>
+              / 5.0
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              changeRating(
+                RATING_STEP
+              );
+            }}
+            disabled={
+              rating >=
+                MAX_RATING ||
+              submitting
+            }
+            aria-label="評価を0.1上げる"
+          >
+            <Plus
+              aria-hidden="true"
+            />
+          </button>
         </div>
 
-        <p className="rating-value">
-          {rating}.0 / 5.0
-        </p>
+        <input
+          className="rating-slider"
+          type="range"
+          min={
+            MIN_RATING
+          }
+          max={
+            MAX_RATING
+          }
+          step={
+            RATING_STEP
+          }
+          value={
+            rating
+          }
+          onChange={(
+            event
+          ) => {
+            setRating(
+              normalizeRating(
+                Number(
+                  event.target
+                    .value
+                )
+              )
+            );
+          }}
+          disabled={
+            submitting
+          }
+          aria-label="評価"
+          aria-valuetext={`${rating.toFixed(
+            1
+          )}点`}
+        />
+
+        <div className="rating-slider-labels">
+          <span>
+            1.0
+          </span>
+
+          <span>
+            5.0
+          </span>
+        </div>
       </div>
 
       <div className="post-form-section">
@@ -698,7 +902,7 @@ export function CreatePostScreen({
                 .value
                 .slice(
                   0,
-                  1000
+                  MAX_COMMENT_LENGTH
                 )
             );
           }}
@@ -711,12 +915,15 @@ export function CreatePostScreen({
 
         <div className="post-character-count">
           {comment.length}
-          /1000
+          /{MAX_COMMENT_LENGTH}
         </div>
       </div>
 
       {error ? (
-        <p className="post-submit-error">
+        <p
+          className="post-submit-error"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
@@ -738,6 +945,7 @@ export function CreatePostScreen({
           <>
             <Check
               size={19}
+              aria-hidden="true"
             />
 
             <span>

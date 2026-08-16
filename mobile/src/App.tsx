@@ -8,6 +8,8 @@ import type {
 } from "@supabase/supabase-js";
 import {
   Bell,
+  BookOpen,
+  CirclePlus,
   Home,
   Search,
   UserRound,
@@ -36,6 +38,9 @@ import {
   EditProfileScreen,
 } from "./screens/EditProfileScreen";
 import {
+  JournalScreen,
+} from "./screens/JournalScreen";
+import {
   LoginScreen,
 } from "./screens/LoginScreen";
 import {
@@ -44,6 +49,9 @@ import {
 import {
   PostDetailScreen,
 } from "./screens/PostDetailScreen";
+import {
+  PostStartScreen,
+} from "./screens/PostStartScreen";
 import {
   ProfileScreen,
 } from "./screens/ProfileScreen";
@@ -72,7 +80,9 @@ import type {
 type Tab =
   | "today"
   | "search"
+  | "create"
   | "community"
+  | "journal"
   | "notifications"
   | "profile";
 
@@ -320,8 +330,10 @@ export function App() {
     window.scrollTo({
       top:
         0,
+
       left:
         0,
+
       behavior:
         "auto",
     });
@@ -434,10 +446,10 @@ export function App() {
     );
   }
 
-  function openUserProfile(
-    userId: string
-  ) {
-    closePostDetail();
+  function resetProfileFlows() {
+    setSelectedProfileUserId(
+      null
+    );
 
     setEditingProfile(
       false
@@ -450,6 +462,14 @@ export function App() {
     setViewingBlockedUsers(
       false
     );
+  }
+
+  function openUserProfile(
+    userId: string
+  ) {
+    closePostDetail();
+
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -457,10 +477,6 @@ export function App() {
       userId ===
       currentUserId
     ) {
-      setSelectedProfileUserId(
-        null
-      );
-
       setTab(
         "profile"
       );
@@ -484,17 +500,7 @@ export function App() {
   function openProfileEditor() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     setEditingProfile(
       true
@@ -512,21 +518,7 @@ export function App() {
   }
 
   function handleProfileSaved() {
-    setEditingProfile(
-      false
-    );
-
-    setSelectedProfileUserId(
-      null
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     setTab(
       "profile"
@@ -536,20 +528,10 @@ export function App() {
   function openSavedPosts() {
     closePostDetail();
 
-    setEditingProfile(
-      false
-    );
-
-    setSelectedProfileUserId(
-      null
-    );
+    resetProfileFlows();
 
     setViewingSavedPosts(
       true
-    );
-
-    setViewingBlockedUsers(
-      false
     );
 
     setTab(
@@ -572,17 +554,7 @@ export function App() {
   function openBlockedUsers() {
     closePostDetail();
 
-    setEditingProfile(
-      false
-    );
-
-    setSelectedProfileUserId(
-      null
-    );
-
-    setViewingSavedPosts(
-      false
-    );
+    resetProfileFlows();
 
     setViewingBlockedUsers(
       true
@@ -618,55 +590,21 @@ export function App() {
   }
 
   function handlePostDeleted() {
-    setEditingPostId(
-      null
-    );
+    closePostDetail();
 
-    setSelectedPostId(
-      null
-    );
-
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
     setTab(
-      "profile"
+      "journal"
     );
   }
 
   function openToday() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -678,21 +616,7 @@ export function App() {
   function openSearch() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -701,24 +625,22 @@ export function App() {
     );
   }
 
+  function openCreatePostFlow() {
+    closePostDetail();
+
+    resetProfileFlows();
+
+    resetSearchFlow();
+
+    setTab(
+      "create"
+    );
+  }
+
   function openCommunity() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -727,24 +649,22 @@ export function App() {
     );
   }
 
+  function openJournal() {
+    closePostDetail();
+
+    resetProfileFlows();
+
+    resetSearchFlow();
+
+    setTab(
+      "journal"
+    );
+  }
+
   function openNotifications() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -756,21 +676,7 @@ export function App() {
   function openProfile() {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     resetSearchFlow();
 
@@ -784,21 +690,7 @@ export function App() {
   ) {
     closePostDetail();
 
-    setSelectedProfileUserId(
-      null
-    );
-
-    setEditingProfile(
-      false
-    );
-
-    setViewingSavedPosts(
-      false
-    );
-
-    setViewingBlockedUsers(
-      false
-    );
+    resetProfileFlows();
 
     setSelectedSauna(
       sauna
@@ -817,9 +709,60 @@ export function App() {
     );
   }
 
-  const shouldHideTabBar =
-    searchView ===
-      "create-post" ||
+  function selectSaunaFromSearch(
+    sauna: Sauna
+  ) {
+    setSelectedSauna(
+      sauna
+    );
+
+    setCreatedPost(
+      null
+    );
+
+    if (
+      tab ===
+      "create"
+    ) {
+      setSearchView(
+        "create-post"
+      );
+
+      return;
+    }
+
+    setSearchView(
+      "detail"
+    );
+  }
+
+  function closeCreatePostScreen() {
+    if (
+      tab ===
+      "create"
+    ) {
+      setSelectedSauna(
+        null
+      );
+
+      setSearchView(
+        "search"
+      );
+
+      return;
+    }
+
+    setSearchView(
+      "detail"
+    );
+  }
+
+  const isNestedSearchView =
+    searchView !==
+    "search";
+
+  const shouldHideNavigation =
+    isNestedSearchView ||
     selectedPostId !==
       null ||
     editingPostId !==
@@ -841,7 +784,81 @@ export function App() {
         }
       />
 
-      <main className="app-content">
+      {!shouldHideNavigation ? (
+        <header className="app-top-bar">
+          <button
+            type="button"
+            className="app-brand-button"
+            onClick={
+              openToday
+            }
+            aria-label="ホームを開く"
+          >
+            TOTONO
+          </button>
+
+          <div className="app-top-actions">
+            <button
+              type="button"
+              className={
+                tab ===
+                "notifications"
+                  ? "app-top-action active"
+                  : "app-top-action"
+              }
+              onClick={
+                openNotifications
+              }
+              aria-label={
+                unreadNotificationCount >
+                0
+                  ? `通知を開く。未読${unreadNotificationCount}件`
+                  : "通知を開く"
+              }
+            >
+              <Bell
+                aria-hidden="true"
+              />
+
+              {unreadNotificationCount >
+              0 ? (
+                <span className="app-top-action-badge">
+                  {unreadNotificationCount >
+                  99
+                    ? "99+"
+                    : unreadNotificationCount}
+                </span>
+              ) : null}
+            </button>
+
+            <button
+              type="button"
+              className={
+                tab ===
+                "profile"
+                  ? "app-top-action active"
+                  : "app-top-action"
+              }
+              onClick={
+                openProfile
+              }
+              aria-label="プロフィールを開く"
+            >
+              <UserRound
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </header>
+      ) : null}
+
+      <main
+        className={
+          shouldHideNavigation
+            ? "app-content"
+            : "app-content app-content-with-top-bar"
+        }
+      >
         {editingProfile ? (
           <EditProfileScreen
             userId={
@@ -950,13 +967,28 @@ export function App() {
             ) : null}
 
             {tab ===
-              "search" ? (
+                "search" ||
+              tab ===
+                "create" ? (
               <>
                 {searchView ===
-                  "search" ? (
+                    "search" &&
+                  tab ===
+                    "search" ? (
                   <SearchScreen
                     onSelectSauna={
-                      openSaunaDetail
+                      selectSaunaFromSearch
+                    }
+                  />
+                ) : null}
+
+                {searchView ===
+                    "search" &&
+                  tab ===
+                    "create" ? (
+                  <PostStartScreen
+                    onSelectSauna={
+                      selectSaunaFromSearch
                     }
                   />
                 ) : null}
@@ -994,11 +1026,9 @@ export function App() {
                     userId={
                       currentUserId
                     }
-                    onBack={() => {
-                      setSearchView(
-                        "detail"
-                      );
-                    }}
+                    onBack={
+                      closeCreatePostScreen
+                    }
                     onCreated={(
                       post
                     ) => {
@@ -1030,6 +1060,10 @@ export function App() {
                       );
                     }}
                     onBackToSauna={() => {
+                      setTab(
+                        "search"
+                      );
+
                       setSearchView(
                         "detail"
                       );
@@ -1053,6 +1087,18 @@ export function App() {
                 }
                 onSelectUser={
                   openUserProfile
+                }
+              />
+            ) : null}
+
+            {tab ===
+              "journal" ? (
+              <JournalScreen
+                userId={
+                  currentUserId
+                }
+                onSelectPost={
+                  openPostDetail
                 }
               />
             ) : null}
@@ -1104,7 +1150,7 @@ export function App() {
         )}
       </main>
 
-      {!shouldHideTabBar ? (
+      {!shouldHideNavigation ? (
         <nav
           className="tab-bar"
           aria-label="メインナビゲーション"
@@ -1114,7 +1160,7 @@ export function App() {
               tab ===
               "today"
             }
-            label="Today"
+            label="ホーム"
             onClick={
               openToday
             }
@@ -1138,6 +1184,20 @@ export function App() {
           <TabButton
             active={
               tab ===
+              "create"
+            }
+            label="投稿"
+            emphasized
+            onClick={
+              openCreatePostFlow
+            }
+          >
+            <CirclePlus />
+          </TabButton>
+
+          <TabButton
+            active={
+              tab ===
               "community"
             }
             label="みんな"
@@ -1151,30 +1211,14 @@ export function App() {
           <TabButton
             active={
               tab ===
-              "notifications"
+              "journal"
             }
-            label="通知"
-            badge={
-              unreadNotificationCount
-            }
+            label="ジャーナル"
             onClick={
-              openNotifications
+              openJournal
             }
           >
-            <Bell />
-          </TabButton>
-
-          <TabButton
-            active={
-              tab ===
-              "profile"
-            }
-            label="プロフィール"
-            onClick={
-              openProfile
-            }
-          >
-            <UserRound />
+            <BookOpen />
           </TabButton>
         </nav>
       ) : null}
@@ -1285,7 +1329,10 @@ function PostCompleteScreen({
 
         <p>
           評価：
-          {post.rating}.0 / 5.0
+          {post.rating.toFixed(
+            1
+          )}{" "}
+          / 5.0
         </p>
 
         {post.comment ? (
@@ -1312,7 +1359,7 @@ function PostCompleteScreen({
           onGoToday
         }
       >
-        Todayへ戻る
+        ホームへ戻る
       </button>
 
       <button
@@ -1332,12 +1379,14 @@ function TabButton({
   active,
   label,
   badge = 0,
+  emphasized = false,
   onClick,
   children,
 }: {
   active: boolean;
   label: string;
   badge?: number;
+  emphasized?: boolean;
   onClick: () => void;
   children: ReactNode;
 }) {
@@ -1346,13 +1395,29 @@ function TabButton({
       ? "99+"
       : badge;
 
+  const classNames = [
+    "tab-button",
+
+    active
+      ? "active"
+      : "",
+
+    emphasized
+      ? "tab-button-emphasized"
+      : "",
+  ]
+    .filter(
+      Boolean
+    )
+    .join(
+      " "
+    );
+
   return (
     <button
       type="button"
       className={
-        active
-          ? "tab-button active"
-          : "tab-button"
+        classNames
       }
       onClick={
         onClick

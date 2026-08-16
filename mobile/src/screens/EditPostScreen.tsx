@@ -11,7 +11,6 @@ import {
   Minus,
   Plus,
   RefreshCw,
-  Star,
   Trash2,
   X,
 } from "lucide-react";
@@ -50,8 +49,32 @@ const MIN_SET_COUNT =
 const MAX_SET_COUNT =
   20;
 
+const MIN_RATING =
+  1;
+
+const MAX_RATING =
+  5;
+
+const RATING_STEP =
+  0.1;
+
 const MAX_COMMENT_LENGTH =
   1000;
+
+function normalizeRating(
+  rating: number
+): number {
+  return Math.min(
+    MAX_RATING,
+    Math.max(
+      MIN_RATING,
+      Math.round(
+        rating *
+          10
+      ) / 10
+    )
+  );
+}
 
 function getTodayDate(): string {
   return new Intl.DateTimeFormat(
@@ -59,10 +82,13 @@ function getTodayDate(): string {
     {
       timeZone:
         "Asia/Tokyo",
+
       year:
         "numeric",
+
       month:
         "2-digit",
+
       day:
         "2-digit",
     }
@@ -440,8 +466,10 @@ export function EditPostScreen({
             MIN_SET_COUNT &&
           setCount <=
             MAX_SET_COUNT &&
-          rating >= 1 &&
-          rating <= 5 &&
+          rating >=
+            MIN_RATING &&
+          rating <=
+            MAX_RATING &&
           comment.length <=
             MAX_COMMENT_LENGTH
         ),
@@ -492,7 +520,9 @@ export function EditPostScreen({
         );
 
         setRating(
-          nextPost.rating
+          normalizeRating(
+            nextPost.rating
+          )
         );
 
         setComment(
@@ -553,7 +583,8 @@ export function EditPostScreen({
       ) =>
         Math.max(
           MIN_SET_COUNT,
-          current - 1
+          current -
+            1
         )
     );
   }
@@ -572,7 +603,29 @@ export function EditPostScreen({
       ) =>
         Math.min(
           MAX_SET_COUNT,
-          current + 1
+          current +
+            1
+        )
+    );
+  }
+
+  function changeRating(
+    amount: number
+  ) {
+    if (
+      saving ||
+      deleting
+    ) {
+      return;
+    }
+
+    setRating(
+      (
+        current
+      ) =>
+        normalizeRating(
+          current +
+            amount
         )
     );
   }
@@ -612,7 +665,10 @@ export function EditPostScreen({
             set_count:
               setCount,
 
-            rating,
+            rating:
+              normalizeRating(
+                rating
+              ),
 
             comment:
               comment.trim(),
@@ -833,6 +889,7 @@ export function EditPostScreen({
               saving ||
               deleting
             }
+            aria-label="セット数を減らす"
           >
             <Minus
               aria-hidden="true"
@@ -858,6 +915,7 @@ export function EditPostScreen({
               saving ||
               deleting
             }
+            aria-label="セット数を増やす"
           >
             <Plus
               aria-hidden="true"
@@ -871,54 +929,106 @@ export function EditPostScreen({
           評価
         </span>
 
-        <div className="rating-input">
-          {[1, 2, 3, 4, 5].map(
-            (
-              value
-            ) => (
-              <button
-                key={
-                  value
-                }
-                type="button"
-                className={
-                  value <=
-                  rating
-                    ? "rating-star active"
-                    : "rating-star"
-                }
-                onClick={() => {
-                  setRating(
-                    value
-                  );
-                }}
-                disabled={
-                  saving ||
-                  deleting
-                }
-                aria-label={`評価${value}点`}
-                aria-pressed={
-                  value ===
-                  rating
-                }
-              >
-                <Star
-                  fill={
-                    value <=
-                    rating
-                      ? "currentColor"
-                      : "none"
-                  }
-                  aria-hidden="true"
-                />
-              </button>
-            )
-          )}
+        <div className="rating-stepper">
+          <button
+            type="button"
+            onClick={() => {
+              changeRating(
+                -RATING_STEP
+              );
+            }}
+            disabled={
+              rating <=
+                MIN_RATING ||
+              saving ||
+              deleting
+            }
+            aria-label="評価を0.1下げる"
+          >
+            <Minus
+              aria-hidden="true"
+            />
+          </button>
+
+          <div className="rating-stepper-value">
+            <strong>
+              {rating.toFixed(
+                1
+              )}
+            </strong>
+
+            <span>
+              / 5.0
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              changeRating(
+                RATING_STEP
+              );
+            }}
+            disabled={
+              rating >=
+                MAX_RATING ||
+              saving ||
+              deleting
+            }
+            aria-label="評価を0.1上げる"
+          >
+            <Plus
+              aria-hidden="true"
+            />
+          </button>
         </div>
 
-        <p className="rating-value">
-          {rating}.0 / 5.0
-        </p>
+        <input
+          className="rating-slider"
+          type="range"
+          min={
+            MIN_RATING
+          }
+          max={
+            MAX_RATING
+          }
+          step={
+            RATING_STEP
+          }
+          value={
+            rating
+          }
+          onChange={(
+            event
+          ) => {
+            setRating(
+              normalizeRating(
+                Number(
+                  event.target
+                    .value
+                )
+              )
+            );
+          }}
+          disabled={
+            saving ||
+            deleting
+          }
+          aria-label="評価"
+          aria-valuetext={`${rating.toFixed(
+            1
+          )}点`}
+        />
+
+        <div className="rating-slider-labels">
+          <span>
+            1.0
+          </span>
+
+          <span>
+            5.0
+          </span>
+        </div>
       </section>
 
       <section className="post-form-section">
