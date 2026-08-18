@@ -160,12 +160,15 @@ type PrefectureImportSummary = {
 const CLOSED_NAME_PATTERNS = [
   "閉業",
   "閉店",
+  "閉館",
   "廃業",
   "廃止",
   "営業終了",
   "解体済",
   "取り壊し",
   "跡地",
+  "(跡)",
+  "（跡）",
 ];
 
 const ROCK_BATH_NAME_PATTERNS = [
