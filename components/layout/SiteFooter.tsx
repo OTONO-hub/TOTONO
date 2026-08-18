@@ -15,8 +15,15 @@ const footerLinks = [
   },
 ] as const;
 
+const OPENSTREETMAP_COPYRIGHT_URL =
+  "https://www.openstreetmap.org/copyright";
+
+const ODBL_LICENSE_URL =
+  "https://opendatacommons.org/licenses/odbl/1-0/";
+
 export function SiteFooter() {
-  const currentYear = new Date().getFullYear();
+  const currentYear =
+    new Date().getFullYear();
 
   return (
     <footer
@@ -100,37 +107,98 @@ export function SiteFooter() {
                 text-sm
               "
             >
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="
-                      rounded-sm
-                      text-muted-foreground
-                      transition-colors
-                      hover:text-foreground
-                      focus-visible:outline-none
-                      focus-visible:ring-2
-                      focus-visible:ring-ring
-                      focus-visible:ring-offset-2
-                    "
+              {footerLinks.map(
+                (
+                  link
+                ) => (
+                  <li
+                    key={
+                      link.href
+                    }
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+                    <Link
+                      href={
+                        link.href
+                      }
+                      className="
+                        rounded-sm
+                        text-muted-foreground
+                        transition-colors
+                        hover:text-foreground
+                        focus-visible:outline-none
+                        focus-visible:ring-2
+                        focus-visible:ring-ring
+                        focus-visible:ring-offset-2
+                      "
+                    >
+                      {
+                        link.label
+                      }
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </nav>
 
-          <p
+          <div
             className="
+              space-y-1
               text-xs
               leading-6
               text-muted-foreground
+              lg:text-right
             "
           >
-            © {currentYear} TOTONO
-          </p>
+            <p>
+              施設データの一部 ©{" "}
+              <a
+                href={
+                  OPENSTREETMAP_COPYRIGHT_URL
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  rounded-sm
+                  underline
+                  underline-offset-4
+                  transition-colors
+                  hover:text-foreground
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-ring
+                  focus-visible:ring-offset-2
+                "
+              >
+                OpenStreetMap contributors
+              </a>
+              {" "}・{" "}
+              <a
+                href={
+                  ODBL_LICENSE_URL
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  rounded-sm
+                  underline
+                  underline-offset-4
+                  transition-colors
+                  hover:text-foreground
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-ring
+                  focus-visible:ring-offset-2
+                "
+              >
+                ODbL
+              </a>
+            </p>
+
+            <p>
+              © {currentYear} TOTONO
+            </p>
+          </div>
         </div>
       </div>
     </footer>
