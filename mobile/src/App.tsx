@@ -73,6 +73,11 @@ import {
 import type {
   Sauna,
 } from "./services/saunas";
+import {
+  createManualPostSauna,
+  createPostSaunaFromSauna,
+  type PostSauna,
+} from "./types/post-sauna";
 import type {
   Post,
 } from "./types/post";
@@ -143,11 +148,29 @@ export function App() {
       "search"
     );
 
+  /*
+   * 施設詳細画面で使用する、
+   * saunasテーブルに登録済みの施設です。
+   */
   const [
     selectedSauna,
     setSelectedSauna,
   ] =
     useState<Sauna | null>(
+      null
+    );
+
+  /*
+   * 投稿画面で使用する施設情報です。
+   *
+   * 登録済み施設の場合はidを持ち、
+   * 手入力施設の場合はidがnullになります。
+   */
+  const [
+    selectedPostSauna,
+    setSelectedPostSauna,
+  ] =
+    useState<PostSauna | null>(
       null
     );
 
@@ -398,6 +421,10 @@ export function App() {
 
   function resetSearchFlow() {
     setSelectedSauna(
+      null
+    );
+
+    setSelectedPostSauna(
       null
     );
 
@@ -696,6 +723,10 @@ export function App() {
       sauna
     );
 
+    setSelectedPostSauna(
+      null
+    );
+
     setCreatedPost(
       null
     );
@@ -724,6 +755,12 @@ export function App() {
       tab ===
       "create"
     ) {
+      setSelectedPostSauna(
+        createPostSaunaFromSauna(
+          sauna
+        )
+      );
+
       setSearchView(
         "create-post"
       );
@@ -731,29 +768,112 @@ export function App() {
       return;
     }
 
+    setSelectedPostSauna(
+      null
+    );
+
     setSearchView(
       "detail"
     );
   }
 
-  function closeCreatePostScreen() {
-    if (
-      tab ===
-      "create"
-    ) {
+  function selectManualSauna(
+    saunaName: string
+  ) {
+    try {
+      const manualSauna =
+        createManualPostSauna(
+          saunaName
+        );
+
       setSelectedSauna(
         null
       );
 
+      setSelectedPostSauna(
+        manualSauna
+      );
+
+      setCreatedPost(
+        null
+      );
+
       setSearchView(
-        "search"
+        "create-post"
+      );
+
+      setTab(
+        "create"
+      );
+    } catch (
+      manualSaunaError
+    ) {
+      console.error(
+        "未登録施設を選択できませんでした。",
+        manualSaunaError
+      );
+    }
+  }
+
+  function startPostFromSaunaDetail() {
+    if (!selectedSauna) {
+      return;
+    }
+
+    setSelectedPostSauna(
+      createPostSaunaFromSauna(
+        selectedSauna
+      )
+    );
+
+    setCreatedPost(
+      null
+    );
+
+    setSearchView(
+      "create-post"
+    );
+  }
+
+  function closeCreatePostScreen() {
+    setCreatedPost(
+      null
+    );
+
+    setSelectedPostSauna(
+      null
+    );
+
+    if (
+      tab ===
+        "search" &&
+      selectedSauna
+    ) {
+      setSearchView(
+        "detail"
       );
 
       return;
     }
 
+    setSelectedSauna(
+      null
+    );
+
     setSearchView(
-      "detail"
+      "search"
+    );
+  }
+
+  function finishCreatedPost(
+    post: Post
+  ) {
+    setCreatedPost(
+      post
+    );
+
+    setSearchView(
+      "post-complete"
     );
   }
 
@@ -990,6 +1110,9 @@ export function App() {
                     onSelectSauna={
                       selectSaunaFromSearch
                     }
+                    onSelectManualSauna={
+                      selectManualSauna
+                    }
                   />
                 ) : null}
 
@@ -1008,20 +1131,18 @@ export function App() {
                         "search"
                       );
                     }}
-                    onCreatePost={() => {
-                      setSearchView(
-                        "create-post"
-                      );
-                    }}
+                    onCreatePost={
+                      startPostFromSaunaDetail
+                    }
                   />
                 ) : null}
 
                 {searchView ===
                   "create-post" &&
-                selectedSauna ? (
+                selectedPostSauna ? (
                   <CreatePostScreen
                     sauna={
-                      selectedSauna
+                      selectedPostSauna
                     }
                     userId={
                       currentUserId
@@ -1029,27 +1150,19 @@ export function App() {
                     onBack={
                       closeCreatePostScreen
                     }
-                    onCreated={(
-                      post
-                    ) => {
-                      setCreatedPost(
-                        post
-                      );
-
-                      setSearchView(
-                        "post-complete"
-                      );
-                    }}
+                    onCreated={
+                      finishCreatedPost
+                    }
                   />
                 ) : null}
 
                 {searchView ===
                   "post-complete" &&
-                selectedSauna &&
+                selectedPostSauna &&
                 createdPost ? (
                   <PostCompleteScreen
                     sauna={
-                      selectedSauna
+                      selectedPostSauna
                     }
                     post={
                       createdPost
@@ -1059,15 +1172,23 @@ export function App() {
                         createdPost.id
                       );
                     }}
-                    onBackToSauna={() => {
-                      setTab(
-                        "search"
-                      );
+                    onBackToSauna={
+                      selectedSauna
+                        ? () => {
+                            setTab(
+                              "search"
+                            );
 
-                      setSearchView(
-                        "detail"
-                      );
-                    }}
+                            setSelectedPostSauna(
+                              null
+                            );
+
+                            setSearchView(
+                              "detail"
+                            );
+                          }
+                        : undefined
+                    }
                     onGoToday={
                       openToday
                     }
@@ -1297,10 +1418,10 @@ function PostCompleteScreen({
   onBackToSauna,
   onGoToday,
 }: {
-  sauna: Sauna;
+  sauna: PostSauna;
   post: Post;
   onViewPost: () => void;
-  onBackToSauna: () => void;
+  onBackToSauna?: () => void;
   onGoToday: () => void;
 }) {
   return (
@@ -1362,15 +1483,17 @@ function PostCompleteScreen({
         ホームへ戻る
       </button>
 
-      <button
-        type="button"
-        className="secondary"
-        onClick={
-          onBackToSauna
-        }
-      >
-        施設詳細へ戻る
-      </button>
+      {onBackToSauna ? (
+        <button
+          type="button"
+          className="secondary"
+          onClick={
+            onBackToSauna
+          }
+        >
+          施設詳細へ戻る
+        </button>
+      ) : null}
     </section>
   );
 }

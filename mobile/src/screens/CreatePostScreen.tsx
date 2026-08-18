@@ -27,14 +27,14 @@ import {
   createPost,
 } from "../services/posts";
 import type {
-  Sauna,
-} from "../services/saunas";
+  PostSauna,
+} from "../types/post-sauna";
 import type {
   Post,
 } from "../types/post";
 
 type CreatePostScreenProps = {
-  sauna: Sauna;
+  sauna: PostSauna;
   userId: string;
   onBack: () => void;
   onCreated: (
@@ -154,8 +154,8 @@ export function CreatePostScreen({
         Boolean(
           supabase &&
             userId &&
-            sauna.id &&
-            sauna.name &&
+            sauna.name
+              .trim() &&
             visitDate &&
             setCount >=
               MIN_SET_COUNT &&
@@ -169,7 +169,6 @@ export function CreatePostScreen({
               MAX_COMMENT_LENGTH
         ),
       [
-        sauna.id,
         sauna.name,
         setCount,
         rating,
@@ -457,7 +456,8 @@ export function CreatePostScreen({
               sauna.id,
 
             sauna_name:
-              sauna.name,
+              sauna.name
+                .trim(),
 
             visit_date:
               visitDate,
@@ -572,7 +572,9 @@ export function CreatePostScreen({
         />
 
         <span>
-          施設詳細へ戻る
+          {sauna.id
+            ? "施設詳細へ戻る"
+            : "施設選択へ戻る"}
         </span>
       </button>
 
@@ -588,6 +590,12 @@ export function CreatePostScreen({
         <p className="lead">
           {sauna.name}
         </p>
+
+        {!sauna.id ? (
+          <span className="create-post-manual-sauna-label">
+            未登録施設
+          </span>
+        ) : null}
       </div>
 
       <div className="post-form-section">

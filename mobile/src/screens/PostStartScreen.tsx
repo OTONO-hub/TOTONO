@@ -3,9 +3,13 @@ import {
   useState,
 } from "react";
 import {
+  Building2,
+  ChevronRight,
   MapPin,
   PenLine,
+  Plus,
   Search,
+  X,
 } from "lucide-react";
 
 import {
@@ -20,6 +24,10 @@ type PostStartScreenProps = {
   onSelectSauna: (
     sauna: Sauna
   ) => void;
+
+  onSelectManualSauna?: (
+    saunaName: string
+  ) => void;
 };
 
 const MIN_SEARCH_LENGTH =
@@ -28,8 +36,12 @@ const MIN_SEARCH_LENGTH =
 const SEARCH_DELAY =
   300;
 
+const MAX_MANUAL_NAME_LENGTH =
+  100;
+
 export function PostStartScreen({
   onSelectSauna,
+  onSelectManualSauna,
 }: PostStartScreenProps) {
   const [
     keyword,
@@ -54,6 +66,26 @@ export function PostStartScreen({
   const [
     error,
     setError,
+  ] =
+    useState<
+      string | null
+    >(null);
+
+  const [
+    showingManualEntry,
+    setShowingManualEntry,
+  ] =
+    useState(false);
+
+  const [
+    manualSaunaName,
+    setManualSaunaName,
+  ] =
+    useState("");
+
+  const [
+    manualEntryError,
+    setManualEntryError,
   ] =
     useState<
       string | null
@@ -175,6 +207,87 @@ export function PostStartScreen({
     }
   }
 
+  function openManualEntry() {
+    const suggestedName =
+      keyword
+        .trim()
+        .slice(
+          0,
+          MAX_MANUAL_NAME_LENGTH
+        );
+
+    setManualSaunaName(
+      suggestedName
+    );
+
+    setManualEntryError(
+      null
+    );
+
+    setShowingManualEntry(
+      true
+    );
+  }
+
+  function closeManualEntry() {
+    setShowingManualEntry(
+      false
+    );
+
+    setManualEntryError(
+      null
+    );
+  }
+
+  function handleManualSaunaSubmit() {
+    const normalizedSaunaName =
+      manualSaunaName
+        .trim()
+        .replace(
+          /\s+/g,
+          " "
+        );
+
+    if (
+      !normalizedSaunaName
+    ) {
+      setManualEntryError(
+        "施設名を入力してください。"
+      );
+
+      return;
+    }
+
+    if (
+      normalizedSaunaName.length >
+      MAX_MANUAL_NAME_LENGTH
+    ) {
+      setManualEntryError(
+        `施設名は${MAX_MANUAL_NAME_LENGTH}文字以内で入力してください。`
+      );
+
+      return;
+    }
+
+    if (
+      !onSelectManualSauna
+    ) {
+      setManualEntryError(
+        "未登録施設の投稿準備が完了していません。"
+      );
+
+      return;
+    }
+
+    setManualEntryError(
+      null
+    );
+
+    onSelectManualSauna(
+      normalizedSaunaName
+    );
+  }
+
   const trimmedKeyword =
     keyword.trim();
 
@@ -208,8 +321,8 @@ export function PostStartScreen({
         </h1>
 
         <p className="lead">
-          まず、訪れたサウナ施設を
-          選択してください。
+          訪れたサウナを検索するか、
+          施設名を直接入力して記録できます。
         </p>
       </header>
 
@@ -256,7 +369,180 @@ export function PostStartScreen({
             autoFocus
           />
         </div>
+
+        <div className="post-start-manual-divider">
+          <span>
+            または
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="post-start-manual-button"
+          onClick={
+            openManualEntry
+          }
+        >
+          <span className="post-start-manual-button-icon">
+            <Plus
+              aria-hidden="true"
+            />
+          </span>
+
+          <span className="post-start-manual-button-copy">
+            <strong>
+              登録されていない施設を入力
+            </strong>
+
+            <small>
+              検索にないサウナでも投稿できます
+            </small>
+          </span>
+
+          <ChevronRight
+            className="post-start-manual-button-arrow"
+            aria-hidden="true"
+          />
+        </button>
       </section>
+
+      {showingManualEntry ? (
+        <section
+          className="post-start-manual-panel"
+          aria-labelledby="manual-sauna-title"
+        >
+          <div className="post-start-manual-panel-header">
+            <div>
+              <p className="eyebrow">
+                Manual Entry
+              </p>
+
+              <h2 id="manual-sauna-title">
+                施設名を入力
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              className="post-start-manual-close"
+              onClick={
+                closeManualEntry
+              }
+              aria-label="手入力を閉じる"
+            >
+              <X
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+
+          <p className="post-start-manual-description">
+            施設データに登録されていない
+            サウナでも、施設名を入力して
+            サ活を記録できます。
+          </p>
+
+          <label
+            className="post-start-manual-label"
+            htmlFor="manual-sauna-name"
+          >
+            施設名
+          </label>
+
+          <div className="post-start-manual-input">
+            <Building2
+              aria-hidden="true"
+            />
+
+            <input
+              id="manual-sauna-name"
+              type="text"
+              value={
+                manualSaunaName
+              }
+              onChange={(
+                event
+              ) => {
+                setManualSaunaName(
+                  event.target
+                    .value
+                    .slice(
+                      0,
+                      MAX_MANUAL_NAME_LENGTH
+                    )
+                );
+
+                setManualEntryError(
+                  null
+                );
+              }}
+              placeholder="例：○○温泉"
+              maxLength={
+                MAX_MANUAL_NAME_LENGTH
+              }
+              autoComplete="organization"
+              enterKeyHint="done"
+              autoFocus
+              onKeyDown={(
+                event
+              ) => {
+                if (
+                  event.key ===
+                  "Enter"
+                ) {
+                  event.preventDefault();
+
+                  handleManualSaunaSubmit();
+                }
+              }}
+            />
+          </div>
+
+          <div className="post-start-manual-meta">
+            <span>
+              サウナ施設の正式名称を
+              入力してください
+            </span>
+
+            <span>
+              {manualSaunaName.length}
+              /{MAX_MANUAL_NAME_LENGTH}
+            </span>
+          </div>
+
+          {manualEntryError ? (
+            <p
+              className="post-start-manual-error"
+              role="alert"
+            >
+              {manualEntryError}
+            </p>
+          ) : null}
+
+          <button
+            type="button"
+            className="post-start-manual-submit"
+            onClick={
+              handleManualSaunaSubmit
+            }
+            disabled={
+              !manualSaunaName.trim()
+            }
+          >
+            この施設名で投稿を続ける
+
+            <ChevronRight
+              aria-hidden="true"
+            />
+          </button>
+
+          <p className="post-start-manual-notice">
+            手入力した施設は施設詳細や
+            お気に入りの対象にはなりませんが、
+            投稿とジャーナルには保存されます。
+          </p>
+        </section>
+      ) : null}
 
       {loading ? (
         <div
@@ -281,7 +567,8 @@ export function PostStartScreen({
         </div>
       ) : null}
 
-      {showInitialState ? (
+      {showInitialState &&
+      !showingManualEntry ? (
         <div className="post-start-guide">
           <Search
             aria-hidden="true"
@@ -301,7 +588,7 @@ export function PostStartScreen({
       ) : null}
 
       {showNoResults ? (
-        <div className="post-start-guide">
+        <div className="post-start-guide post-start-no-results">
           <MapPin
             aria-hidden="true"
           />
@@ -311,9 +598,19 @@ export function PostStartScreen({
           </strong>
 
           <p>
-            施設名を短くしたり、
-            エリア名でも検索してみてください。
+            検索条件を変えるか、
+            登録されていない施設として
+            直接入力できます。
           </p>
+
+          <button
+            type="button"
+            onClick={
+              openManualEntry
+            }
+          >
+            「{trimmedKeyword}」で投稿する
+          </button>
         </div>
       ) : null}
 
@@ -394,6 +691,20 @@ export function PostStartScreen({
               );
             }
           )}
+
+          <button
+            type="button"
+            className="post-start-results-manual-button"
+            onClick={
+              openManualEntry
+            }
+          >
+            <Plus
+              aria-hidden="true"
+            />
+
+            検索結果にない施設を入力する
+          </button>
         </div>
       ) : null}
     </section>

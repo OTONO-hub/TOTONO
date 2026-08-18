@@ -11625,3 +11625,364 @@ h1 {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ========================================
+   未登録サウナ施設の手入力
+======================================== */
+
+.post-start-manual-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0;
+  color: rgba(62, 58, 58, 0.4);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.post-start-manual-divider::before,
+.post-start-manual-divider::after {
+  height: 1px;
+  flex: 1;
+  background: rgba(62, 58, 58, 0.1);
+  content: "";
+}
+
+.post-start-manual-button {
+  display: grid;
+  width: 100%;
+  min-height: 72px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 14px;
+  border: 1px dashed rgba(0, 180, 182, 0.42);
+  border-radius: 19px;
+  background: rgba(0, 180, 182, 0.06);
+  color: #3e3a3a;
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.post-start-manual-button:active {
+  transform: scale(0.985);
+  border-color: rgba(0, 180, 182, 0.72);
+  background: rgba(0, 180, 182, 0.11);
+}
+
+.post-start-manual-button-icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #00b4b6;
+  color: #fff;
+}
+
+.post-start-manual-button-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.post-start-manual-button-copy {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.post-start-manual-button-copy strong {
+  color: #3e3a3a;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.post-start-manual-button-copy small {
+  color: rgba(62, 58, 58, 0.5);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.post-start-manual-button-arrow {
+  width: 18px;
+  height: 18px;
+  color: rgba(62, 58, 58, 0.4);
+}
+
+.post-start-manual-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid rgba(0, 180, 182, 0.18);
+  border-radius: 26px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(159, 217, 246, 0.28),
+      transparent 34%
+    ),
+    rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 48px rgba(62, 58, 58, 0.09);
+}
+
+.post-start-manual-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.post-start-manual-panel-header .eyebrow {
+  margin: 0 0 6px;
+  color: #00a1a3;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.post-start-manual-panel-header h2 {
+  margin: 0;
+  color: #3e3a3a;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.post-start-manual-close {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(62, 58, 58, 0.07);
+  color: rgba(62, 58, 58, 0.65);
+}
+
+.post-start-manual-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.post-start-manual-description {
+  margin: 15px 0 20px;
+  color: rgba(62, 58, 58, 0.58);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.post-start-manual-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #3e3a3a;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.post-start-manual-input {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid rgba(62, 58, 58, 0.12);
+  border-radius: 17px;
+  background: #f7f7f8;
+  color: rgba(62, 58, 58, 0.48);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.post-start-manual-input:focus-within {
+  border-color: rgba(0, 180, 182, 0.62);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 180, 182, 0.1);
+}
+
+.post-start-manual-input svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.post-start-manual-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #3e3a3a;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.post-start-manual-input input::placeholder {
+  color: rgba(62, 58, 58, 0.34);
+}
+
+.post-start-manual-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  color: rgba(62, 58, 58, 0.42);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.post-start-manual-meta span:last-child {
+  flex: 0 0 auto;
+}
+
+.post-start-manual-error {
+  margin: 13px 0 0;
+  padding: 11px 13px;
+  border-radius: 13px;
+  background: rgba(233, 88, 132, 0.1);
+  color: #c93f69;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.post-start-manual-submit {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 17px;
+  background: #3e3a3a;
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  box-shadow: 0 12px 26px rgba(62, 58, 58, 0.18);
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease;
+}
+
+.post-start-manual-submit:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.post-start-manual-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+  box-shadow: none;
+}
+
+.post-start-manual-submit svg {
+  width: 18px;
+  height: 18px;
+}
+
+.post-start-manual-notice {
+  margin: 13px 0 0;
+  color: rgba(62, 58, 58, 0.42);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.post-start-no-results button {
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #3e3a3a;
+  color: #fff;
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.post-start-results-manual-button {
+  display: flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 0 16px;
+  border: 1px dashed rgba(0, 180, 182, 0.42);
+  border-radius: 17px;
+  background: rgba(0, 180, 182, 0.06);
+  color: #008f91;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.post-start-results-manual-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.create-post-manual-sauna-label {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 28px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 0 11px;
+  border: 1px solid rgba(0, 180, 182, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 180, 182, 0.09);
+  color: #008f91;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+@media (max-width: 390px) {
+  .post-start-manual-panel {
+    padding: 19px 17px;
+  }
+
+  .post-start-manual-button {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    padding-right: 11px;
+    padding-left: 11px;
+  }
+
+  .post-start-manual-button-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .post-start-manual-meta {
+    align-items: flex-end;
+  }
+
+  .post-start-manual-meta span:first-child {
+    max-width: 14rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-start-manual-button,
+  .post-start-manual-input,
+  .post-start-manual-submit {
+    transition: none;
+  }
+}
