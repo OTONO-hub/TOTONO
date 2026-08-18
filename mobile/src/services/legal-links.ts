@@ -8,6 +8,9 @@ import {
 const DEFAULT_PUBLIC_WEB_URL =
   "https://www.totono-sauna.com";
 
+const OPENSTREETMAP_COPYRIGHT_URL =
+  "https://www.openstreetmap.org/copyright";
+
 function normalizeUrl(
   value:
     | string
@@ -86,6 +89,9 @@ export const termsOfServiceUrl =
     "/terms"
   );
 
+export const openStreetMapCopyrightUrl =
+  OPENSTREETMAP_COPYRIGHT_URL;
+
 export async function openExternalPage(
   url: string
 ): Promise<void> {
@@ -134,5 +140,12 @@ export async function openPrivacyPolicy(): Promise<void> {
 export async function openTermsOfService(): Promise<void> {
   await openExternalPage(
     termsOfServiceUrl
+  );
+}
+
+export async function openOpenStreetMapCopyright():
+  Promise<void> {
+  await openExternalPage(
+    openStreetMapCopyrightUrl
   );
 }

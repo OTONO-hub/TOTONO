@@ -2,19 +2,22 @@ import {
   useState,
 } from "react";
 import {
+  Database,
   ExternalLink,
   FileText,
   ShieldCheck,
 } from "lucide-react";
 
 import {
+  openOpenStreetMapCopyright,
   openPrivacyPolicy,
   openTermsOfService,
 } from "../services/legal-links";
 
 type LegalPage =
   | "privacy"
-  | "terms";
+  | "terms"
+  | "facility-data";
 
 export function LegalLinks() {
   const [
@@ -53,13 +56,18 @@ export function LegalLinks() {
     );
 
     try {
-      if (
-        page ===
-        "privacy"
-      ) {
-        await openPrivacyPolicy();
-      } else {
-        await openTermsOfService();
+      switch (page) {
+        case "privacy":
+          await openPrivacyPolicy();
+          break;
+
+        case "terms":
+          await openTermsOfService();
+          break;
+
+        case "facility-data":
+          await openOpenStreetMapCopyright();
+          break;
       }
     } catch (
       error
@@ -167,6 +175,48 @@ export function LegalLinks() {
           <span className="legal-link-action">
             {openingPage ===
             "terms"
+              ? "開いています..."
+              : "開く"}
+
+            <ExternalLink
+              aria-hidden="true"
+            />
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="legal-link-button"
+          onClick={() => {
+            void handleOpen(
+              "facility-data"
+            );
+          }}
+          disabled={
+            Boolean(
+              openingPage
+            )
+          }
+        >
+          <span className="legal-link-icon legal-link-icon-data">
+            <Database
+              aria-hidden="true"
+            />
+          </span>
+
+          <span className="legal-link-content">
+            <strong>
+              施設データについて
+            </strong>
+
+            <small>
+              © OpenStreetMap contributors・ODbL
+            </small>
+          </span>
+
+          <span className="legal-link-action">
+            {openingPage ===
+            "facility-data"
               ? "開いています..."
               : "開く"}
 
