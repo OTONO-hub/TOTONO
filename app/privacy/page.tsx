@@ -555,14 +555,7 @@ export default function PrivacyPage() {
             ))}
           </div>
 
-          <aside className="mt-14 rounded-3xl border border-border/60 bg-muted/40 p-6 text-sm leading-7 text-muted-foreground sm:p-8">
-            <p>
-              本ページは、TOTONOの現在のサービス内容をもとに作成しています。
-              正式公開前には、実際に導入するアクセス解析・監視サービス、
-              運営者情報、お問い合わせ方法およびアカウント削除方法と
-              内容が一致していることを確認してください。
-            </p>
-          </aside>
+
 
           <div className="mt-10">
             <Link

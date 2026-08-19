@@ -277,7 +277,7 @@ export default function ContactPage() {
                           text-muted-foreground
                         "
                       >
-                        受付準備中
+                        現在利用できません
                       </p>
                     </article>
                   );
@@ -388,7 +388,7 @@ export default function ContactPage() {
 
                 <div>
                   <h2 className="font-semibold">
-                    お問い合わせ窓口を準備しています
+                  お問い合わせ窓口を一時的に利用できません
                   </h2>
 
                   <p
@@ -399,8 +399,9 @@ export default function ContactPage() {
                       text-muted-foreground
                     "
                   >
-                    正式公開前にお問い合わせ用メールアドレスを設定し、
-                    各窓口を利用できる状態にします。
+                    現在、お問い合わせ窓口を一時的にご利用いただけません。
+                    恐れ入りますが、しばらく時間をおいてから
+                    もう一度お試しください。
                   </p>
                 </div>
               </div>

@@ -739,15 +739,6 @@ export default function TermsPage() {
             ))}
           </div>
 
-          <aside className="mt-14 rounded-3xl border border-border/60 bg-muted/40 p-6 text-sm leading-7 text-muted-foreground sm:p-8">
-            <p>
-              本ページは、TOTONOの現在のサービス内容をもとに作成した
-              利用規約の初稿です。正式公開前には、実際の運営者情報、
-              お問い合わせ方法、アカウント削除方法、有料機能の有無、
-              事業所在地および運用体制と内容が一致していることを
-              確認してください。
-            </p>
-          </aside>
 
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
