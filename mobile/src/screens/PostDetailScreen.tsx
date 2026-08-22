@@ -445,7 +445,7 @@ function PostRating({
       )}
 
       <strong>
-        {rating}.0
+        {rating.toFixed(1)}
       </strong>
     </div>
   );

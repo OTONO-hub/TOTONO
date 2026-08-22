@@ -23,8 +23,9 @@ import {
   isFavoriteSauna,
   removeFavoriteSauna,
 } from "../services/favorite-saunas";
-import type {
-  Sauna,
+import {
+  getSaunaById,
+  type Sauna,
 } from "../services/saunas";
 
 type SaunaDetailScreenProps = {
@@ -34,31 +35,205 @@ type SaunaDetailScreenProps = {
   onCreatePost: () => void;
 };
 
+/**
+ * 都道府県・市区町村・住所の
+ * 重複を避けた表示用住所を作成します。
+ */
+function createLocationText(
+  sauna: Sauna
+): string {
+  const address =
+    sauna.address?.trim() ??
+    "";
+
+  /*
+   * addressに完全な住所が登録されている場合は、
+   * それを優先して表示します。
+   *
+   * 例：
+   * prefecture: 東京都
+   * city: 文京区
+   * address: 東京都文京区春日1丁目1-1
+   *
+   * 表示：
+   * 東京都文京区春日1丁目1-1
+   */
+  if (address) {
+    return address;
+  }
+
+  /*
+   * addressがない場合のみ、
+   * 都道府県と市区町村から表示文を作成します。
+   */
+  return [
+    sauna.prefecture,
+    sauna.city,
+  ]
+    .map(
+      (value) =>
+        value?.trim() ??
+        ""
+    )
+    .filter(Boolean)
+    .filter(
+      (
+        value,
+        index,
+        values
+      ) =>
+        values.indexOf(
+          value
+        ) === index
+    )
+    .join(" ");
+}
+
 export function SaunaDetailScreen({
   sauna,
   userId,
   onBack,
   onCreatePost,
 }: SaunaDetailScreenProps) {
+  /*
+   * 検索結果から渡された施設情報を
+   * 初期表示に使用します。
+   *
+   * その後、施設IDから最新の完全な情報を
+   * Supabaseより再取得します。
+   */
+  const [
+    displaySauna,
+    setDisplaySauna,
+  ] =
+    useState<Sauna>(
+      sauna
+    );
+
+  const [
+    saunaLoading,
+    setSaunaLoading,
+  ] =
+    useState(false);
+
+  const [
+    saunaError,
+    setSaunaError,
+  ] =
+    useState<string | null>(
+      null
+    );
+
   const [
     favorite,
     setFavorite,
-  ] = useState<boolean | null>(
-    null
-  );
+  ] =
+    useState<boolean | null>(
+      null
+    );
 
   const [
     favoriteUpdating,
     setFavoriteUpdating,
-  ] = useState(false);
+  ] =
+    useState(false);
 
   const [
     favoriteError,
     setFavoriteError,
-  ] = useState<string | null>(
-    null
-  );
+  ] =
+    useState<string | null>(
+      null
+    );
 
+  /*
+   * 詳細画面を開いたときに、
+   * 施設IDから完全な施設情報を再取得します。
+   */
+  useEffect(() => {
+    /*
+     * 別の施設へ切り替わった場合、
+     * まず新しい施設の受け取りデータを表示します。
+     */
+    setDisplaySauna(
+      sauna
+    );
+
+    setSaunaError(
+      null
+    );
+
+    if (!supabase) {
+      return;
+    }
+
+    const client =
+      supabase;
+
+    let cancelled =
+      false;
+
+    async function loadSauna() {
+      setSaunaLoading(
+        true
+      );
+
+      try {
+        const latestSauna =
+          await getSaunaById(
+            client,
+            sauna.id
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        if (latestSauna) {
+          setDisplaySauna(
+            latestSauna
+          );
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(
+          "施設情報を再取得できませんでした。",
+          error
+        );
+
+        /*
+         * 再取得に失敗した場合も、
+         * 検索結果から渡された情報で
+         * 詳細画面を表示し続けます。
+         */
+        setSaunaError(
+          "最新の施設情報を取得できませんでした。"
+        );
+      } finally {
+        if (!cancelled) {
+          setSaunaLoading(
+            false
+          );
+        }
+      }
+    }
+
+    void loadSauna();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    sauna,
+  ]);
+
+  /*
+   * お気に入り状態を取得します。
+   */
   useEffect(() => {
     if (!supabase) {
       return;
@@ -69,6 +244,14 @@ export function SaunaDetailScreen({
 
     let cancelled =
       false;
+
+    setFavorite(
+      null
+    );
+
+    setFavoriteError(
+      null
+    );
 
     async function loadFavorite() {
       try {
@@ -117,20 +300,9 @@ export function SaunaDetailScreen({
   ]);
 
   const locationText =
-    [
-      sauna.prefecture,
-      sauna.city,
-      sauna.address,
-    ]
-      .filter(
-        (
-          value
-        ): value is string =>
-          Boolean(
-            value?.trim()
-          )
-      )
-      .join(" ");
+    createLocationText(
+      displaySauna
+    );
 
   async function handleFavoriteToggle() {
     if (
@@ -164,13 +336,13 @@ export function SaunaDetailScreen({
         await addFavoriteSauna(
           client,
           userId,
-          sauna.id
+          displaySauna.id
         );
       } else {
         await removeFavoriteSauna(
           client,
           userId,
-          sauna.id
+          displaySauna.id
         );
       }
     } catch (error) {
@@ -250,14 +422,14 @@ export function SaunaDetailScreen({
         </button>
       </div>
 
-      {sauna.image_url ? (
+      {displaySauna.image_url ? (
         <div className="detail-hero-image">
           <img
             src={
-              sauna.image_url
+              displaySauna.image_url
             }
             alt={
-              sauna.name
+              displaySauna.name
             }
           />
         </div>
@@ -275,7 +447,7 @@ export function SaunaDetailScreen({
         </p>
 
         <h1>
-          {sauna.name}
+          {displaySauna.name}
         </h1>
 
         {locationText ? (
@@ -291,8 +463,30 @@ export function SaunaDetailScreen({
           </div>
         ) : null}
 
+        {saunaLoading ? (
+          <p
+            className="search-status"
+            role="status"
+            aria-live="polite"
+          >
+            施設情報を確認しています...
+          </p>
+        ) : null}
+
+        {saunaError ? (
+          <p
+            className="favorite-error"
+            role="alert"
+          >
+            {saunaError}
+          </p>
+        ) : null}
+
         {favoriteError ? (
-          <p className="favorite-error">
+          <p
+            className="favorite-error"
+            role="alert"
+          >
             {favoriteError}
           </p>
         ) : null}
@@ -319,7 +513,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="サウナ室"
             active={
-              sauna.has_sauna_room
+              displaySauna.has_sauna_room
             }
             icon={
               <Wind />
@@ -329,7 +523,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="水風呂"
             active={
-              sauna.has_cold_bath
+              displaySauna.has_cold_bath
             }
             icon={
               <Waves />
@@ -339,7 +533,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="外気浴"
             active={
-              sauna.has_outdoor_air_bath
+              displaySauna.has_outdoor_air_bath
             }
             icon={
               <Wind />
@@ -349,7 +543,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="休憩スペース"
             active={
-              sauna.has_rest_area
+              displaySauna.has_rest_area
             }
             icon={
               <Waves />
@@ -359,7 +553,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="食事"
             active={
-              sauna.has_restaurant
+              displaySauna.has_restaurant
             }
             icon={
               <Utensils />
@@ -369,7 +563,7 @@ export function SaunaDetailScreen({
           <FacilityItem
             label="駐車場"
             active={
-              sauna.has_parking
+              displaySauna.has_parking
             }
             icon={
               <Car />
@@ -384,20 +578,20 @@ export function SaunaDetailScreen({
         </p>
 
         <div className="detail-info-card">
-          {sauna.opening_hours ? (
+          {displaySauna.opening_hours ? (
             <InfoRow
               label="営業時間"
               value={
-                sauna.opening_hours
+                displaySauna.opening_hours
               }
             />
           ) : null}
 
-          {sauna.postal_code ? (
+          {displaySauna.postal_code ? (
             <InfoRow
               label="郵便番号"
               value={
-                sauna.postal_code
+                displaySauna.postal_code
               }
             />
           ) : null}
@@ -411,11 +605,11 @@ export function SaunaDetailScreen({
             />
           ) : null}
 
-          {sauna.phone_number ? (
+          {displaySauna.phone_number ? (
             <InfoRow
               label="電話番号"
               value={
-                sauna.phone_number
+                displaySauna.phone_number
               }
             />
           ) : null}
@@ -423,10 +617,10 @@ export function SaunaDetailScreen({
       </div>
 
       <div className="detail-actions">
-        {sauna.phone_number ? (
+        {displaySauna.phone_number ? (
           <a
             className="detail-action-button"
-            href={`tel:${sauna.phone_number}`}
+            href={`tel:${displaySauna.phone_number}`}
           >
             <Phone
               size={18}
@@ -439,11 +633,11 @@ export function SaunaDetailScreen({
           </a>
         ) : null}
 
-        {sauna.website_url ? (
+        {displaySauna.website_url ? (
           <a
             className="detail-action-button"
             href={
-              sauna.website_url
+              displaySauna.website_url
             }
             target="_blank"
             rel="noreferrer"

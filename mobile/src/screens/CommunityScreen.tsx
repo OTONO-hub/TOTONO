@@ -451,7 +451,7 @@ function CommunityPostCard({
               aria-hidden="true"
             />
 
-            {post.rating}.0
+            {post.rating.toFixed(1)}
           </span>
         </div>
 
