@@ -132,7 +132,7 @@ export function MobileSaunaActionBar({
             aria-hidden="true"
           />
 
-          <span>保存</span>
+          <span>行きたい</span>
         </a>
 
         <Link
