@@ -719,6 +719,81 @@ h1 {
   opacity: 0.4;
 }
 
+.post-advanced-section {
+  margin-top: 28px;
+  border: 1px solid rgba(62, 58, 58, 0.09);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 16px;
+}
+
+.post-advanced-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  color: #3e3a3a;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.post-advanced-toggle > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.post-advanced-toggle svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  transition: transform 180ms ease;
+}
+
+.post-advanced-toggle > svg.expanded {
+  transform: rotate(180deg);
+}
+
+.post-advanced-toggle:disabled {
+  opacity: 0.45;
+}
+
+.post-private-note-field {
+  margin-top: 13px;
+  border-top: 1px solid rgba(62, 58, 58, 0.08);
+  padding-top: 17px;
+}
+
+.post-private-note-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.post-private-note-heading .post-form-label {
+  margin-bottom: 0;
+}
+
+.post-private-note-heading > span {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.45;
+}
+
+.post-private-note-field > p {
+  margin: 8px 0 12px;
+  font-size: 10px;
+  line-height: 1.65;
+  opacity: 0.5;
+}
+
 .post-submit-error {
   margin: 22px 0 0;
   color: #e95884;
