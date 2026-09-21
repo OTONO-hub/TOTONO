@@ -75,6 +75,7 @@ type ProfileScreenProps = {
     postId: string
   ) => void;
   onEditProfile?: () => void;
+  onOpenVisitedSaunas?: () => void;
   onOpenWantToGo?: () => void;
   onOpenSavedPosts?: () => void;
   onOpenBlockedUsers?: () => void;
@@ -1002,10 +1003,13 @@ function AchievementsSection({
 }
 
 function ProfileMenu({
+  onOpenVisitedSaunas,
   onOpenWantToGo,
   onOpenSavedPosts,
   onOpenBlockedUsers,
 }: {
+  onOpenVisitedSaunas?:
+    () => void;
   onOpenWantToGo?:
     () => void;
   onOpenSavedPosts?:
@@ -1015,6 +1019,14 @@ function ProfileMenu({
 }) {
   return (
     <section className="profile-rich-menu">
+      {onOpenVisitedSaunas ? (
+        <button type="button" onClick={onOpenVisitedSaunas}>
+          <span className="profile-rich-menu-icon"><MapPin aria-hidden="true" /></span>
+          <span><strong>行ったサウナ</strong><small>これまでの訪問施設を振り返る</small></span>
+          <ChevronRight aria-hidden="true" />
+        </button>
+      ) : null}
+
       {onOpenWantToGo ? (
         <button
           type="button"
@@ -1110,6 +1122,7 @@ export function ProfileScreen({
   email,
   onSelectPost: _onSelectPost,
   onEditProfile,
+  onOpenVisitedSaunas,
   onOpenWantToGo,
   onOpenSavedPosts,
   onOpenBlockedUsers,
@@ -1437,6 +1450,9 @@ export function ProfileScreen({
       />
 
       <ProfileMenu
+        onOpenVisitedSaunas={
+          onOpenVisitedSaunas
+        }
         onOpenWantToGo={
           onOpenWantToGo
         }
