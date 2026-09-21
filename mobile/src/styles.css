@@ -11986,3 +11986,222 @@ h1 {
     transition: none;
   }
 }
+
+.sauna-submission-open-button {
+  width: 100%;
+  margin-top: 18px;
+  border: 1px solid rgba(
+    62,
+    58,
+    58,
+    0.1
+  );
+  border-radius: 16px;
+  background: #3e3a3a;
+  padding: 15px 18px;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sauna-submission-open-button:active {
+  transform: scale(0.99);
+}
+
+.sauna-submission-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+  border-top: 1px solid rgba(
+    62,
+    58,
+    58,
+    0.08
+  );
+  padding-top: 22px;
+  text-align: left;
+}
+
+.sauna-submission-heading strong {
+  display: block;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.sauna-submission-heading p {
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.58;
+}
+
+.sauna-submission-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.sauna-submission-form label > span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sauna-submission-form label small {
+  border-radius: 999px;
+  background: rgba(
+    253,
+    208,
+    0,
+    0.22
+  );
+  padding: 3px 7px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.sauna-submission-form input,
+.sauna-submission-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(
+    62,
+    58,
+    58,
+    0.12
+  );
+  border-radius: 14px;
+  outline: none;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.9
+  );
+  padding: 13px 14px;
+  color: #3e3a3a;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.sauna-submission-form textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.sauna-submission-form input:focus,
+.sauna-submission-form textarea:focus {
+  border-color: rgba(
+    62,
+    58,
+    58,
+    0.42
+  );
+  box-shadow: 0 0 0 3px rgba(
+    253,
+    208,
+    0,
+    0.16
+  );
+}
+
+.sauna-submission-form input::placeholder,
+.sauna-submission-form textarea::placeholder {
+  color: rgba(
+    62,
+    58,
+    58,
+    0.38
+  );
+}
+
+.sauna-submission-error {
+  margin: 0;
+  border-radius: 14px;
+  background: rgba(
+    233,
+    88,
+    132,
+    0.1
+  );
+  padding: 12px 14px;
+  color: #c73563;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.sauna-submission-actions {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.5fr);
+  gap: 10px;
+}
+
+.sauna-submission-actions button {
+  min-height: 48px;
+  border-radius: 14px;
+  padding: 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sauna-submission-cancel-button {
+  border: 1px solid rgba(
+    62,
+    58,
+    58,
+    0.12
+  );
+  background: transparent;
+  color: #3e3a3a;
+}
+
+.sauna-submission-submit-button {
+  border: 0;
+  background: #3e3a3a;
+  color: #fff;
+}
+
+.sauna-submission-actions button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.sauna-submission-success {
+  margin-top: 20px;
+  border: 1px solid rgba(
+    62,
+    58,
+    58,
+    0.08
+  );
+  border-radius: 18px;
+  background: rgba(
+    253,
+    208,
+    0,
+    0.13
+  );
+  padding: 18px;
+  text-align: left;
+}
+
+.sauna-submission-success strong {
+  display: block;
+  font-size: 15px;
+}
+
+.sauna-submission-success p {
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.62;
+}

@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 
 import {
+  SaunaSubmissionForm,
+} from "../components/SaunaSubmissionForm";
+import {
   supabase,
 } from "../lib/supabase";
 import {
@@ -16,6 +19,7 @@ import {
 } from "../services/saunas";
 
 type SearchScreenProps = {
+  currentUserId: string;
   onSelectSauna: (
     sauna: Sauna
   ) => void;
@@ -28,6 +32,7 @@ const SEARCH_DELAY =
   300;
 
 export function SearchScreen({
+  currentUserId,
   onSelectSauna,
 }: SearchScreenProps) {
   const [
@@ -269,6 +274,15 @@ export function SearchScreen({
             エリア名でも
             検索してみてください。
           </p>
+
+          <SaunaSubmissionForm
+            currentUserId={
+              currentUserId
+            }
+            initialName={
+              trimmedKeyword
+            }
+          />
         </div>
       ) : null}
 

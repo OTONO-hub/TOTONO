@@ -1096,6 +1096,9 @@ export function App() {
                   tab ===
                     "search" ? (
                   <SearchScreen
+                    currentUserId={
+                      currentUserId
+                    }
                     onSelectSauna={
                       selectSaunaFromSearch
                     }
