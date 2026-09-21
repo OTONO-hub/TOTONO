@@ -7,7 +7,9 @@ import {
 import {
   ArrowLeft,
   Check,
+  ChevronDown,
   ImagePlus,
+  LockKeyhole,
   Minus,
   Plus,
   X,
@@ -19,6 +21,10 @@ import {
 import {
   createPostImages,
 } from "../services/post-images";
+import {
+  MAX_PRIVATE_NOTE_LENGTH,
+  savePostPrivateNote,
+} from "../services/post-private-notes";
 import {
   deleteUploadedPostImages,
   uploadPostImageFromUri,
@@ -121,6 +127,18 @@ export function CreatePostScreen({
     useState("");
 
   const [
+    privateNote,
+    setPrivateNote,
+  ] =
+    useState("");
+
+  const [
+    showAdvanced,
+    setShowAdvanced,
+  ] =
+    useState(false);
+
+  const [
     images,
     setImages,
   ] =
@@ -166,13 +184,16 @@ export function CreatePostScreen({
             rating <=
               MAX_RATING &&
             comment.length <=
-              MAX_COMMENT_LENGTH
+              MAX_COMMENT_LENGTH &&
+            privateNote.length <=
+              MAX_PRIVATE_NOTE_LENGTH
         ),
       [
         sauna.name,
         setCount,
         rating,
         comment.length,
+        privateNote.length,
         userId,
         visitDate,
       ]
@@ -408,6 +429,10 @@ export function CreatePostScreen({
     const uploadedFilePaths:
       string[] = [];
 
+    let createdPostId:
+      | string
+      | null = null;
+
     try {
       const uploadedImages = [];
 
@@ -482,6 +507,16 @@ export function CreatePostScreen({
           }
         );
 
+      createdPostId =
+        post.id;
+
+      await savePostPrivateNote(
+        client,
+        post.id,
+        userId,
+        privateNote
+      );
+
       if (
         uploadedImages.length >
         0
@@ -530,6 +565,34 @@ export function CreatePostScreen({
       console.error(
         submitError
       );
+
+      if (createdPostId) {
+        const {
+          error:
+            cleanupPostError,
+        } = await client
+          .from(
+            "posts"
+          )
+          .delete()
+          .eq(
+            "id",
+            createdPostId
+          )
+          .eq(
+            "user_id",
+            userId
+          );
+
+        if (
+          cleanupPostError
+        ) {
+          console.error(
+            "投稿作成失敗後の投稿削除に失敗しました。",
+            cleanupPostError
+          );
+        }
+      }
 
       if (
         uploadedFilePaths.length >
@@ -926,6 +989,97 @@ export function CreatePostScreen({
           /{MAX_COMMENT_LENGTH}
         </div>
       </div>
+
+      <section className="post-advanced-section">
+        <button
+          type="button"
+          className="post-advanced-toggle"
+          onClick={() => {
+            setShowAdvanced(
+              (
+                current
+              ) =>
+                !current
+            );
+          }}
+          aria-expanded={
+            showAdvanced
+          }
+          aria-controls="create-post-advanced-fields"
+          disabled={
+            submitting
+          }
+        >
+          <span>
+            <LockKeyhole
+              aria-hidden="true"
+            />
+
+            {showAdvanced
+              ? "詳しい記録を閉じる"
+              : "＋ 詳しく記録する"}
+          </span>
+
+          <ChevronDown
+            className={
+              showAdvanced
+                ? "expanded"
+                : undefined
+            }
+            aria-hidden="true"
+          />
+        </button>
+
+        {showAdvanced ? (
+          <div
+            id="create-post-advanced-fields"
+            className="post-private-note-field"
+          >
+            <div className="post-private-note-heading">
+              <label
+                className="post-form-label"
+                htmlFor="private-note"
+              >
+                自分だけのメモ
+              </label>
+
+              <span>
+                {privateNote.length}
+                /{MAX_PRIVATE_NOTE_LENGTH}
+              </span>
+            </div>
+
+            <p>
+              この内容は他のユーザーには表示されません。
+            </p>
+
+            <textarea
+              id="private-note"
+              className="post-comment-input"
+              value={
+                privateNote
+              }
+              onChange={(
+                event
+              ) => {
+                setPrivateNote(
+                  event.target
+                    .value
+                    .slice(
+                      0,
+                      MAX_PRIVATE_NOTE_LENGTH
+                    )
+                );
+              }}
+              placeholder="次回試したい入り方や、自分用の振り返りなど"
+              rows={5}
+              disabled={
+                submitting
+              }
+            />
+          </div>
+        ) : null}
+      </section>
 
       {error ? (
         <p

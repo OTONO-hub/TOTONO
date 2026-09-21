@@ -16,10 +16,12 @@ import {
   ArrowLeft,
   CalendarDays,
   Camera,
+  ChevronDown,
   Flame,
   ImagePlus,
   LoaderCircle,
   MessageSquareText,
+  LockKeyhole,
   Save,
   Sparkles,
   Star,
@@ -46,6 +48,11 @@ import {
   updatePostImageSortOrder,
   type PostImage,
 } from "@/services/post-images";
+import {
+  getPostPrivateNote,
+  MAX_PRIVATE_NOTE_LENGTH,
+  savePostPrivateNote,
+} from "@/services/post-private-notes";
 import {
   getPostById,
   updatePost,
@@ -117,6 +124,12 @@ export default function EditPostPage() {
 
   const [comment, setComment] =
     useState("");
+
+  const [privateNote, setPrivateNote] =
+    useState("");
+
+  const [showAdvanced, setShowAdvanced] =
+    useState(false);
 
   const [
     existingImages,
@@ -215,6 +228,17 @@ export default function EditPostPage() {
 
         setComment(
           post.comment ?? ""
+        );
+
+        const savedPrivateNote =
+          await getPostPrivateNote(
+            supabase,
+            params.id
+          );
+
+        setPrivateNote(savedPrivateNote);
+        setShowAdvanced(
+          Boolean(savedPrivateNote)
         );
 
         const postImages =
@@ -555,6 +579,17 @@ export default function EditPostPage() {
       return;
     }
 
+    if (
+      privateNote.trim().length >
+      MAX_PRIVATE_NOTE_LENGTH
+    ) {
+      toast.error(
+        `自分だけのメモは${MAX_PRIVATE_NOTE_LENGTH}文字以内で入力してください。`
+      );
+
+      return;
+    }
+
     setLoading(true);
 
     let uploadedFilePaths:
@@ -740,6 +775,13 @@ export default function EditPostPage() {
             finalImageUrls[0] ??
             null,
         }
+      );
+
+      await savePostPrivateNote(
+        supabase,
+        params.id,
+        user.id,
+        privateNote
       );
 
       const removedStoragePaths =
@@ -1789,6 +1831,101 @@ export default function EditPostPage() {
                   </div>
                 )}
               </FormSection>
+
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-border/60
+                  bg-muted/25
+                  p-5
+                "
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowAdvanced(
+                      (current) => !current
+                    )
+                  }
+                  aria-expanded={showAdvanced}
+                  aria-controls="advanced-post-fields"
+                  disabled={loading}
+                  className="
+                    flex
+                    min-h-11
+                    w-full
+                    items-center
+                    justify-between
+                    gap-3
+                    text-left
+                    text-sm
+                    font-semibold
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-ring
+                    focus-visible:ring-offset-2
+                  "
+                >
+                  <span className="flex items-center gap-2">
+                    <LockKeyhole
+                      className="size-4"
+                      aria-hidden="true"
+                    />
+
+                    {showAdvanced
+                      ? "詳しい記録を閉じる"
+                      : "＋ 詳しく記録する"}
+                  </span>
+
+                  <ChevronDown
+                    className={`size-4 transition-transform ${
+                      showAdvanced
+                        ? "rotate-180"
+                        : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
+
+                {showAdvanced ? (
+                  <div
+                    id="advanced-post-fields"
+                    className="mt-4 space-y-2 border-t border-border/60 pt-4"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <label
+                        htmlFor="private-note"
+                        className="text-sm font-semibold"
+                      >
+                        自分だけのメモ
+                      </label>
+
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {privateNote.length} / {MAX_PRIVATE_NOTE_LENGTH}
+                      </span>
+                    </div>
+
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      この内容は他のユーザーには表示されません。
+                    </p>
+
+                    <Textarea
+                      id="private-note"
+                      value={privateNote}
+                      onChange={(event) =>
+                        setPrivateNote(
+                          event.target.value
+                        )
+                      }
+                      maxLength={MAX_PRIVATE_NOTE_LENGTH}
+                      placeholder="次回試したい入り方や、自分用の振り返りなど"
+                      disabled={loading}
+                      className="min-h-32 resize-y bg-background"
+                    />
+                  </div>
+                ) : null}
+              </div>
 
               <div
                 className="

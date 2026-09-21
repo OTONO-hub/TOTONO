@@ -7,7 +7,9 @@ import {
   ArrowLeft,
   CalendarDays,
   Check,
+  ChevronDown,
   Flame,
+  LockKeyhole,
   Minus,
   Plus,
   RefreshCw,
@@ -22,6 +24,11 @@ import {
   deleteOwnPost,
   updateOwnPost,
 } from "../services/post-management";
+import {
+  getPostPrivateNote,
+  MAX_PRIVATE_NOTE_LENGTH,
+  savePostPrivateNote,
+} from "../services/post-private-notes";
 import {
   getPostDetail,
   type PostDetail,
@@ -394,6 +401,18 @@ export function EditPostScreen({
     useState("");
 
   const [
+    privateNote,
+    setPrivateNote,
+  ] =
+    useState("");
+
+  const [
+    showAdvanced,
+    setShowAdvanced,
+  ] =
+    useState(false);
+
+  const [
     loading,
     setLoading,
   ] =
@@ -471,10 +490,13 @@ export function EditPostScreen({
           rating <=
             MAX_RATING &&
           comment.length <=
-            MAX_COMMENT_LENGTH
+            MAX_COMMENT_LENGTH &&
+          privateNote.length <=
+            MAX_PRIVATE_NOTE_LENGTH
         ),
       [
         comment.length,
+        privateNote.length,
         post,
         rating,
         setCount,
@@ -528,6 +550,32 @@ export function EditPostScreen({
         setComment(
           nextPost.comment ??
             ""
+        );
+
+        if (!supabase) {
+          throw new Error(
+            "Supabaseが初期化されていません。"
+          );
+        }
+
+        const savedPrivateNote =
+          await getPostPrivateNote(
+            supabase,
+            postId
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        setPrivateNote(
+          savedPrivateNote
+        );
+
+        setShowAdvanced(
+          Boolean(
+            savedPrivateNote
+          )
         );
 
         setError(
@@ -679,6 +727,13 @@ export function EditPostScreen({
               null,
           }
         );
+
+      await savePostPrivateNote(
+        client,
+        post.id,
+        userId,
+        privateNote
+      );
 
       onUpdated(
         updatedPost
@@ -1069,6 +1124,99 @@ export function EditPostScreen({
           {comment.length}
           /{MAX_COMMENT_LENGTH}
         </div>
+      </section>
+
+      <section className="post-advanced-section">
+        <button
+          type="button"
+          className="post-advanced-toggle"
+          onClick={() => {
+            setShowAdvanced(
+              (
+                current
+              ) =>
+                !current
+            );
+          }}
+          aria-expanded={
+            showAdvanced
+          }
+          aria-controls="edit-post-advanced-fields"
+          disabled={
+            saving ||
+            deleting
+          }
+        >
+          <span>
+            <LockKeyhole
+              aria-hidden="true"
+            />
+
+            {showAdvanced
+              ? "詳しい記録を閉じる"
+              : "＋ 詳しく記録する"}
+          </span>
+
+          <ChevronDown
+            className={
+              showAdvanced
+                ? "expanded"
+                : undefined
+            }
+            aria-hidden="true"
+          />
+        </button>
+
+        {showAdvanced ? (
+          <div
+            id="edit-post-advanced-fields"
+            className="post-private-note-field"
+          >
+            <div className="post-private-note-heading">
+              <label
+                className="post-form-label"
+                htmlFor="edit-private-note"
+              >
+                自分だけのメモ
+              </label>
+
+              <span>
+                {privateNote.length}
+                /{MAX_PRIVATE_NOTE_LENGTH}
+              </span>
+            </div>
+
+            <p>
+              この内容は他のユーザーには表示されません。
+            </p>
+
+            <textarea
+              id="edit-private-note"
+              className="post-comment-input"
+              value={
+                privateNote
+              }
+              onChange={(
+                event
+              ) => {
+                setPrivateNote(
+                  event.target
+                    .value
+                    .slice(
+                      0,
+                      MAX_PRIVATE_NOTE_LENGTH
+                    )
+                );
+              }}
+              placeholder="次回試したい入り方や、自分用の振り返りなど"
+              rows={5}
+              disabled={
+                saving ||
+                deleting
+              }
+            />
+          </div>
+        ) : null}
       </section>
 
       {error ? (
