@@ -73,6 +73,9 @@ import {
 import {
   WantToGoScreen,
 } from "./screens/WantToGoScreen";
+import {
+  VisitedSaunasScreen,
+} from "./screens/VisitedSaunasScreen";
 import type {
   Sauna,
 } from "./services/saunas";
@@ -222,6 +225,11 @@ export function App() {
     useState(
       false
     );
+
+  const [
+    viewingVisitedSaunas,
+    setViewingVisitedSaunas,
+  ] = useState(false);
 
   const [
     viewingWantToGo,
@@ -378,6 +386,7 @@ export function App() {
     editingPostId,
     selectedProfileUserId,
     editingProfile,
+    viewingVisitedSaunas,
     viewingWantToGo,
     viewingSavedPosts,
     viewingBlockedUsers,
@@ -494,6 +503,10 @@ export function App() {
       false
     );
 
+    setViewingVisitedSaunas(
+      false
+    );
+
     setViewingWantToGo(
       false
     );
@@ -594,6 +607,24 @@ export function App() {
     setTab(
       "profile"
     );
+  }
+
+  function openVisitedSaunas() {
+    closePostDetail();
+    resetProfileFlows();
+    setViewingVisitedSaunas(true);
+    setTab("profile");
+  }
+
+  function closeVisitedSaunas() {
+    closePostDetail();
+    setViewingVisitedSaunas(false);
+    setTab("profile");
+  }
+
+  function openSaunaFromVisited(sauna: Sauna) {
+    setViewingVisitedSaunas(false);
+    openSaunaDetail(sauna);
   }
 
   function closeWantToGo() {
@@ -944,6 +975,7 @@ export function App() {
     selectedProfileUserId !==
       null ||
     editingProfile ||
+    viewingVisitedSaunas ||
     viewingWantToGo ||
     viewingSavedPosts ||
     viewingBlockedUsers;
@@ -1084,6 +1116,12 @@ export function App() {
             onSelectUser={
               openUserProfile
             }
+          />
+        ) : viewingVisitedSaunas ? (
+          <VisitedSaunasScreen
+            userId={currentUserId}
+            onBack={closeVisitedSaunas}
+            onSelectSauna={openSaunaFromVisited}
           />
         ) : viewingWantToGo ? (
           <WantToGoScreen
@@ -1328,6 +1366,9 @@ export function App() {
                 }
                 onEditProfile={
                   openProfileEditor
+                }
+                onOpenVisitedSaunas={
+                  openVisitedSaunas
                 }
                 onOpenWantToGo={
                   openWantToGo

@@ -23,6 +23,7 @@ import { SaunaPersonaCard } from "@/components/profile/SaunaPersonaCard";
 import { SaunaRhythmCard } from "@/components/profile/SaunaRhythmCard";
 import { SaunaSummary } from "@/components/profile/SaunaSummary";
 import { TopVisitedSaunas } from "@/components/profile/TopVisitedSaunas";
+import { VisitedSaunasSection } from "@/components/profile/VisitedSaunasSection";
 import { XpStatusCard } from "@/components/profile/XpStatusCard";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/state/EmptyState";
@@ -695,6 +696,10 @@ export default async function ProfilePage() {
                 profileInsights.topVisitedSaunas
               }
             />
+          </ScrollReveal>
+
+          <ScrollReveal duration="normal" distance="subtle">
+            <VisitedSaunasSection count={profileInsights.visitedSaunas} />
           </ScrollReveal>
 
           <ScrollReveal
