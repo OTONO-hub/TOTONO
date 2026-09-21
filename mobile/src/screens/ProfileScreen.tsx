@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Flame,
   Gauge,
+  Heart,
   LogOut,
   MapPin,
   Pencil,
@@ -74,6 +75,7 @@ type ProfileScreenProps = {
     postId: string
   ) => void;
   onEditProfile?: () => void;
+  onOpenWantToGo?: () => void;
   onOpenSavedPosts?: () => void;
   onOpenBlockedUsers?: () => void;
 };
@@ -1000,9 +1002,12 @@ function AchievementsSection({
 }
 
 function ProfileMenu({
+  onOpenWantToGo,
   onOpenSavedPosts,
   onOpenBlockedUsers,
 }: {
+  onOpenWantToGo?:
+    () => void;
   onOpenSavedPosts?:
     () => void;
   onOpenBlockedUsers?:
@@ -1010,6 +1015,35 @@ function ProfileMenu({
 }) {
   return (
     <section className="profile-rich-menu">
+      {onOpenWantToGo ? (
+        <button
+          type="button"
+          onClick={
+            onOpenWantToGo
+          }
+        >
+          <span className="profile-rich-menu-icon">
+            <Heart
+              aria-hidden="true"
+            />
+          </span>
+
+          <span>
+            <strong>
+              行きたいサウナ
+            </strong>
+
+            <small>
+              次のサ活候補を見返す
+            </small>
+          </span>
+
+          <ChevronRight
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
+
       {onOpenSavedPosts ? (
         <button
           type="button"
@@ -1076,6 +1110,7 @@ export function ProfileScreen({
   email,
   onSelectPost: _onSelectPost,
   onEditProfile,
+  onOpenWantToGo,
   onOpenSavedPosts,
   onOpenBlockedUsers,
 }: ProfileScreenProps) {
@@ -1402,6 +1437,9 @@ export function ProfileScreen({
       />
 
       <ProfileMenu
+        onOpenWantToGo={
+          onOpenWantToGo
+        }
         onOpenSavedPosts={
           onOpenSavedPosts
         }

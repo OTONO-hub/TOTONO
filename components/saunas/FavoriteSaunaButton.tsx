@@ -86,12 +86,12 @@ export function FavoriteSaunaButton({
       router.refresh();
     } catch (error) {
       console.error(
-        "お気に入りサウナの更新に失敗しました。",
+        "行きたいサウナの更新に失敗しました。",
         error
       );
 
       setErrorMessage(
-        "お気に入りを更新できませんでした。時間をおいて再度お試しください。"
+        "行きたい状態を更新できませんでした。時間をおいて再度お試しください。"
       );
     } finally {
       setIsLoading(false);
@@ -99,24 +99,24 @@ export function FavoriteSaunaButton({
   };
 
   const visibleLabel = !userId
-    ? "ログインしてお気に入りに追加"
+    ? "ログインして行きたいに追加"
     : isLoading
       ? isFavorite
         ? "解除中..."
         : "追加中..."
       : isFavorite
-        ? "お気に入り済み"
-        : "お気に入りに追加";
+        ? "行きたいに追加済み"
+        : "行きたい";
 
   const accessibleLabel = !userId
-    ? "ログインしてこの施設をお気に入りに追加"
+    ? "ログインしてこの施設を行きたいに追加"
     : isLoading
       ? isFavorite
-        ? "お気に入りから解除しています"
-        : "お気に入りに追加しています"
+        ? "行きたいから解除しています"
+        : "行きたいに追加しています"
       : isFavorite
-        ? "この施設をお気に入りから解除"
-        : "この施設をお気に入りに追加";
+        ? "この施設を行きたいから解除"
+        : "この施設を行きたいに追加";
 
   return (
     <div className="w-full">

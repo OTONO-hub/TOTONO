@@ -121,7 +121,7 @@ export async function FavoriteSaunasSection({
                 sm:text-3xl
               "
             >
-              お気に入り施設
+              行きたいサウナ
             </h2>
 
             <p
@@ -133,7 +133,7 @@ export async function FavoriteSaunasSection({
                 text-muted-foreground
               "
             >
-              また行きたい施設や、これから訪れたい施設をまとめています。
+              気になる施設を、次のサ活候補としてまとめています。
             </p>
           </div>
 
@@ -155,8 +155,8 @@ export async function FavoriteSaunasSection({
         {displayedSaunas.length === 0 ? (
           <div className="px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
             <DashboardState
-              title="お気に入り施設はまだありません"
-              description="気になるサウナを見つけたら、施設詳細ページからお気に入りに保存してみましょう。"
+              title="行きたいサウナはまだありません"
+              description="気になるサウナを見つけて、次のサ活候補に追加してみましょう。"
               icon={
                 <Search
                   className="size-5"

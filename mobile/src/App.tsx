@@ -70,6 +70,9 @@ import {
 import {
   UserProfileScreen,
 } from "./screens/UserProfileScreen";
+import {
+  WantToGoScreen,
+} from "./screens/WantToGoScreen";
 import type {
   Sauna,
 } from "./services/saunas";
@@ -215,6 +218,14 @@ export function App() {
   const [
     editingProfile,
     setEditingProfile,
+  ] =
+    useState(
+      false
+    );
+
+  const [
+    viewingWantToGo,
+    setViewingWantToGo,
   ] =
     useState(
       false
@@ -367,6 +378,7 @@ export function App() {
     editingPostId,
     selectedProfileUserId,
     editingProfile,
+    viewingWantToGo,
     viewingSavedPosts,
     viewingBlockedUsers,
   ]);
@@ -482,6 +494,10 @@ export function App() {
       false
     );
 
+    setViewingWantToGo(
+      false
+    );
+
     setViewingSavedPosts(
       false
     );
@@ -563,6 +579,44 @@ export function App() {
 
     setTab(
       "profile"
+    );
+  }
+
+  function openWantToGo() {
+    closePostDetail();
+
+    resetProfileFlows();
+
+    setViewingWantToGo(
+      true
+    );
+
+    setTab(
+      "profile"
+    );
+  }
+
+  function closeWantToGo() {
+    closePostDetail();
+
+    setViewingWantToGo(
+      false
+    );
+
+    setTab(
+      "profile"
+    );
+  }
+
+  function openSaunaFromWantToGo(
+    sauna: Sauna
+  ) {
+    setViewingWantToGo(
+      false
+    );
+
+    openSaunaDetail(
+      sauna
     );
   }
 
@@ -890,6 +944,7 @@ export function App() {
     selectedProfileUserId !==
       null ||
     editingProfile ||
+    viewingWantToGo ||
     viewingSavedPosts ||
     viewingBlockedUsers;
 
@@ -1028,6 +1083,18 @@ export function App() {
             }
             onSelectUser={
               openUserProfile
+            }
+          />
+        ) : viewingWantToGo ? (
+          <WantToGoScreen
+            userId={
+              currentUserId
+            }
+            onBack={
+              closeWantToGo
+            }
+            onSelectSauna={
+              openSaunaFromWantToGo
             }
           />
         ) : viewingSavedPosts ? (
@@ -1261,6 +1328,9 @@ export function App() {
                 }
                 onEditProfile={
                   openProfileEditor
+                }
+                onOpenWantToGo={
+                  openWantToGo
                 }
                 onOpenSavedPosts={
                   openSavedPosts

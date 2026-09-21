@@ -323,7 +323,7 @@ export function SaunaOverview({
               />
             }
             value={favoriteCount.toString()}
-            label="保存"
+            label="行きたい"
           />
         </div>
       </section>

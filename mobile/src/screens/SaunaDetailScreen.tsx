@@ -232,7 +232,7 @@ export function SaunaDetailScreen({
   ]);
 
   /*
-   * お気に入り状態を取得します。
+   * 行きたい状態を取得します。
    */
   useEffect(() => {
     if (!supabase) {
@@ -283,7 +283,7 @@ export function SaunaDetailScreen({
         );
 
         setFavoriteError(
-          "お気に入り状態を取得できませんでした。"
+          "行きたい状態を取得できませんでした。"
         );
       }
     }
@@ -356,8 +356,8 @@ export function SaunaDetailScreen({
 
       setFavoriteError(
         nextFavorite
-          ? "お気に入りに追加できませんでした。"
-          : "お気に入りを解除できませんでした。"
+          ? "行きたいに追加できませんでした。"
+          : "行きたいから解除できませんでした。"
       );
     } finally {
       setFavoriteUpdating(
@@ -402,8 +402,8 @@ export function SaunaDetailScreen({
           }
           aria-label={
             favorite
-              ? "お気に入りから解除"
-              : "お気に入りに追加"
+              ? "行きたいから解除"
+              : "行きたいに追加"
           }
           aria-pressed={
             favorite ??
