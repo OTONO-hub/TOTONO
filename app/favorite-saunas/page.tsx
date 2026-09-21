@@ -96,7 +96,7 @@ export default async function FavoriteSaunasPage() {
                 text-muted-foreground
               "
             >
-              Favorite Saunas
+              Want to Go
             </p>
 
             <h1
@@ -122,7 +122,7 @@ export default async function FavoriteSaunasPage() {
                 text-muted-foreground
               "
             >
-              お気に入りに追加したサウナを確認するには、
+              行きたいに追加したサウナを確認するには、
               ログインしてください。
             </p>
 
@@ -317,7 +317,7 @@ export default async function FavoriteSaunasPage() {
                       text-muted-foreground
                     "
                   >
-                    Favorite Saunas
+                    Want to Go
                   </p>
                 </div>
 
@@ -333,7 +333,7 @@ export default async function FavoriteSaunasPage() {
                     lg:text-5xl
                   "
                 >
-                  お気に入りサウナ
+                  行きたいサウナ
                 </h1>
 
                 <p
@@ -370,7 +370,7 @@ export default async function FavoriteSaunasPage() {
                     text-muted-foreground
                   "
                 >
-                  保存した施設
+                  行きたい施設
                 </p>
 
                 <p
@@ -400,7 +400,7 @@ export default async function FavoriteSaunasPage() {
 
           {/* お気に入り一覧 */}
           <section
-            aria-label="お気に入りサウナ一覧"
+            aria-label="行きたいサウナ一覧"
             className="mt-12 sm:mt-14 lg:mt-16"
           >
             {favoriteSaunas.length === 0 ? (
@@ -443,7 +443,7 @@ export default async function FavoriteSaunasPage() {
                     text-foreground
                   "
                 >
-                  お気に入りのサウナはまだありません
+                  行きたいサウナはまだありません
                 </h2>
 
                 <p
@@ -457,7 +457,7 @@ export default async function FavoriteSaunasPage() {
                   "
                 >
                   気になる施設を見つけたら、
-                  施設詳細ページからお気に入りに追加してみましょう。
+                  次のサ活候補に追加してみましょう。
                 </p>
 
                 <Link
