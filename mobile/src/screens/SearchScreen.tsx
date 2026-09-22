@@ -3,8 +3,12 @@ import {
   useState,
 } from "react";
 import {
+  Clock3,
+  History,
   MapPin,
   Search,
+  Trash2,
+  Waves,
 } from "lucide-react";
 
 import {
@@ -14,12 +18,19 @@ import {
   supabase,
 } from "../lib/supabase";
 import {
+  clearRecentlyViewedSaunas,
+  getRecentlyViewedSaunas,
+  type RecentlyViewedSauna,
+} from "../services/recently-viewed-saunas";
+import {
+  getSaunaById,
   searchSaunas,
   type Sauna,
 } from "../services/saunas";
 
 type SearchScreenProps = {
   currentUserId: string;
+  active: boolean;
   onSelectSauna: (
     sauna: Sauna
   ) => void;
@@ -33,6 +44,7 @@ const SEARCH_DELAY =
 
 export function SearchScreen({
   currentUserId,
+  active,
   onSelectSauna,
 }: SearchScreenProps) {
   const [
@@ -58,6 +70,24 @@ export function SearchScreen({
   ] = useState<
     string | null
   >(null);
+
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedSauna[]>([]);
+  const [openingRecentId, setOpeningRecentId] = useState<string | null>(null);
+  const [recentError, setRecentError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!active) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setRecentlyViewed(getRecentlyViewedSaunas());
+      setOpeningRecentId(null);
+      setRecentError(null);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [active]);
 
   useEffect(() => {
     if (!supabase) {
@@ -177,6 +207,28 @@ export function SearchScreen({
     }
   }
 
+  async function openRecentlyViewedSauna(saunaId: string) {
+    if (!supabase || openingRecentId) return;
+
+    setOpeningRecentId(saunaId);
+    setRecentError(null);
+
+    try {
+      const sauna = await getSaunaById(supabase, saunaId);
+      if (!sauna) throw new Error("施設情報が見つかりませんでした。");
+      onSelectSauna(sauna);
+    } catch {
+      setRecentError("施設詳細を開けませんでした。もう一度お試しください。");
+      setOpeningRecentId(null);
+    }
+  }
+
+  function clearHistory() {
+    clearRecentlyViewedSaunas();
+    setRecentlyViewed([]);
+    setRecentError(null);
+  }
+
   const trimmedKeyword =
     keyword.trim();
 
@@ -249,7 +301,45 @@ export function SearchScreen({
       ) : null}
 
       {showInitialState ? (
-        <div className="card">
+        recentlyViewed.length > 0 ? (
+          <section className="recently-viewed-section" aria-labelledby="recently-viewed-heading">
+            <div className="recently-viewed-heading">
+              <div>
+                <p className="eyebrow"><History aria-hidden="true" />Recently Viewed</p>
+                <h2 id="recently-viewed-heading">最近見たサウナ</h2>
+              </div>
+              <button type="button" onClick={clearHistory}>
+                <Trash2 aria-hidden="true" />履歴を削除
+              </button>
+            </div>
+
+            {recentError ? <p className="saved-posts-action-error" role="alert">{recentError}</p> : null}
+
+            <div className="recently-viewed-list">
+              {recentlyViewed.map((sauna) => (
+                <button
+                  type="button"
+                  className="recently-viewed-card"
+                  key={sauna.id}
+                  disabled={openingRecentId === sauna.id}
+                  onClick={() => { void openRecentlyViewedSauna(sauna.id); }}
+                >
+                  {sauna.imageUrl ? (
+                    <img src={sauna.imageUrl} alt="" loading="lazy" />
+                  ) : (
+                    <span className="recently-viewed-placeholder"><Waves aria-hidden="true" /></span>
+                  )}
+                  <span className="recently-viewed-content">
+                    <strong>{sauna.name}</strong>
+                    <small><MapPin aria-hidden="true" />{[sauna.prefecture, sauna.city].filter(Boolean).join(" ") || "所在地未登録"}</small>
+                    <small><Clock3 aria-hidden="true" />{openingRecentId === sauna.id ? "読み込み中..." : formatViewedAt(sauna.viewedAt)}</small>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <div className="card">
           <strong>
             行きたいサウナを
             探してみましょう
@@ -259,7 +349,8 @@ export function SearchScreen({
             施設名やエリアを
             入力すると検索できます。
           </p>
-        </div>
+          </div>
+        )
       ) : null}
 
       {showNoResults ? (
@@ -359,4 +450,18 @@ export function SearchScreen({
       ) : null}
     </section>
   );
+}
+
+function formatViewedAt(value: string): string {
+  const viewedAt = new Date(value);
+  if (Number.isNaN(viewedAt.getTime())) return "最近";
+  const minutes = Math.floor((Date.now() - viewedAt.getTime()) / 60_000);
+  if (minutes < 1) return "たった今";
+  if (minutes < 60) return `${minutes}分前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}時間前`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "昨日";
+  if (days < 7) return `${days}日前`;
+  return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric" }).format(viewedAt);
 }

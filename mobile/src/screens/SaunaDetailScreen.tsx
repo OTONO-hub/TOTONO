@@ -27,6 +27,9 @@ import {
   getSaunaById,
   type Sauna,
 } from "../services/saunas";
+import {
+  saveRecentlyViewedSauna,
+} from "../services/recently-viewed-saunas";
 
 type SaunaDetailScreenProps = {
   sauna: Sauna;
@@ -95,6 +98,17 @@ export function SaunaDetailScreen({
   onBack,
   onCreatePost,
 }: SaunaDetailScreenProps) {
+  useEffect(() => {
+    saveRecentlyViewedSauna({
+      id: sauna.id,
+      name: sauna.name,
+      imageUrl: sauna.image_url,
+      prefecture: sauna.prefecture,
+      city: sauna.city,
+      averageRating: null,
+    });
+  }, [sauna]);
+
   /*
    * 検索結果から渡された施設情報を
    * 初期表示に使用します。
