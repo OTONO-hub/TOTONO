@@ -4,6 +4,7 @@ import {
 } from "react";
 import {
   Clock3,
+  ChevronDown,
   History,
   MapPin,
   Search,
@@ -42,6 +43,16 @@ const MIN_SEARCH_LENGTH =
 const SEARCH_DELAY =
   300;
 
+const PREFECTURES = [
+  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県",
+  "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+  "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+  "徳島県", "香川県", "愛媛県", "高知県",
+  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
+] as const;
+
 export function SearchScreen({
   currentUserId,
   active,
@@ -51,6 +62,16 @@ export function SearchScreen({
     keyword,
     setKeyword,
   ] = useState("");
+
+  const [
+    prefecture,
+    setPrefecture,
+  ] = useState("");
+
+  const [
+    retryCount,
+    setRetryCount,
+  ] = useState(0);
 
   const [
     results,
@@ -98,8 +119,8 @@ export function SearchScreen({
       keyword.trim();
 
     if (
-      trimmedKeyword.length <
-      MIN_SEARCH_LENGTH
+      trimmedKeyword.length < MIN_SEARCH_LENGTH &&
+      !prefecture
     ) {
       return;
     }
@@ -126,7 +147,8 @@ export function SearchScreen({
               const saunas =
                 await searchSaunas(
                   authClient,
-                  trimmedKeyword
+                  trimmedKeyword,
+                  prefecture
                 );
 
               if (
@@ -180,7 +202,7 @@ export function SearchScreen({
         timeoutId
       );
     };
-  }, [keyword]);
+  }, [keyword, prefecture, retryCount]);
 
   function handleKeywordChange(
     value: string
@@ -190,8 +212,8 @@ export function SearchScreen({
     );
 
     if (
-      value.trim().length <
-      MIN_SEARCH_LENGTH
+      value.trim().length < MIN_SEARCH_LENGTH &&
+      !prefecture
     ) {
       setResults(
         []
@@ -205,6 +227,29 @@ export function SearchScreen({
         false
       );
     }
+  }
+
+  function handlePrefectureChange(
+    value: string
+  ) {
+    setPrefecture(value);
+    setError(null);
+
+    if (
+      !value &&
+      keyword.trim().length < MIN_SEARCH_LENGTH
+    ) {
+      setResults([]);
+      setLoading(false);
+    }
+  }
+
+  function clearSearchConditions() {
+    setKeyword("");
+    setPrefecture("");
+    setResults([]);
+    setError(null);
+    setLoading(false);
   }
 
   async function openRecentlyViewedSauna(saunaId: string) {
@@ -233,12 +278,11 @@ export function SearchScreen({
     keyword.trim();
 
   const showInitialState =
-    trimmedKeyword.length ===
-    0;
+    trimmedKeyword.length === 0 &&
+    !prefecture;
 
   const showNoResults =
-    trimmedKeyword.length >=
-      MIN_SEARCH_LENGTH &&
+    (trimmedKeyword.length >= MIN_SEARCH_LENGTH || Boolean(prefecture)) &&
     !loading &&
     !error &&
     results.length ===
@@ -284,6 +328,35 @@ export function SearchScreen({
         />
       </div>
 
+      <div className="search-filter-row">
+        <label className="search-prefecture-filter">
+          <MapPin aria-hidden="true" />
+          <select
+            value={prefecture}
+            onChange={(event) => {
+              handlePrefectureChange(event.target.value);
+            }}
+            aria-label="都道府県で絞り込む"
+          >
+            <option value="">全国から探す</option>
+            {PREFECTURES.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <ChevronDown aria-hidden="true" />
+        </label>
+
+        {prefecture ? (
+          <button
+            type="button"
+            className="search-clear-button"
+            onClick={clearSearchConditions}
+          >
+            条件を解除
+          </button>
+        ) : null}
+      </div>
+
       {loading ? (
         <div className="search-status">
           <p>
@@ -293,10 +366,18 @@ export function SearchScreen({
       ) : null}
 
       {error ? (
-        <div className="search-status">
+        <div className="search-error-card" role="alert">
           <p>
             {error}
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              setRetryCount((count) => count + 1);
+            }}
+          >
+            もう一度試す
+          </button>
         </div>
       ) : null}
 
@@ -361,19 +442,24 @@ export function SearchScreen({
           </strong>
 
           <p>
-            別の施設名や
-            エリア名でも
-            検索してみてください。
+            検索条件を変えて
+            もう一度お試しください。
           </p>
 
-          <SaunaSubmissionForm
-            currentUserId={
-              currentUserId
-            }
-            initialName={
-              trimmedKeyword
-            }
-          />
+          <button
+            type="button"
+            className="search-empty-clear-button"
+            onClick={clearSearchConditions}
+          >
+            検索条件を解除
+          </button>
+
+          {trimmedKeyword ? (
+            <SaunaSubmissionForm
+              currentUserId={currentUserId}
+              initialName={trimmedKeyword}
+            />
+          ) : null}
         </div>
       ) : null}
 

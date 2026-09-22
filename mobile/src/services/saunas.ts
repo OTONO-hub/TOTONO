@@ -33,13 +33,47 @@ const SEARCH_LIMIT = 20;
 
 export async function searchSaunas(
   supabase: SupabaseClient,
-  keyword: string
+  keyword: string,
+  prefecture?: string
 ): Promise<Sauna[]> {
   const trimmedKeyword =
     keyword.trim();
+  const trimmedPrefecture =
+    prefecture?.trim() ?? "";
+
+  if (
+    !trimmedKeyword &&
+    !trimmedPrefecture
+  ) {
+    return [];
+  }
 
   if (!trimmedKeyword) {
-    return [];
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("saunas")
+      .select("*")
+      .eq(
+        "prefecture",
+        trimmedPrefecture
+      )
+      .order("is_verified", {
+        ascending: false,
+      })
+      .order("name", {
+        ascending: true,
+      })
+      .limit(SEARCH_LIMIT);
+
+    if (error) {
+      throw new Error(
+        `施設の検索に失敗しました: ${error.message}`
+      );
+    }
+
+    return (data ?? []) as Sauna[];
   }
 
   const {
@@ -51,6 +85,7 @@ export async function searchSaunas(
       search_keyword:
         trimmedKeyword,
       search_prefecture:
+        trimmedPrefecture ||
         null,
       result_limit:
         SEARCH_LIMIT,
