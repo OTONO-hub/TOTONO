@@ -1303,6 +1303,7 @@ export function App() {
                     <SearchScreen
                       currentUserId={currentUserId}
                       onSelectSauna={selectSaunaFromSearch}
+                      active={searchView === "search"}
                     />
                   </div>
                 ) : null}

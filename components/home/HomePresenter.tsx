@@ -9,6 +9,7 @@ import { HomeExperience } from "@/components/home/HomeExperience";
 import { HomeQuickActionsSection } from "@/components/home/HomeQuickActionsSection";
 import { HomeSaunaLifeSection } from "@/components/home/HomeSaunaLifeSection";
 import { HomeSummarySection } from "@/components/home/HomeSummarySection";
+import { RecentlyViewedSaunas } from "@/components/home/RecentlyViewedSaunas";
 import { TodayHeroSection } from "@/components/home/TodayHeroSection";
 import { TodayJourneyCard } from "@/components/home/TodayJourneyCard";
 import { TodayJourneyHistory } from "@/components/home/TodayJourneyHistory";
@@ -157,19 +158,18 @@ export function HomePresenter({
         </ScrollReveal>
       }
       recommendations={
-        <ScrollReveal
-          duration="slow"
-          distance="normal"
-        >
-          <AlternativeRecommendationsSection
-            saunas={
-              dashboard.recommendations
-            }
-            preferredPrefecture={
-              dashboard.preferredPrefecture
-            }
-          />
-        </ScrollReveal>
+        <div className="space-y-6 sm:space-y-8">
+          <ScrollReveal duration="normal" distance="subtle">
+            <RecentlyViewedSaunas />
+          </ScrollReveal>
+
+          <ScrollReveal duration="slow" distance="normal">
+            <AlternativeRecommendationsSection
+              saunas={dashboard.recommendations}
+              preferredPrefecture={dashboard.preferredPrefecture}
+            />
+          </ScrollReveal>
+        </div>
       }
       popularSaunas={
         <ScrollReveal
