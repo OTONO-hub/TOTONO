@@ -9324,6 +9324,39 @@ h1 {
   padding: 12px;
 }
 
+.journal-calendar-navigation {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.journal-calendar-navigation button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(62, 58, 58, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #3e3a3a;
+}
+
+.journal-calendar-navigation button:active {
+  transform: scale(0.95);
+}
+
+.journal-calendar-navigation button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.journal-calendar-navigation > span {
+  min-width: 76px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .journal-calendar-weekdays,
 .journal-calendar-days {
   display: grid;
@@ -9381,7 +9414,9 @@ h1 {
   min-width: 0;
   align-items: center;
   justify-content: center;
+  border: 0;
   border-radius: 13px;
+  background: transparent;
   color:
     rgba(
       62,
@@ -9408,6 +9443,11 @@ h1 {
     );
 }
 
+.journal-calendar-day.selected {
+  outline: 2px solid #fdd000;
+  outline-offset: 2px;
+}
+
 .journal-calendar-day.recorded i {
   position: absolute;
   bottom: 4px;
@@ -9422,6 +9462,139 @@ h1 {
 
 .journal-calendar-day.empty {
   visibility: hidden;
+}
+
+.journal-calendar-empty {
+  margin-top: 16px;
+  border: 1px dashed rgba(62, 58, 58, 0.1);
+  border-radius: 17px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.journal-calendar-empty svg {
+  width: 19px;
+  height: 19px;
+  opacity: 0.35;
+}
+
+.journal-calendar-empty strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+.journal-calendar-empty p,
+.journal-calendar-hint,
+.journal-calendar-no-record {
+  color: rgba(62, 58, 58, 0.52);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.journal-calendar-empty p {
+  margin: 6px 0 0;
+}
+
+.journal-calendar-hint {
+  margin: 16px 0 0;
+  border-top: 1px solid rgba(62, 58, 58, 0.07);
+  padding-top: 14px;
+  text-align: center;
+}
+
+.journal-calendar-selected {
+  margin-top: 16px;
+  border-top: 1px solid rgba(62, 58, 58, 0.07);
+  padding-top: 16px;
+}
+
+.journal-calendar-selected-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.journal-calendar-selected-heading .eyebrow {
+  margin: 0 0 5px;
+  font-size: 8px;
+}
+
+.journal-calendar-selected-heading strong {
+  font-size: 13px;
+}
+
+.journal-calendar-selected-heading > span {
+  font-size: 10px;
+  font-weight: 750;
+  opacity: 0.48;
+}
+
+.journal-calendar-no-record {
+  margin: 12px 0 0;
+  border-radius: 14px;
+  background: rgba(62, 58, 58, 0.04);
+  padding: 14px;
+}
+
+.journal-calendar-log-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.journal-calendar-log-list button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(62, 58, 58, 0.07);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 13px;
+  color: #3e3a3a;
+  text-align: left;
+}
+
+.journal-calendar-log-list button:active {
+  transform: scale(0.985);
+}
+
+.journal-calendar-log-list button > div {
+  min-width: 0;
+}
+
+.journal-calendar-log-list button strong {
+  display: block;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journal-calendar-log-list button div span {
+  display: block;
+  margin-top: 5px;
+  font-size: 9px;
+  opacity: 0.5;
+}
+
+.journal-calendar-log-list button > span {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.journal-calendar-log-list button > span svg {
+  width: 13px;
+  height: 13px;
+  fill: #fdd000;
+  color: #fdd000;
 }
 
 .journal-recent-list {

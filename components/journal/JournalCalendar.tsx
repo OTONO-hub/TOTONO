@@ -1,14 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  Star,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import type { JournalPost } from "@/services/journal";
 
 type JournalCalendarProps = {
-  yearMonth: string;
-  monthLabel: string;
+  initialYearMonth: string;
   posts: JournalPost[];
 };
 
@@ -19,23 +25,47 @@ type CalendarDay = {
   posts: JournalPost[];
 };
 
-const WEEKDAY_LABELS = [
-  "月",
-  "火",
-  "水",
-  "木",
-  "金",
-  "土",
-  "日",
-];
+const WEEKDAY_LABELS = ["月", "火", "水", "木", "金", "土", "日"];
+
+function getMonthLabel(yearMonth: string): string {
+  const [yearText, monthText] = yearMonth.split("-");
+  const month = Number(monthText);
+
+  if (!yearText || !Number.isInteger(month)) {
+    return yearMonth;
+  }
+
+  return `${yearText}年${month}月`;
+}
+
+function moveMonth(yearMonth: string, amount: number): string {
+  const [yearText, monthText] = yearMonth.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return yearMonth;
+  }
+
+  const nextDate = new Date(
+    Date.UTC(year, month - 1 + amount, 1)
+  );
+
+  return `${nextDate.getUTCFullYear()}-${String(
+    nextDate.getUTCMonth() + 1
+  ).padStart(2, "0")}`;
+}
 
 function createCalendarDays(
   yearMonth: string,
   posts: JournalPost[]
 ): CalendarDay[] {
-  const [yearText, monthText] =
-    yearMonth.split("-");
-
+  const [yearText, monthText] = yearMonth.split("-");
   const year = Number(yearText);
   const month = Number(monthText);
 
@@ -48,46 +78,24 @@ function createCalendarDays(
     return [];
   }
 
-  const postsByDate = new Map<
-    string,
-    JournalPost[]
-  >();
+  const postsByDate = new Map<string, JournalPost[]>();
 
   for (const post of posts) {
-    const currentPosts =
-      postsByDate.get(post.visit_date) ?? [];
+    if (!post.visit_date.startsWith(yearMonth)) {
+      continue;
+    }
 
+    const currentPosts = postsByDate.get(post.visit_date) ?? [];
     currentPosts.push(post);
-
-    postsByDate.set(
-      post.visit_date,
-      currentPosts
-    );
+    postsByDate.set(post.visit_date, currentPosts);
   }
 
-  const daysInMonth = new Date(
-    Date.UTC(year, month, 0)
-  ).getUTCDate();
-
-  const firstDay = new Date(
-    Date.UTC(year, month - 1, 1)
-  ).getUTCDay();
-
-  /*
-   * JavaScriptは日曜日を0として扱います。
-   * 今回のカレンダーは月曜日始まりなので、
-   * 月曜日を0へ変換します。
-   */
-  const leadingEmptyDays =
-    (firstDay + 6) % 7;
-
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const firstDay = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+  const leadingEmptyDays = (firstDay + 6) % 7;
   const calendarDays: CalendarDay[] = [];
 
-  for (
-    let index = 0;
-    index < leadingEmptyDays;
-    index += 1
-  ) {
+  for (let index = 0; index < leadingEmptyDays; index += 1) {
     calendarDays.push({
       key: `empty-leading-${index}`,
       day: null,
@@ -96,14 +104,8 @@ function createCalendarDays(
     });
   }
 
-  for (
-    let day = 1;
-    day <= daysInMonth;
-    day += 1
-  ) {
-    const date = `${yearText}-${monthText}-${String(
-      day
-    ).padStart(2, "0")}`;
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = `${yearMonth}-${String(day).padStart(2, "0")}`;
 
     calendarDays.push({
       key: date,
@@ -113,10 +115,6 @@ function createCalendarDays(
     });
   }
 
-  /*
-   * 最後の週も7日分表示されるように
-   * 空のセルを追加します。
-   */
   while (calendarDays.length % 7 !== 0) {
     calendarDays.push({
       key: `empty-trailing-${calendarDays.length}`,
@@ -138,17 +136,53 @@ function getTodayInJapan(): string {
   }).format(new Date());
 }
 
+function formatSelectedDate(date: string): string {
+  const parsedDate = new Date(`${date}T00:00:00+09:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date;
+  }
+
+  return new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(parsedDate);
+}
+
 export function JournalCalendar({
-  yearMonth,
-  monthLabel,
+  initialYearMonth,
   posts,
 }: JournalCalendarProps) {
-  const calendarDays = createCalendarDays(
-    yearMonth,
-    posts
+  const [yearMonth, setYearMonth] = useState(initialYearMonth);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const calendarDays = useMemo(
+    () => createCalendarDays(yearMonth, posts),
+    [posts, yearMonth]
+  );
+
+  const monthPosts = useMemo(
+    () => posts.filter((post) => post.visit_date.startsWith(yearMonth)),
+    [posts, yearMonth]
+  );
+
+  const selectedPosts = useMemo(
+    () =>
+      selectedDate
+        ? posts.filter((post) => post.visit_date === selectedDate)
+        : [],
+    [posts, selectedDate]
   );
 
   const today = getTodayInJapan();
+  const monthLabel = getMonthLabel(yearMonth);
+
+  const changeMonth = (amount: number) => {
+    setYearMonth((current) => moveMonth(current, amount));
+    setSelectedDate(null);
+  };
 
   if (calendarDays.length === 0) {
     return null;
@@ -157,316 +191,161 @@ export function JournalCalendar({
   return (
     <section
       aria-labelledby="journal-calendar-heading"
-      className="
-        overflow-hidden
-        rounded-[2rem]
-        border border-border/55
-        bg-card/90
-        shadow-sm
-        backdrop-blur-md
-        sm:rounded-[2.5rem]
-      "
+      className="overflow-hidden rounded-[2rem] border border-border/55 bg-card/90 shadow-sm backdrop-blur-md sm:rounded-[2.5rem]"
     >
-      <div
-        className="
-          flex
-          flex-col
-          gap-5
-          border-b border-border/45
-          px-5
-          py-6
-          sm:flex-row
-          sm:items-end
-          sm:justify-between
-          sm:px-8
-          sm:py-7
-        "
-      >
+      <div className="flex flex-col gap-5 border-b border-border/45 px-5 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-8 sm:py-7">
         <div>
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-            "
-          >
-            <span
-              className="
-                flex
-                size-10
-                items-center
-                justify-center
-                rounded-full
-                bg-secondary/20
-                text-foreground
-              "
-            >
-              <CalendarDays
-                className="size-4"
-                strokeWidth={1.7}
-                aria-hidden="true"
-              />
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 items-center justify-center rounded-full bg-secondary/20 text-foreground">
+              <CalendarDays className="size-4" strokeWidth={1.7} aria-hidden="true" />
             </span>
-
-            <p
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[0.22em]
-                text-muted-foreground
-              "
-            >
-              Monthly Calendar
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Sauna Calendar
             </p>
           </div>
 
           <h2
             id="journal-calendar-heading"
-            className="
-              mt-4
-              text-2xl
-              font-semibold
-              tracking-[-0.035em]
-              text-foreground
-              sm:text-3xl
-            "
+            className="mt-4 text-2xl font-semibold tracking-[-0.035em] text-foreground sm:text-3xl"
           >
             {monthLabel}の記録
           </h2>
-
-          <p
-            className="
-              mt-3
-              text-sm
-              leading-7
-              text-muted-foreground
-            "
-          >
-            サウナへ行った日を、月ごとに振り返れます。
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            日付を選ぶと、その日のサ活を振り返れます。
           </p>
         </div>
 
-        <div
-          className="
-            inline-flex
-            items-center
-            gap-2
-            text-xs
-            font-medium
-            text-muted-foreground
-          "
-        >
-          <span
-            aria-hidden="true"
-            className="
-              size-2.5
-              rounded-full
-              bg-accent
-            "
-          />
-
-          サ活を記録した日
+        <div className="flex items-center justify-between gap-3 sm:justify-end" aria-label="表示月を変更">
+          <button
+            type="button"
+            onClick={() => changeMonth(-1)}
+            aria-label="前月を表示"
+            className="flex size-11 items-center justify-center rounded-full border border-border/60 bg-background text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <ChevronLeft className="size-4" aria-hidden="true" />
+          </button>
+          <span className="min-w-28 text-center text-sm font-semibold tabular-nums">
+            {monthLabel}
+          </span>
+          <button
+            type="button"
+            onClick={() => changeMonth(1)}
+            aria-label="翌月を表示"
+            className="flex size-11 items-center justify-center rounded-full border border-border/60 bg-background text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </button>
         </div>
       </div>
 
-      <div
-        className="
-          overflow-x-auto
-          px-4
-          py-5
-          sm:px-7
-          sm:py-7
-        "
-      >
-        <div className="min-w-[42rem]">
-          <div
-            className="
-              grid
-              grid-cols-7
-              border-b border-border/45
-            "
-          >
-            {WEEKDAY_LABELS.map(
-              (weekday, index) => (
-                <div
-                  key={weekday}
-                  className="
-                    px-2
-                    pb-3
-                    text-center
-                    text-xs
-                    font-semibold
-                    text-muted-foreground
-                  "
-                >
+      <div className="px-4 py-5 sm:px-7 sm:py-7">
+        <div className="grid grid-cols-7 border-b border-border/45">
+          {WEEKDAY_LABELS.map((weekday, index) => (
+            <div key={weekday} className="px-1 pb-3 text-center text-xs font-semibold text-muted-foreground">
+              <span className={index >= 5 ? "text-foreground/65" : undefined}>
+                {weekday}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 pt-2 sm:gap-2">
+          {calendarDays.map((calendarDay) => {
+            if (calendarDay.day === null || calendarDay.date === null) {
+              return <div key={calendarDay.key} aria-hidden="true" className="aspect-square" />;
+            }
+
+            const hasPosts = calendarDay.posts.length > 0;
+            const isToday = calendarDay.date === today;
+            const isSelected = calendarDay.date === selectedDate;
+
+            return (
+              <button
+                key={calendarDay.key}
+                type="button"
+                onClick={() => setSelectedDate(calendarDay.date)}
+                aria-pressed={isSelected}
+                aria-label={`${monthLabel}${calendarDay.day}日${
+                  hasPosts ? `、サ活${calendarDay.posts.length}件` : "、サ活なし"
+                }`}
+                className={`relative flex aspect-square min-w-0 flex-col items-center justify-center rounded-xl border text-xs font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:rounded-2xl ${
+                  isSelected
+                    ? "border-foreground bg-foreground text-background"
+                    : hasPosts
+                      ? "border-accent/35 bg-accent/10 text-foreground hover:bg-accent/20"
+                      : "border-transparent text-muted-foreground hover:bg-muted/60"
+                }`}
+              >
+                <span className={isToday && !isSelected ? "underline decoration-accent decoration-2 underline-offset-4" : undefined}>
+                  {calendarDay.day}
+                </span>
+                {hasPosts ? (
                   <span
-                    className={
-                      index >= 5
-                        ? "text-foreground/65"
-                        : undefined
-                    }
+                    aria-hidden="true"
+                    className={`absolute bottom-1.5 size-1.5 rounded-full sm:bottom-2 ${
+                      isSelected ? "bg-accent" : "bg-foreground"
+                    }`}
+                  />
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        {monthPosts.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-border/60 bg-muted/20 px-5 py-10 text-center">
+            <Flame className="mx-auto size-5 text-muted-foreground" aria-hidden="true" />
+            <h3 className="mt-4 text-sm font-semibold">この月のサ活はまだありません</h3>
+            <p className="mt-2 text-xs leading-6 text-muted-foreground">
+              サ活を記録すると、カレンダーに印がつきます。
+            </p>
+          </div>
+        ) : selectedDate ? (
+          <div className="mt-6 border-t border-border/45 pt-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Selected Day</p>
+                <h3 className="mt-2 text-lg font-semibold">{formatSelectedDate(selectedDate)}</h3>
+              </div>
+              <span className="text-xs font-medium text-muted-foreground">{selectedPosts.length}件</span>
+            </div>
+
+            {selectedPosts.length === 0 ? (
+              <p className="mt-4 rounded-2xl bg-muted/35 px-4 py-5 text-sm text-muted-foreground">
+                この日のサ活記録はありません。
+              </p>
+            ) : (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {selectedPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/posts/${post.id}`}
+                    className="group rounded-2xl border border-border/55 bg-background/70 p-4 transition hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transform-none"
                   >
-                    {weekday}
-                  </span>
-                </div>
-              )
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h4 className="truncate text-sm font-semibold">{post.sauna_name}</h4>
+                        <p className="mt-2 text-xs text-muted-foreground">{post.set_count}セット</p>
+                      </div>
+                      <span className="flex items-center gap-1 text-xs font-semibold">
+                        <Star className="size-3.5 fill-accent text-accent" aria-hidden="true" />
+                        {post.rating.toFixed(1)}
+                      </span>
+                    </div>
+                    <span className="mt-4 flex items-center justify-end gap-1 text-xs font-semibold text-muted-foreground group-hover:text-foreground">
+                      詳細を見る
+                      <ArrowRight className="size-3.5" aria-hidden="true" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
-
-          <div
-            className="
-              grid
-              grid-cols-7
-            "
-          >
-            {calendarDays.map((calendarDay) => {
-              if (
-                calendarDay.day === null ||
-                calendarDay.date === null
-              ) {
-                return (
-                  <div
-                    key={calendarDay.key}
-                    aria-hidden="true"
-                    className="
-                      min-h-28
-                      border-b
-                      border-r
-                      border-border/35
-                      bg-muted/10
-                      p-2
-                    "
-                  />
-                );
-              }
-
-              const hasPosts =
-                calendarDay.posts.length > 0;
-
-              const isToday =
-                calendarDay.date === today;
-
-              const firstPost =
-                calendarDay.posts[0];
-
-              return (
-                <div
-                  key={calendarDay.key}
-                  className="
-                    relative
-                    min-h-28
-                    border-b
-                    border-r
-                    border-border/35
-                    p-2
-                    sm:p-3
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                      gap-2
-                    "
-                  >
-                    <span
-                      className={`
-                        flex
-                        size-7
-                        items-center
-                        justify-center
-                        rounded-full
-                        text-xs
-                        font-semibold
-                        tabular-nums
-                        ${
-                          isToday
-                            ? "bg-foreground text-background"
-                            : "text-muted-foreground"
-                        }
-                      `}
-                    >
-                      {calendarDay.day}
-                    </span>
-
-                    {calendarDay.posts.length > 1 ? (
-                      <span
-                        className="
-                          rounded-full
-                          bg-muted
-                          px-2
-                          py-0.5
-                          text-[0.65rem]
-                          font-semibold
-                          text-muted-foreground
-                        "
-                      >
-                        {calendarDay.posts.length}件
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {hasPosts && firstPost ? (
-                    <Link
-                      href={`/posts/${firstPost.id}`}
-                      className="
-                        group
-                        mt-3
-                        block
-                        rounded-xl
-                        border border-accent/20
-                        bg-accent/10
-                        p-2.5
-                        transition-colors
-                        hover:bg-accent/15
-                        motion-reduce:transition-none
-                      "
-                    >
-                      <span
-                        className="
-                          block
-                          truncate
-                          text-xs
-                          font-semibold
-                          text-foreground
-                        "
-                      >
-                        {firstPost.sauna_name}
-                      </span>
-
-                      <span
-                        className="
-                          mt-1.5
-                          flex
-                          items-center
-                          justify-between
-                          gap-2
-                          text-[0.65rem]
-                          text-muted-foreground
-                        "
-                      >
-                        {firstPost.set_count}セット
-
-                        <ArrowRight
-                          className="
-                            size-3
-                            transition-transform
-                            group-hover:translate-x-0.5
-                            motion-reduce:transition-none
-                          "
-                          strokeWidth={1.8}
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </Link>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        ) : (
+          <p className="mt-6 border-t border-border/45 pt-5 text-center text-xs text-muted-foreground">
+            印のある日付を選ぶと、その日の記録を表示します。
+          </p>
+        )}
       </div>
     </section>
   );

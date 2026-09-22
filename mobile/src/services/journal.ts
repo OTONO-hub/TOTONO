@@ -16,7 +16,7 @@ export type JournalPost = {
   visit_date: string;
   set_count: number;
   rating: number;
-  comment: string;
+  comment: string | null;
   image_url: string | null;
   created_at: string;
   updated_at: string;
@@ -40,6 +40,7 @@ export type JournalFavoriteSauna = {
 
 export type JournalData = {
   summary: JournalSummary;
+  posts: JournalPost[];
   recentEntries: JournalPost[];
   monthlyPosts: JournalPost[];
   favoriteSaunas:
@@ -553,6 +554,8 @@ export async function getJournalData(
 
   return {
     summary,
+
+    posts,
 
     monthlyPosts,
 

@@ -17,7 +17,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { getJournalData } from "@/services/journal";
-import { getPosts } from "@/services/posts";
 
 export default async function JournalPage() {
   const supabase = await createClient();
@@ -155,24 +154,10 @@ export default async function JournalPage() {
     );
   }
 
-  /*
-   * Journal画面に必要なデータと、
-   * 全投稿データを並行して取得します。
-   */
-  const [
-    journalData,
-    allPosts,
-  ] = await Promise.all([
-    getJournalData(
-      supabase,
-      user.id,
-      4
-    ),
-    getPosts(supabase),
-  ]);
-
-  const myPosts = allPosts.filter(
-    (post) => post.user_id === user.id
+  const journalData = await getJournalData(
+    supabase,
+    user.id,
+    4
   );
 
   return (
@@ -237,13 +222,10 @@ export default async function JournalPage() {
             className="scroll-mt-28"
           >
             <JournalCalendar
-              yearMonth={
+              initialYearMonth={
                 journalData.summary.yearMonth
               }
-              monthLabel={
-                journalData.summary.monthLabel
-              }
-              posts={journalData.monthlyPosts}
+              posts={journalData.posts}
             />
           </div>
 
@@ -472,7 +454,9 @@ export default async function JournalPage() {
             id="journal-insights"
             className="scroll-mt-28"
           >
-            <JournalInsights posts={myPosts} />
+            <JournalInsights
+              posts={journalData.posts}
+            />
           </div>
         </div>
       </main>
