@@ -7,6 +7,7 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  ChevronLeft,
   ChevronRight,
   Flame,
   MapPin,
@@ -44,6 +45,87 @@ const WEEKDAY_LABELS = [
   "金",
   "土",
 ];
+
+function getMonthLabel(
+  yearMonth: string
+): string {
+  const [
+    yearText,
+    monthText,
+  ] =
+    yearMonth.split(
+      "-"
+    );
+
+  const month =
+    Number(
+      monthText
+    );
+
+  if (
+    !yearText ||
+    !Number.isInteger(
+      month
+    )
+  ) {
+    return yearMonth;
+  }
+
+  return `${yearText}年${month}月`;
+}
+
+function moveMonth(
+  yearMonth: string,
+  amount: number
+): string {
+  const [
+    yearText,
+    monthText,
+  ] =
+    yearMonth.split(
+      "-"
+    );
+
+  const year =
+    Number(
+      yearText
+    );
+
+  const month =
+    Number(
+      monthText
+    );
+
+  if (
+    !Number.isInteger(
+      year
+    ) ||
+    !Number.isInteger(
+      month
+    ) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return yearMonth;
+  }
+
+  const nextDate =
+    new Date(
+      year,
+      month -
+        1 +
+        amount,
+      1
+    );
+
+  return `${nextDate.getFullYear()}-${String(
+    nextDate.getMonth() +
+      1
+  ).padStart(
+    2,
+    "0"
+  )}`;
+}
 
 function formatVisitDate(
   visitDate: string
@@ -189,10 +271,34 @@ function JournalSummarySection({
 
 function JournalCalendar({
   journalData,
+  onSelectPost,
 }: {
   journalData:
     JournalData;
+  onSelectPost: (
+    postId: string
+  ) => void;
 }) {
+  const [
+    yearMonth,
+    setYearMonth,
+  ] =
+    useState(
+      journalData
+        .summary
+        .yearMonth
+    );
+
+  const [
+    selectedDate,
+    setSelectedDate,
+  ] =
+    useState<
+      string | null
+    >(
+      null
+    );
+
   const calendarDays =
     useMemo(
       () => {
@@ -200,9 +306,7 @@ function JournalCalendar({
           yearText,
           monthText,
         ] =
-          journalData
-            .summary
-            .yearMonth
+          yearMonth
             .split(
               "-"
             );
@@ -256,8 +360,17 @@ function JournalCalendar({
         for (
           const post of
           journalData
-            .monthlyPosts
+            .posts
         ) {
+          if (
+            !post.visit_date
+              .startsWith(
+                yearMonth
+              )
+          ) {
+            continue;
+          }
+
           const day =
             Number(
               post.visit_date
@@ -314,6 +427,13 @@ function JournalCalendar({
               return {
                 day,
 
+                date: `${yearMonth}-${String(
+                  day
+                ).padStart(
+                  2,
+                  "0"
+                )}`,
+
                 posts:
                   postsByDay.get(
                     day
@@ -325,9 +445,73 @@ function JournalCalendar({
         ];
       },
       [
-        journalData,
+        journalData.posts,
+        yearMonth,
       ]
     );
+
+  const monthPosts =
+    useMemo(
+      () =>
+        journalData
+          .posts
+          .filter(
+            (
+              post
+            ) =>
+              post.visit_date
+                .startsWith(
+                  yearMonth
+                )
+          ),
+      [
+        journalData.posts,
+        yearMonth,
+      ]
+    );
+
+  const selectedPosts =
+    useMemo(
+      () =>
+        selectedDate
+          ? journalData
+              .posts
+              .filter(
+                (
+                  post
+                ) =>
+                  post.visit_date ===
+                  selectedDate
+              )
+          : [],
+      [
+        journalData.posts,
+        selectedDate,
+      ]
+    );
+
+  const monthLabel =
+    getMonthLabel(
+      yearMonth
+    );
+
+  function changeMonth(
+    amount: number
+  ) {
+    setYearMonth(
+      (
+        current
+      ) =>
+        moveMonth(
+          current,
+          amount
+        )
+    );
+
+    setSelectedDate(
+      null
+    );
+  }
 
   return (
     <section
@@ -345,9 +529,39 @@ function JournalCalendar({
           </h2>
         </div>
 
-        <CalendarDays
-          aria-hidden="true"
-        />
+        <div className="journal-calendar-navigation">
+          <button
+            type="button"
+            onClick={() => {
+              changeMonth(
+                -1
+              );
+            }}
+            aria-label="前月を表示"
+          >
+            <ChevronLeft
+              aria-hidden="true"
+            />
+          </button>
+
+          <span>
+            {monthLabel}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              changeMonth(
+                1
+              );
+            }}
+            aria-label="翌月を表示"
+          >
+            <ChevronRight
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
 
       <div className="journal-calendar">
@@ -374,17 +588,30 @@ function JournalCalendar({
               index
             ) =>
               calendarDay ? (
-                <div
+                <button
                   key={
                     calendarDay.day
                   }
+                  type="button"
+                  onClick={() => {
+                    setSelectedDate(
+                      calendarDay.date
+                    );
+                  }}
                   className={
-                    calendarDay
-                      .posts
-                      .length >
-                    0
-                      ? "journal-calendar-day recorded"
-                      : "journal-calendar-day"
+                    `journal-calendar-day${
+                      calendarDay.posts.length > 0
+                        ? " recorded"
+                        : ""
+                    }${
+                      selectedDate === calendarDay.date
+                        ? " selected"
+                        : ""
+                    }`
+                  }
+                  aria-pressed={
+                    selectedDate ===
+                    calendarDay.date
                   }
                   aria-label={
                     calendarDay
@@ -407,7 +634,7 @@ function JournalCalendar({
                       aria-hidden="true"
                     />
                   ) : null}
-                </div>
+                </button>
               ) : (
                 <div
                   key={`empty-${index}`}
@@ -417,6 +644,96 @@ function JournalCalendar({
               )
           )}
         </div>
+
+        {monthPosts.length ===
+        0 ? (
+          <div className="journal-calendar-empty">
+            <Flame
+              aria-hidden="true"
+            />
+
+            <strong>
+              この月のサ活はまだありません
+            </strong>
+
+            <p>
+              サ活を記録すると、ここに印がつきます。
+            </p>
+          </div>
+        ) : selectedDate ? (
+          <div className="journal-calendar-selected">
+            <div className="journal-calendar-selected-heading">
+              <div>
+                <p className="eyebrow">
+                  Selected Day
+                </p>
+
+                <strong>
+                  {formatVisitDate(
+                    selectedDate
+                  )}
+                </strong>
+              </div>
+
+              <span>
+                {selectedPosts.length}
+                件
+              </span>
+            </div>
+
+            {selectedPosts.length ===
+            0 ? (
+              <p className="journal-calendar-no-record">
+                この日のサ活記録はありません。
+              </p>
+            ) : (
+              <div className="journal-calendar-log-list">
+                {selectedPosts.map(
+                  (
+                    post
+                  ) => (
+                    <button
+                      key={
+                        post.id
+                      }
+                      type="button"
+                      onClick={() => {
+                        onSelectPost(
+                          post.id
+                        );
+                      }}
+                    >
+                      <div>
+                        <strong>
+                          {post.sauna_name}
+                        </strong>
+
+                        <span>
+                          {post.set_count}
+                          セット
+                        </span>
+                      </div>
+
+                      <span>
+                        <Star
+                          aria-hidden="true"
+                        />
+
+                        {post.rating.toFixed(
+                          1
+                        )}
+                      </span>
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="journal-calendar-hint">
+            印のある日付を選ぶと、その日の記録を表示します。
+          </p>
+        )}
       </div>
     </section>
   );
@@ -1128,6 +1445,9 @@ export function JournalScreen({
       <JournalCalendar
         journalData={
           journalData
+        }
+        onSelectPost={
+          onSelectPost
         }
       />
 
