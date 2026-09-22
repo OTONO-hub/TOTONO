@@ -1373,6 +1373,11 @@ export function App() {
                 onOpenWantToGo={
                   openWantToGo
                 }
+                onOpenJournal={() => {
+                  closePostDetail();
+                  resetProfileFlows();
+                  setTab("journal");
+                }}
                 onOpenSavedPosts={
                   openSavedPosts
                 }
