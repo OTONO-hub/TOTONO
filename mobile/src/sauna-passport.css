@@ -1,0 +1,132 @@
+.sauna-passport-card {
+  overflow: hidden;
+  margin: 18px 16px 22px;
+  padding: 24px 18px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 26px;
+  color: #f7fffc;
+  background: linear-gradient(145deg, #173c36, #24594f);
+  box-shadow: 0 20px 50px -30px rgba(10, 45, 39, 0.72);
+}
+
+.sauna-passport-eyebrow {
+  margin: 0;
+  color: rgba(219, 255, 241, 0.65);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.sauna-passport-card h2 {
+  margin: 7px 0 0;
+  font-size: 26px;
+  letter-spacing: -0.04em;
+}
+
+.sauna-passport-copy {
+  margin: 8px 0 0;
+  color: rgba(235, 255, 248, 0.68);
+  font-size: 12px;
+}
+
+.sauna-passport-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 22px 0 0;
+}
+
+.sauna-passport-stats > div {
+  min-width: 0;
+  padding: 13px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sauna-passport-stats dt {
+  overflow: hidden;
+  color: rgba(235, 255, 248, 0.62);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sauna-passport-stats dd {
+  margin: 6px 0 0;
+  font-size: 25px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sauna-passport-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+  color: rgba(235, 255, 248, 0.7);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.sauna-passport-progress {
+  overflow: hidden;
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sauna-passport-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #a7f3d0;
+}
+
+.sauna-passport-actions {
+  margin: 21px -18px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(0, 0, 0, 0.09);
+}
+
+.sauna-passport-actions button {
+  display: grid;
+  grid-template-columns: 19px 1fr 16px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 13px 18px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: inherit;
+  text-align: left;
+  background: transparent;
+}
+
+.sauna-passport-actions button:last-child { border-bottom: 0; }
+
+.sauna-passport-actions button > svg {
+  width: 17px;
+  color: rgba(209, 250, 229, 0.76);
+}
+
+.sauna-passport-actions button > svg:last-child {
+  width: 14px;
+  color: rgba(235, 255, 248, 0.42);
+}
+
+.sauna-passport-actions strong,
+.sauna-passport-actions small { display: block; }
+
+.sauna-passport-actions strong { font-size: 12px; }
+
+.sauna-passport-actions small {
+  margin-top: 2px;
+  color: rgba(235, 255, 248, 0.55);
+  font-size: 10px;
+}

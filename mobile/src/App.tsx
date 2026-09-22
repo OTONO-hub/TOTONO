@@ -87,6 +87,7 @@ import {
 import type {
   Post,
 } from "./types/post";
+import "./sauna-passport.css";
 
 type Tab =
   | "today"
