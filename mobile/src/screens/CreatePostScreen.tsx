@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Check,
   ChevronDown,
+  FileWarning,
   ImagePlus,
   LockKeyhole,
   Minus,
@@ -74,6 +75,12 @@ const MAX_IMAGE_COUNT =
 const MAX_COMMENT_LENGTH =
   1000;
 
+const INITIAL_SET_COUNT =
+  3;
+
+const INITIAL_RATING =
+  5;
+
 function normalizeRating(
   rating: number
 ): number {
@@ -89,6 +96,62 @@ function normalizeRating(
   );
 }
 
+function DiscardPostConfirmation({
+  onCancel,
+  onDiscard,
+}: {
+  onCancel: () => void;
+  onDiscard: () => void;
+}) {
+  return (
+    <div className="delete-post-overlay" role="presentation">
+      <section
+        className="delete-post-dialog discard-post-dialog"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="discard-post-title"
+        aria-describedby="discard-post-description"
+      >
+        <button
+          type="button"
+          className="delete-post-close"
+          onClick={onCancel}
+          aria-label="投稿の破棄確認を閉じる"
+        >
+          <X aria-hidden="true" />
+        </button>
+
+        <div className="delete-post-icon discard-post-icon">
+          <FileWarning aria-hidden="true" />
+        </div>
+
+        <p className="eyebrow">Unsaved Record</p>
+        <h2 id="discard-post-title">入力内容を破棄しますか？</h2>
+        <p id="discard-post-description">
+          入力したサ活と選択した写真は保存されません。
+          この画面に残ることもできます。
+        </p>
+
+        <button
+          type="button"
+          className="delete-post-confirm discard-post-confirm"
+          onClick={onDiscard}
+        >
+          入力内容を破棄する
+        </button>
+
+        <button
+          type="button"
+          className="secondary delete-post-cancel"
+          onClick={onCancel}
+        >
+          入力を続ける
+        </button>
+      </section>
+    </div>
+  );
+}
+
 export function CreatePostScreen({
   sauna,
   userId,
@@ -101,24 +164,34 @@ export function CreatePostScreen({
     );
 
   const [
+    initialVisitDate,
+  ] = useState(
+    getTodayDate
+  );
+
+  const [
     visitDate,
     setVisitDate,
   ] =
     useState(
-      getTodayDate()
+      initialVisitDate
     );
 
   const [
     setCount,
     setSetCount,
   ] =
-    useState(3);
+    useState(
+      INITIAL_SET_COUNT
+    );
 
   const [
     rating,
     setRating,
   ] =
-    useState(5);
+    useState(
+      INITIAL_RATING
+    );
 
   const [
     comment,
@@ -166,6 +239,22 @@ export function CreatePostScreen({
       string | null
     >(null);
 
+  const [
+    showDiscardConfirmation,
+    setShowDiscardConfirmation,
+  ] = useState(false);
+
+  const hasUnsavedChanges =
+    visitDate !==
+      initialVisitDate ||
+    setCount !==
+      INITIAL_SET_COUNT ||
+    rating !==
+      INITIAL_RATING ||
+    comment.length > 0 ||
+    privateNote.length > 0 ||
+    images.length > 0;
+
   const canSubmit =
     useMemo(
       () =>
@@ -211,6 +300,45 @@ export function CreatePostScreen({
 
     imageInputRef.current
       ?.click();
+  }
+
+  function handleBack() {
+    if (
+      submitting ||
+      selectingImages
+    ) {
+      return;
+    }
+
+    if (hasUnsavedChanges) {
+      setShowDiscardConfirmation(
+        true
+      );
+
+      return;
+    }
+
+    onBack();
+  }
+
+  function discardAndGoBack() {
+    for (const image of images) {
+      if (
+        image.webPath.startsWith(
+          "blob:"
+        )
+      ) {
+        URL.revokeObjectURL(
+          image.webPath
+        );
+      }
+    }
+
+    setShowDiscardConfirmation(
+      false
+    );
+
+    onBack();
   }
 
   function handleImageInputChange(
@@ -619,14 +747,26 @@ export function CreatePostScreen({
 
   return (
     <section className="create-post-screen">
+      {showDiscardConfirmation ? (
+        <DiscardPostConfirmation
+          onCancel={() => {
+            setShowDiscardConfirmation(
+              false
+            );
+          }}
+          onDiscard={
+            discardAndGoBack
+          }
+        />
+      ) : null}
+
       <button
         type="button"
         className="detail-back-button"
-        onClick={
-          onBack
-        }
+        onClick={handleBack}
         disabled={
-          submitting
+          submitting ||
+          selectingImages
         }
       >
         <ArrowLeft
