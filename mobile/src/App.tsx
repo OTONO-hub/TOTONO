@@ -87,6 +87,7 @@ import {
 import type {
   Post,
 } from "./types/post";
+import "./sauna-passport.css";
 
 type Tab =
   | "today"
@@ -1373,6 +1374,11 @@ export function App() {
                 onOpenWantToGo={
                   openWantToGo
                 }
+                onOpenJournal={() => {
+                  closePostDetail();
+                  resetProfileFlows();
+                  setTab("journal");
+                }}
                 onOpenSavedPosts={
                   openSavedPosts
                 }

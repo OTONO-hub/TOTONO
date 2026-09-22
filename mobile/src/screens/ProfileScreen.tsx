@@ -12,6 +12,7 @@ import {
   Heart,
   LogOut,
   MapPin,
+  CalendarDays,
   Pencil,
   RefreshCw,
   Sparkles,
@@ -65,6 +66,10 @@ import {
   calculateSaunaXp,
   type SaunaXpResult,
 } from "../services/profile-xp";
+import {
+  getSaunaPassport,
+  type SaunaPassport,
+} from "../services/sauna-passport";
 
 type ProfileScreenProps = {
   userId: string;
@@ -77,6 +82,7 @@ type ProfileScreenProps = {
   onEditProfile?: () => void;
   onOpenVisitedSaunas?: () => void;
   onOpenWantToGo?: () => void;
+  onOpenJournal?: () => void;
   onOpenSavedPosts?: () => void;
   onOpenBlockedUsers?: () => void;
 };
@@ -92,7 +98,57 @@ type ProfileViewData = {
   rhythm: SaunaRhythm;
   nextAchievement:
     NextAchievement;
+  passport: SaunaPassport;
 };
+
+function SaunaPassportCard({
+  passport,
+  onOpenVisitedSaunas,
+  onOpenWantToGo,
+  onOpenJournal,
+}: {
+  passport: SaunaPassport;
+  onOpenVisitedSaunas?: () => void;
+  onOpenWantToGo?: () => void;
+  onOpenJournal?: () => void;
+}) {
+  const progress = Math.min(100, (passport.prefectures / 47) * 100);
+  const actions = [
+    { label: "Want to Go", value: `${passport.wantToGo} facilities`, icon: Heart, onClick: onOpenWantToGo },
+    { label: "Visited", value: `${passport.facilities} facilities`, icon: MapPin, onClick: onOpenVisitedSaunas },
+    { label: "Journal", value: `${passport.saunaDays} sauna days`, icon: CalendarDays, onClick: onOpenJournal },
+  ];
+
+  return (
+    <section className="sauna-passport-card">
+      <p className="sauna-passport-eyebrow">My Sauna Life</p>
+      <h2>Sauna Passport</h2>
+      <p className="sauna-passport-copy">サ活を重ねるほど、あなたの記録が育ちます。</p>
+
+      <dl className="sauna-passport-stats">
+        <div><dt>Sauna Days</dt><dd>{passport.saunaDays}</dd></div>
+        <div><dt>Facilities</dt><dd>{passport.facilities}</dd></div>
+        <div><dt>Prefectures</dt><dd>{passport.prefectures}</dd></div>
+      </dl>
+
+      <div className="sauna-passport-progress-label">
+        <span>Japan Sauna Journey</span>
+        <span>{passport.prefectures} / 47 Prefectures</span>
+      </div>
+      <div className="sauna-passport-progress"><span style={{ width: `${progress}%` }} /></div>
+
+      <div className="sauna-passport-actions">
+        {actions.map(({ label, value, icon: Icon, onClick }) => (
+          <button type="button" key={label} onClick={onClick} disabled={!onClick}>
+            <Icon aria-hidden="true" />
+            <span><strong>{label}</strong><small>{value}</small></span>
+            <ChevronRight aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function getDisplayName(
   profile:
@@ -1124,6 +1180,7 @@ export function ProfileScreen({
   onEditProfile,
   onOpenVisitedSaunas,
   onOpenWantToGo,
+  onOpenJournal,
   onOpenSavedPosts,
   onOpenBlockedUsers,
 }: ProfileScreenProps) {
@@ -1219,6 +1276,17 @@ export function ProfileScreen({
             posts
           );
 
+        const passport =
+          await getSaunaPassport(
+            client,
+            userId,
+            posts
+          );
+
+        if (cancelled) {
+          return;
+        }
+
         const xp =
           calculateSaunaXp({
             visitCount:
@@ -1259,6 +1327,7 @@ export function ProfileScreen({
           persona,
           rhythm,
           nextAchievement,
+          passport,
         });
 
         setError(
@@ -1399,6 +1468,13 @@ export function ProfileScreen({
         onEditProfile={
           onEditProfile
         }
+      />
+
+      <SaunaPassportCard
+        passport={data.passport}
+        onOpenVisitedSaunas={onOpenVisitedSaunas}
+        onOpenWantToGo={onOpenWantToGo}
+        onOpenJournal={onOpenJournal}
       />
 
       <XpStatusSection

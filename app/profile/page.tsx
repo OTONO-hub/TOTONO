@@ -20,6 +20,7 @@ import { MonthlyActivityChart } from "@/components/profile/MonthlyActivityChart"
 import { NextAchievementCard } from "@/components/profile/NextAchievementCard";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { SaunaPersonaCard } from "@/components/profile/SaunaPersonaCard";
+import { SaunaPassport } from "@/components/profile/SaunaPassport";
 import { SaunaRhythmCard } from "@/components/profile/SaunaRhythmCard";
 import { SaunaSummary } from "@/components/profile/SaunaSummary";
 import { TopVisitedSaunas } from "@/components/profile/TopVisitedSaunas";
@@ -50,6 +51,7 @@ import {
 } from "@/services/profile";
 import { getProfileInsights } from "@/services/profile-insights";
 import { calculateSaunaXp } from "@/services/profile-xp";
+import { getSaunaPassport } from "@/services/sauna-passport";
 import type { CommentWithAuthor } from "@/types/comment";
 
 export default async function ProfilePage() {
@@ -461,6 +463,12 @@ export default async function ProfilePage() {
   const profileInsights =
     getProfileInsights(myPosts);
 
+  const saunaPassport = await getSaunaPassport(
+    supabase,
+    user.id,
+    myPosts
+  );
+
   const saunaRhythm =
     calculateSaunaRhythm(myPosts);
 
@@ -586,6 +594,10 @@ export default async function ProfilePage() {
               }
             />
           </FadeIn>
+
+          <ScrollReveal duration="normal" distance="subtle">
+            <SaunaPassport passport={saunaPassport} />
+          </ScrollReveal>
 
           <ScrollReveal
             duration="normal"
