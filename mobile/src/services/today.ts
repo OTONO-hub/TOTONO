@@ -21,6 +21,7 @@ export type TodayData = {
     | TodayRecentActivity
     | null;
   favoriteSaunas: Sauna[];
+  warnings: string[];
 };
 
 type PostImageRow = {
@@ -213,23 +214,32 @@ export async function getTodayData(
     ]);
 
   if (
-    recentPostResult.error
-  ) {
-    throw new Error(
-      `最近のサ活を取得できませんでした: ${recentPostResult.error.message}`
-    );
-  }
-
-  if (
+    recentPostResult.error &&
     favoritesResult.error
   ) {
     throw new Error(
-      `お気に入り施設を取得できませんでした: ${favoritesResult.error.message}`
+      "Todayの情報を取得できませんでした。通信状態を確認して、もう一度お試しください。"
+    );
+  }
+
+  const warnings: string[] = [];
+
+  if (recentPostResult.error) {
+    warnings.push(
+      "最近のサ活を読み込めませんでした。"
+    );
+  }
+
+  if (favoritesResult.error) {
+    warnings.push(
+      "行きたいサウナを読み込めませんでした。"
     );
   }
 
   const recentPost =
-    recentPostResult.data;
+    recentPostResult.error
+      ? null
+      : recentPostResult.data;
 
   const recentActivity:
     | TodayRecentActivity
@@ -266,7 +276,9 @@ export async function getTodayData(
 
   const favoriteSaunas =
     (
-      favoritesResult.data ??
+      (favoritesResult.error
+        ? []
+        : favoritesResult.data) ??
       []
     )
       .map(
@@ -283,5 +295,6 @@ export async function getTodayData(
   return {
     recentActivity,
     favoriteSaunas,
+    warnings,
   };
 }

@@ -777,6 +777,23 @@ export function TodayScreen({
         }
       />
 
+      {todayData.warnings.length > 0 ? (
+        <div className="partial-data-warning" role="status">
+          {todayData.warnings.map((warning) => (
+            <p key={warning}>{warning}</p>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setReloadKey((currentKey) => currentKey + 1);
+            }}
+          >
+            <RefreshCw aria-hidden="true" />
+            再読み込み
+          </button>
+        </div>
+      ) : null}
+
       <RecentActivitySection
         activity={
           todayData.recentActivity

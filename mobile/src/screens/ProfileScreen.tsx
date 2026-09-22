@@ -99,6 +99,7 @@ type ProfileViewData = {
   nextAchievement:
     NextAchievement;
   passport: SaunaPassport;
+  warnings: string[];
 };
 
 function SaunaPassportCard({
@@ -1242,33 +1243,64 @@ export function ProfileScreen({
     async function loadProfile() {
       try {
         const [
-          profile,
-          posts,
-          followerCount,
-          followingCount,
-        ] =
-          await Promise.all([
-            getProfileData(
-              userId
-            ),
-
-            getJournalPosts(
-              userId
-            ),
-
-            getFollowerCount(
-              client,
-              userId
-            ),
-
-            getFollowingCount(
-              client,
-              userId
-            ),
-          ]);
+          profileResult,
+          postsResult,
+          followerCountResult,
+          followingCountResult,
+        ] = await Promise.allSettled([
+          getProfileData(
+            userId
+          ),
+          getJournalPosts(
+            userId
+          ),
+          getFollowerCount(
+            client,
+            userId
+          ),
+          getFollowingCount(
+            client,
+            userId
+          ),
+        ]);
 
         if (cancelled) {
           return;
+        }
+
+        if (profileResult.status === "rejected") {
+          throw profileResult.reason;
+        }
+
+        const profile =
+          profileResult.value;
+
+        const warnings: string[] = [];
+
+        const posts =
+          postsResult.status === "fulfilled"
+            ? postsResult.value
+            : [];
+
+        const followerCount =
+          followerCountResult.status === "fulfilled"
+            ? followerCountResult.value
+            : 0;
+
+        const followingCount =
+          followingCountResult.status === "fulfilled"
+            ? followingCountResult.value
+            : 0;
+
+        if (postsResult.status === "rejected") {
+          warnings.push("サ活記録と統計を読み込めませんでした。");
+        }
+
+        if (
+          followerCountResult.status === "rejected" ||
+          followingCountResult.status === "rejected"
+        ) {
+          warnings.push("フォロー情報を読み込めませんでした。");
         }
 
         const insights =
@@ -1276,12 +1308,27 @@ export function ProfileScreen({
             posts
           );
 
-        const passport =
-          await getSaunaPassport(
+        let passport: SaunaPassport;
+
+        try {
+          passport = await getSaunaPassport(
             client,
             userId,
             posts
           );
+        } catch {
+          passport = {
+            saunaDays: new Set(
+              posts.map((post) => post.visit_date).filter(Boolean)
+            ).size,
+            facilities: insights.visitedSaunas,
+            prefectures: 0,
+            prefectureNames: [],
+            wantToGo: 0,
+          };
+
+          warnings.push("Passportの一部を読み込めませんでした。");
+        }
 
         if (cancelled) {
           return;
@@ -1328,6 +1375,7 @@ export function ProfileScreen({
           rhythm,
           nextAchievement,
           passport,
+          warnings,
         });
 
         setError(
@@ -1469,6 +1517,24 @@ export function ProfileScreen({
           onEditProfile
         }
       />
+
+      {data.warnings.length > 0 ? (
+        <div className="partial-data-warning" role="status">
+          {data.warnings.map((warning) => (
+            <p key={warning}>{warning}</p>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setLoading(true);
+              setReloadKey((currentKey) => currentKey + 1);
+            }}
+          >
+            <RefreshCw aria-hidden="true" />
+            再読み込み
+          </button>
+        </div>
+      ) : null}
 
       <SaunaPassportCard
         passport={data.passport}
