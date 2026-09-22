@@ -13,17 +13,17 @@ import {
 
 type SaunaFacilitiesProps = {
   hasSaunaRoom: boolean;
-  hasColdBath: boolean;
-  hasOutdoorAirBath: boolean;
-  hasRestArea: boolean;
-  hasRestaurant: boolean;
-  hasParking: boolean;
+  hasColdBath: boolean | null;
+  hasOutdoorAirBath: boolean | null;
+  hasRestArea: boolean | null;
+  hasRestaurant: boolean | null;
+  hasParking: boolean | null;
 };
 
 type FacilityItem = {
   label: string;
   description: string;
-  available: boolean;
+  available: boolean | null;
   icon: ReactNode;
 };
 
@@ -111,7 +111,11 @@ export function SaunaFacilities({
   ];
 
   const availableFacilityCount = facilities.filter(
-    (facility) => facility.available
+    (facility) => facility.available === true
+  ).length;
+
+  const unknownFacilityCount = facilities.filter(
+    (facility) => facility.available === null
   ).length;
 
   const facilityIntroduction =
@@ -202,7 +206,7 @@ export function SaunaFacilities({
         </div>
 
         <div
-          aria-label={`${facilities.length}件中${availableFacilityCount}件の設備が利用できます`}
+          aria-label={`${facilities.length}件中${availableFacilityCount}件の設備が利用できます。${unknownFacilityCount}件は未確認です`}
           className="
             inline-flex
             w-fit
@@ -233,7 +237,10 @@ export function SaunaFacilities({
           />
 
           <span>
-            {availableFacilityCount} / {facilities.length} 設備
+            {availableFacilityCount} 設備
+            {unknownFacilityCount > 0
+              ? `・${unknownFacilityCount} 未確認`
+              : ""}
           </span>
         </div>
       </div>
@@ -354,11 +361,11 @@ export function SaunaFacilities({
 
 type FacilityIntroductionOptions = {
   hasSaunaRoom: boolean;
-  hasColdBath: boolean;
-  hasOutdoorAirBath: boolean;
-  hasRestArea: boolean;
-  hasRestaurant: boolean;
-  hasParking: boolean;
+  hasColdBath: boolean | null;
+  hasOutdoorAirBath: boolean | null;
+  hasRestArea: boolean | null;
+  hasRestaurant: boolean | null;
+  hasParking: boolean | null;
 };
 
 function createFacilityIntroduction({
@@ -432,9 +439,11 @@ type FacilityFeatureCardProps = {
 function FacilityFeatureCard({
   facility,
 }: FacilityFeatureCardProps) {
-  const availabilityLabel = facility.available
+  const availabilityLabel = facility.available === true
     ? "利用できます"
-    : "利用できません";
+    : facility.available === false
+      ? "利用できません"
+      : "情報が未確認です";
 
   return (
     <article
@@ -592,7 +601,7 @@ function FacilityFeatureCard({
               }
             `}
           >
-            {facility.available ? (
+            {facility.available === true ? (
               <>
                 <Check
                   className="size-3"
@@ -601,7 +610,7 @@ function FacilityFeatureCard({
                 />
                 あり
               </>
-            ) : (
+            ) : facility.available === false ? (
               <>
                 <Minus
                   className="size-3"
@@ -609,6 +618,15 @@ function FacilityFeatureCard({
                   aria-hidden="true"
                 />
                 なし
+              </>
+            ) : (
+              <>
+                <Minus
+                  className="size-3"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+                未確認
               </>
             )}
           </span>

@@ -19,11 +19,11 @@ export type Sauna = {
   google_place_id: string | null;
   source: string | null;
   has_sauna_room: boolean;
-  has_cold_bath: boolean;
-  has_outdoor_air_bath: boolean;
-  has_rest_area: boolean;
-  has_restaurant: boolean;
-  has_parking: boolean;
+  has_cold_bath: boolean | null;
+  has_outdoor_air_bath: boolean | null;
+  has_rest_area: boolean | null;
+  has_restaurant: boolean | null;
+  has_parking: boolean | null;
   is_verified: boolean;
   created_at: string;
   updated_at: string;
