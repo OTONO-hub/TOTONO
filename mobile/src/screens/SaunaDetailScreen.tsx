@@ -677,15 +677,17 @@ function FacilityItem({
   icon,
 }: {
   label: string;
-  active: boolean;
+  active: boolean | null;
   icon: ReactNode;
 }) {
   return (
     <div
       className={
-        active
+        active === true
           ? "facility-item active"
-          : "facility-item"
+          : active === null
+            ? "facility-item unknown"
+            : "facility-item"
       }
     >
       <div className="facility-icon">
@@ -695,6 +697,10 @@ function FacilityItem({
       <span>
         {label}
       </span>
+
+      {active === null ? (
+        <small>未確認</small>
+      ) : null}
     </div>
   );
 }

@@ -564,6 +564,17 @@ h1 {
   opacity: 1;
 }
 
+.facility-item.unknown {
+  opacity: 0.65;
+}
+
+.facility-item small {
+  margin-left: auto;
+  color: rgba(62, 58, 58, 0.52);
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .facility-icon {
   display: grid;
   width: 36px;

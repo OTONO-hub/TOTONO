@@ -128,11 +128,11 @@ type SaunaImportRow = {
   imported_at: string;
   last_synced_at: string;
   has_sauna_room: boolean;
-  has_cold_bath: boolean;
-  has_outdoor_air_bath: boolean;
-  has_rest_area: boolean;
-  has_restaurant: boolean;
-  has_parking: boolean;
+  has_cold_bath: boolean | null;
+  has_outdoor_air_bath: boolean | null;
+  has_rest_area: boolean | null;
+  has_restaurant: boolean | null;
+  has_parking: boolean | null;
   is_verified: boolean;
 };
 
@@ -573,18 +573,42 @@ function getCoordinates(
 
 function parseBooleanTag(
   value: string | undefined
-): boolean {
+): boolean | null {
   if (!value) {
-    return false;
+    return null;
   }
 
-  return [
+  const normalizedValue = value.trim().toLowerCase();
+
+  if ([
     "yes",
     "true",
     "1",
     "designated",
     "permissive",
-  ].includes(value.trim().toLowerCase());
+  ].includes(normalizedValue)) {
+    return true;
+  }
+
+  if (["no", "false", "0"].includes(normalizedValue)) {
+    return false;
+  }
+
+  return null;
+}
+
+function combineBooleanTags(
+  ...values: Array<boolean | null>
+): boolean | null {
+  if (values.includes(true)) {
+    return true;
+  }
+
+  if (values.includes(false)) {
+    return false;
+  }
+
+  return null;
 }
 
 function includesAnyPattern(
@@ -743,35 +767,42 @@ function createImportRow(
     last_synced_at: importedAt,
     has_sauna_room: true,
     has_cold_bath:
-      parseBooleanTag(
-        tags.cold_bath
-      ) ||
-      parseBooleanTag(
-        tags["bath:cold"]
+      combineBooleanTags(
+        parseBooleanTag(
+          tags.cold_bath
+        ),
+        parseBooleanTag(
+          tags["bath:cold"]
+        )
       ),
     has_outdoor_air_bath:
-      parseBooleanTag(
-        tags.outdoor_bath
-      ) ||
-      parseBooleanTag(
-        tags.open_air_bath
+      combineBooleanTags(
+        parseBooleanTag(
+          tags.outdoor_bath
+        ),
+        parseBooleanTag(
+          tags.open_air_bath
+        )
       ),
     has_rest_area:
       parseBooleanTag(
         tags.rest_area
       ),
     has_restaurant:
-      parseBooleanTag(
-        tags.restaurant
-      ) ||
-      parseBooleanTag(
-        tags.food
+      combineBooleanTags(
+        parseBooleanTag(
+          tags.restaurant
+        ),
+        parseBooleanTag(
+          tags.food
+        )
       ),
     has_parking:
-      parseBooleanTag(
-        tags.parking
-      ) ||
-      tags.amenity === "parking",
+      tags.amenity === "parking"
+        ? true
+        : parseBooleanTag(
+            tags.parking
+          ),
     is_verified: false,
   };
 }
