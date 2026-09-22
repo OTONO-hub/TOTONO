@@ -104,6 +104,23 @@ type SearchView =
   | "create-post"
   | "post-complete";
 
+type SaunaDetailReturnTarget =
+  | {
+      kind: "tab";
+      tab: Tab;
+    }
+  | {
+      kind: "want-to-go";
+    }
+  | {
+      kind: "visited";
+    }
+  | {
+      kind: "post";
+      postId: string;
+      tab: Tab;
+    };
+
 export function App() {
   const [
     session,
@@ -154,6 +171,11 @@ export function App() {
     useState<SearchView>(
       "search"
     );
+
+  const [
+    saunaDetailReturnTarget,
+    setSaunaDetailReturnTarget,
+  ] = useState<SaunaDetailReturnTarget | null>(null);
 
   /*
    * 施設詳細画面で使用する、
@@ -457,6 +479,10 @@ export function App() {
     setSearchView(
       "search"
     );
+
+    setSaunaDetailReturnTarget(
+      null
+    );
   }
 
   function closePostDetail() {
@@ -624,7 +650,6 @@ export function App() {
   }
 
   function openSaunaFromVisited(sauna: Sauna) {
-    setViewingVisitedSaunas(false);
     openSaunaDetail(sauna);
   }
 
@@ -643,10 +668,6 @@ export function App() {
   function openSaunaFromWantToGo(
     sauna: Sauna
   ) {
-    setViewingWantToGo(
-      false
-    );
-
     openSaunaDetail(
       sauna
     );
@@ -801,6 +822,26 @@ export function App() {
   function openSaunaDetail(
     sauna: Sauna
   ) {
+    const returnTarget: SaunaDetailReturnTarget =
+      viewingVisitedSaunas
+        ? { kind: "visited" }
+        : viewingWantToGo
+          ? { kind: "want-to-go" }
+          : selectedPostId
+            ? {
+                kind: "post",
+                postId: selectedPostId,
+                tab,
+              }
+            : {
+                kind: "tab",
+                tab,
+              };
+
+    setSaunaDetailReturnTarget(
+      returnTarget
+    );
+
     closePostDetail();
 
     resetProfileFlows();
@@ -824,6 +865,56 @@ export function App() {
     setTab(
       "search"
     );
+  }
+
+  function closeSaunaDetail() {
+    const returnTarget =
+      saunaDetailReturnTarget;
+
+    setSelectedSauna(
+      null
+    );
+
+    setSelectedPostSauna(
+      null
+    );
+
+    setCreatedPost(
+      null
+    );
+
+    setSearchView(
+      "search"
+    );
+
+    setSaunaDetailReturnTarget(
+      null
+    );
+
+    if (!returnTarget) {
+      setTab("search");
+      return;
+    }
+
+    if (returnTarget.kind === "visited") {
+      setViewingVisitedSaunas(true);
+      setTab("profile");
+      return;
+    }
+
+    if (returnTarget.kind === "want-to-go") {
+      setViewingWantToGo(true);
+      setTab("profile");
+      return;
+    }
+
+    if (returnTarget.kind === "post") {
+      setSelectedPostId(returnTarget.postId);
+      setTab(returnTarget.tab);
+      return;
+    }
+
+    setTab(returnTarget.tab);
   }
 
   function selectSaunaFromSearch(
@@ -857,6 +948,11 @@ export function App() {
     setSelectedPostSauna(
       null
     );
+
+    setSaunaDetailReturnTarget({
+      kind: "tab",
+      tab: "search",
+    });
 
     setSearchView(
       "detail"
@@ -1197,18 +1293,13 @@ export function App() {
               tab ===
                 "create" ? (
               <>
-                {searchView ===
-                    "search" &&
-                  tab ===
-                    "search" ? (
-                  <SearchScreen
-                    currentUserId={
-                      currentUserId
-                    }
-                    onSelectSauna={
-                      selectSaunaFromSearch
-                    }
-                  />
+                {tab === "search" ? (
+                  <div hidden={searchView !== "search"}>
+                    <SearchScreen
+                      currentUserId={currentUserId}
+                      onSelectSauna={selectSaunaFromSearch}
+                    />
+                  </div>
                 ) : null}
 
                 {searchView ===
@@ -1235,11 +1326,9 @@ export function App() {
                     userId={
                       currentUserId
                     }
-                    onBack={() => {
-                      setSearchView(
-                        "search"
-                      );
-                    }}
+                    onBack={
+                      closeSaunaDetail
+                    }
                     onCreatePost={
                       startPostFromSaunaDetail
                     }

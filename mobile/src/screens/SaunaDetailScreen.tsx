@@ -382,7 +382,7 @@ export function SaunaDetailScreen({
           />
 
           <span>
-            検索結果へ戻る
+            前の画面へ戻る
           </span>
         </button>
 
