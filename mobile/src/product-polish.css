@@ -1,0 +1,39 @@
+.partial-data-warning {
+  margin: 0 16px;
+  padding: 13px 15px;
+  border: 1px solid rgba(180, 140, 0, 0.18);
+  border-radius: 16px;
+  background: rgba(253, 208, 0, 0.11);
+  color: #6f5b00;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.partial-data-warning p {
+  margin: 0;
+}
+
+.partial-data-warning p + p {
+  margin-top: 3px;
+}
+
+.partial-data-warning button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 9px;
+  border: 1px solid rgba(62, 58, 58, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 0 14px;
+  color: #3e3a3a;
+  font: inherit;
+  font-weight: 800;
+}
+
+.partial-data-warning button svg {
+  width: 14px;
+  height: 14px;
+}
