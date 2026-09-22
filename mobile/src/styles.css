@@ -263,6 +263,114 @@ h1 {
   margin-top: 20px;
 }
 
+.search-box {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  border: 1px solid rgba(62, 58, 58, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 0 17px;
+  box-shadow: 0 12px 38px rgba(62, 58, 58, 0.06);
+}
+
+.search-box svg {
+  flex: 0 0 auto;
+  opacity: 0.48;
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #3e3a3a;
+  font-size: 16px;
+}
+
+.search-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.search-prefecture-filter {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 46px;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(62, 58, 58, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 0 13px;
+}
+
+.search-prefecture-filter svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  opacity: 0.5;
+}
+
+.search-prefecture-filter select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  appearance: none;
+  background: transparent;
+  color: #3e3a3a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.search-clear-button {
+  min-height: 44px;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #3e3a3a;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.search-error-card {
+  margin-top: 18px;
+  border: 1px solid rgba(233, 88, 132, 0.15);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+  color: #b54063;
+  font-size: 13px;
+  text-align: center;
+}
+
+.search-error-card p {
+  margin: 0;
+}
+
+.search-error-card button,
+.search-empty-clear-button {
+  min-height: 42px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #3e3a3a;
+  padding: 0 18px;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .sauna-result-card {
   display: flex;
   width: 100%;
