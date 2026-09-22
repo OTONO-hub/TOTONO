@@ -1220,6 +1220,7 @@ export function App() {
             userId={currentUserId}
             onBack={closeVisitedSaunas}
             onSelectSauna={openSaunaFromVisited}
+            onCreatePost={openCreatePostFlow}
           />
         ) : viewingWantToGo ? (
           <WantToGoScreen
@@ -1231,6 +1232,9 @@ export function App() {
             }
             onSelectSauna={
               openSaunaFromWantToGo
+            }
+            onGoSearch={
+              openSearch
             }
           />
         ) : viewingSavedPosts ? (
@@ -1419,6 +1423,9 @@ export function App() {
                 }
                 onSelectPost={
                   openPostDetail
+                }
+                onCreatePost={
+                  openCreatePostFlow
                 }
               />
             ) : null}
