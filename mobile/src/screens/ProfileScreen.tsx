@@ -1242,16 +1242,15 @@ export function ProfileScreen({
 
     async function loadProfile() {
       try {
-        const profile =
-          await getProfileData(
-            userId
-          );
-
         const [
+          profileResult,
           postsResult,
           followerCountResult,
           followingCountResult,
         ] = await Promise.allSettled([
+          getProfileData(
+            userId
+          ),
           getJournalPosts(
             userId
           ),
@@ -1268,6 +1267,13 @@ export function ProfileScreen({
         if (cancelled) {
           return;
         }
+
+        if (profileResult.status === "rejected") {
+          throw profileResult.reason;
+        }
+
+        const profile =
+          profileResult.value;
 
         const warnings: string[] = [];
 
