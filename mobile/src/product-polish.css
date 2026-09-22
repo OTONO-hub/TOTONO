@@ -37,3 +37,29 @@
   width: 14px;
   height: 14px;
 }
+
+.empty-state-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #3e3a3a;
+  padding: 0 20px;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.empty-state-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.empty-state-action:active {
+  transform: scale(0.985);
+}

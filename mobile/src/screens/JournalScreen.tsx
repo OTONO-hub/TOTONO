@@ -9,6 +9,7 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CirclePlus,
   Flame,
   MapPin,
   RefreshCw,
@@ -31,6 +32,7 @@ type JournalScreenProps = {
   onSelectPost: (
     postId: string
   ) => void;
+  onCreatePost: () => void;
 };
 
 const JOURNAL_PAGE_SIZE =
@@ -272,12 +274,14 @@ function JournalSummarySection({
 function JournalCalendar({
   journalData,
   onSelectPost,
+  onCreatePost,
 }: {
   journalData:
     JournalData;
   onSelectPost: (
     postId: string
   ) => void;
+  onCreatePost: () => void;
 }) {
   const [
     yearMonth,
@@ -659,6 +663,14 @@ function JournalCalendar({
             <p>
               サ活を記録すると、ここに印がつきます。
             </p>
+            <button
+              type="button"
+              className="empty-state-action"
+              onClick={onCreatePost}
+            >
+              <CirclePlus aria-hidden="true" />
+              サ活を記録する
+            </button>
           </div>
         ) : selectedDate ? (
           <div className="journal-calendar-selected">
@@ -1103,6 +1115,7 @@ function JournalActivityCard({
 export function JournalScreen({
   userId,
   onSelectPost,
+  onCreatePost,
 }: JournalScreenProps) {
   const [
     journalData,
@@ -1448,6 +1461,9 @@ export function JournalScreen({
         }
         onSelectPost={
           onSelectPost
+        }
+        onCreatePost={
+          onCreatePost
         }
       />
 

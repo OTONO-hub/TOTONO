@@ -9,6 +9,7 @@ import {
   Heart,
   MapPin,
   RefreshCw,
+  Search,
   Trash2,
   Waves,
 } from "lucide-react";
@@ -30,12 +31,14 @@ type WantToGoScreenProps = {
   onSelectSauna: (
     sauna: Sauna
   ) => void;
+  onGoSearch: () => void;
 };
 
 export function WantToGoScreen({
   userId,
   onBack,
   onSelectSauna,
+  onGoSearch,
 }: WantToGoScreenProps) {
   const [saunas, setSaunas] =
     useState<Sauna[]>([]);
@@ -210,6 +213,14 @@ export function WantToGoScreen({
           <p>
             気になるサウナを見つけて、次のサ活候補に追加してみましょう。
           </p>
+          <button
+            type="button"
+            className="empty-state-action"
+            onClick={onGoSearch}
+          >
+            <Search aria-hidden="true" />
+            サウナを探す
+          </button>
         </div>
       ) : (
         <div className="saved-posts-list">
