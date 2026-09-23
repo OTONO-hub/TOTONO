@@ -11,6 +11,7 @@ import {
   hasSupabaseConfig,
   supabase,
 } from "../lib/supabase";
+import { trackProductEvent } from "../services/product-events";
 
 type LoginStep =
   | "email"
@@ -211,6 +212,13 @@ export function LoginScreen() {
           "ログインセッションを作成できませんでした。"
         );
       }
+
+      trackProductEvent(data.session.user.id, {
+        eventName: "login",
+        source: "auth",
+        sourceScreen: "login",
+        authMethod: "email",
+      });
     } catch (
       verificationError
     ) {
