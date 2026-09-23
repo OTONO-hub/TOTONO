@@ -6,6 +6,7 @@ export type ProductEventName =
   | "sign_up"
   | "login"
   | "app_open"
+  | "app_return"
   | "today_view"
   | "search_view"
   | "sauna_search"
@@ -69,6 +70,29 @@ export function trackProductEvent(
   void insertProductEvent(supabase, userId, event).catch((error: unknown) => {
     console.warn("プロダクトイベントを記録できませんでした。", error);
   });
+}
+
+export async function recordAppReturn(
+  client: SupabaseClient
+): Promise<boolean> {
+  const {
+    data,
+    error,
+  } =
+    await client.rpc(
+      "record_app_return"
+    );
+
+  if (error) {
+    console.warn(
+      "アプリ再訪イベントを記録できませんでした。",
+      error.message
+    );
+
+    return false;
+  }
+
+  return data === true;
 }
 
 export function trackRecommendationEvent(
