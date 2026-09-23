@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { insertProductEvent } from "./product-events";
+import {
+  insertProductEvent,
+  recordAppReturn,
+} from "./product-events";
 
 describe("insertProductEvent", () => {
   it("inserts an iOS recommendation event without personal profile data", async () => {
@@ -142,5 +145,58 @@ describe("insertProductEvent", () => {
     }));
     expect(payload).not.toHaveProperty("email");
     expect(payload).not.toHaveProperty("username");
+  });
+});
+
+describe("recordAppReturn", () => {
+  it("uses the server-side retention RPC", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: true,
+      error: null,
+    });
+    const client = { rpc } as unknown as SupabaseClient;
+
+    await expect(
+      recordAppReturn(
+        client
+      )
+    ).resolves.toBe(
+      true
+    );
+    expect(
+      rpc
+    ).toHaveBeenCalledWith(
+      "record_app_return"
+    );
+  });
+
+  it("does not block app startup when retention tracking fails", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        message: "offline",
+      },
+    });
+    const client = { rpc } as unknown as SupabaseClient;
+    const warning = vi
+      .spyOn(
+        console,
+        "warn"
+      )
+      .mockImplementation(
+        () => undefined
+      );
+
+    await expect(
+      recordAppReturn(
+        client
+      )
+    ).resolves.toBe(
+      false
+    );
+    expect(
+      warning
+    ).toHaveBeenCalled();
+    warning.mockRestore();
   });
 });

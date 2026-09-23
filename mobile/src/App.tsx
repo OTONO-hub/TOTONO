@@ -8,6 +8,12 @@ import type {
   Session,
 } from "@supabase/supabase-js";
 import {
+  App as CapacitorApp,
+} from "@capacitor/app";
+import type {
+  PluginListenerHandle,
+} from "@capacitor/core";
+import {
   Bell,
   BookOpen,
   CirclePlus,
@@ -80,7 +86,10 @@ import {
 import type {
   Sauna,
 } from "./services/saunas";
-import { trackProductEvent } from "./services/product-events";
+import {
+  recordAppReturn,
+  trackProductEvent,
+} from "./services/product-events";
 import {
   createManualPostSauna,
   createPostSaunaFromSauna,
@@ -411,7 +420,75 @@ export function App() {
       eventName: "app_open",
       source: "app_lifecycle",
     });
+
   }, [ready, session]);
+
+  useEffect(() => {
+    if (
+      !ready ||
+      !session ||
+      !supabase
+    ) {
+      return;
+    }
+
+    const eventClient =
+      supabase;
+
+    let cancelled =
+      false;
+
+    let listener:
+      | PluginListenerHandle
+      | null =
+      null;
+
+    void recordAppReturn(
+      eventClient
+    );
+
+    void CapacitorApp
+      .addListener(
+        "appStateChange",
+        ({
+          isActive,
+        }) => {
+          if (
+            isActive &&
+            !cancelled
+          ) {
+            void recordAppReturn(
+              eventClient
+            );
+          }
+        }
+      )
+      .then((
+        nextListener
+      ) => {
+        if (cancelled) {
+          void nextListener
+            .remove();
+          return;
+        }
+
+        listener =
+          nextListener;
+      });
+
+    return () => {
+      cancelled =
+        true;
+
+      if (listener) {
+        void listener
+          .remove();
+      }
+    };
+  }, [
+    ready,
+    session,
+  ]);
 
   useEffect(() => {
     if (!ready || !session) return;
