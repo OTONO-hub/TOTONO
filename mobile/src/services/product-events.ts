@@ -6,6 +6,8 @@ export type ProductEventName =
   | "app_open"
   | "today_view"
   | "search_view"
+  | "sauna_search"
+  | "sauna_detail_view"
   | "recommendation_view"
   | "recommendation_change"
   | "recommendation_detail_view"
@@ -15,8 +17,9 @@ export type ProductEventName =
 
 export type ProductEvent = {
   eventName: ProductEventName;
-  source: "app_lifecycle" | "screen_view" | "today_next_sauna";
+  source: "app_lifecycle" | "screen_view" | "sauna_search" | "today_next_sauna";
   sourceScreen?: string;
+  searchMethod?: "keyword" | "prefecture" | "current_location";
   saunaId?: string;
   recommendationReason?: string;
   sessionPosition?: number;
@@ -36,6 +39,7 @@ export async function insertProductEvent(
     session_position: event.sessionPosition ?? null,
     source: event.source,
     source_screen: event.sourceScreen?.slice(0, 50) ?? null,
+    search_method: event.searchMethod ?? null,
   });
 
   if (error) {

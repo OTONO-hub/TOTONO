@@ -35,6 +35,7 @@ import {
   searchSaunas,
   type Sauna,
 } from "../services/saunas";
+import { trackProductEvent } from "../services/product-events";
 
 type SearchScreenProps = {
   currentUserId: string;
@@ -202,6 +203,17 @@ export function SearchScreen({
               setResults(
                 saunas
               );
+
+              trackProductEvent(currentUserId, {
+                eventName: "sauna_search",
+                source: "sauna_search",
+                sourceScreen: "search",
+                searchMethod: nearbyLocation
+                  ? "current_location"
+                  : prefecture
+                    ? "prefecture"
+                    : "keyword",
+              });
             } catch (
               searchError
             ) {
@@ -244,7 +256,7 @@ export function SearchScreen({
         timeoutId
       );
     };
-  }, [keyword, prefecture, retryCount, nearbyLocation, radiusKm]);
+  }, [currentUserId, keyword, prefecture, retryCount, nearbyLocation, radiusKm]);
 
   function handleKeywordChange(
     value: string
