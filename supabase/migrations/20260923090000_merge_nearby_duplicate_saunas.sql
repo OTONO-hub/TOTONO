@@ -24,9 +24,7 @@ begin
       from public.saunas
       where id = merge_record.duplicate_id
     ) then
-      raise exception
-        'Duplicate sauna record % does not exist',
-        merge_record.duplicate_id;
+      continue;
     end if;
 
     if not exists (
