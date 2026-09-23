@@ -1487,6 +1487,9 @@ export function App() {
                     onCreatePost={
                       startPostFromSaunaDetail
                     }
+                    onSelectPost={
+                      openPostDetail
+                    }
                   />
                 ) : null}
 
