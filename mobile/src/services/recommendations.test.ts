@@ -28,4 +28,15 @@ describe("selectNextSaunaRecommendation", () => {
 
     expect(selectNextSaunaRecommendation(candidates, new Set(["visited"]), null)).toBeNull();
   });
+
+  it("does not return a facility already shown in the session", () => {
+    const candidates: RecommendationCandidate[] = [
+      { sauna: sauna("shown", "東京都"), postCount: 10, favoriteCount: 10, averageRating: 5 },
+      { sauna: sauna("next", "東京都"), postCount: 2, favoriteCount: 1, averageRating: 4.6 },
+    ];
+
+    const result = selectNextSaunaRecommendation(candidates, new Set(["shown"]), "東京都");
+
+    expect(result?.sauna.id).toBe("next");
+  });
 });
