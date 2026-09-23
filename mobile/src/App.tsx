@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -79,6 +80,7 @@ import {
 import type {
   Sauna,
 } from "./services/saunas";
+import { trackProductEvent } from "./services/product-events";
 import {
   createManualPostSauna,
   createPostSaunaFromSauna,
@@ -123,6 +125,8 @@ type SaunaDetailReturnTarget =
     };
 
 export function App() {
+  const appOpenTracked = useRef(false);
+  const previousLocation = useRef<string | null>(null);
   const [
     session,
     setSession,
@@ -391,6 +395,39 @@ export function App() {
   }, [
     authRetryKey,
   ]);
+
+  useEffect(() => {
+    if (!ready || !session || appOpenTracked.current) return;
+    appOpenTracked.current = true;
+    trackProductEvent(session.user.id, {
+      eventName: "app_open",
+      source: "app_lifecycle",
+    });
+  }, [ready, session]);
+
+  useEffect(() => {
+    if (!ready || !session) return;
+
+    const location = `${tab}:${searchView}`;
+    if (previousLocation.current === location) return;
+
+    const sourceScreen = previousLocation.current?.split(":")[0];
+    previousLocation.current = location;
+
+    if (tab === "today") {
+      trackProductEvent(session.user.id, {
+        eventName: "today_view",
+        source: "screen_view",
+        sourceScreen,
+      });
+    } else if (tab === "search" && searchView === "search") {
+      trackProductEvent(session.user.id, {
+        eventName: "search_view",
+        source: "screen_view",
+        sourceScreen,
+      });
+    }
+  }, [ready, searchView, session, tab]);
 
   useEffect(() => {
     window.scrollTo({
