@@ -39,6 +39,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>TOTONOでサ活の写真やプロフィール画像を撮影するためにカメラを使用します。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>現在地周辺のサウナ施設を探すために使用します。位置情報は保存されません。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>TOTONOで撮影したサ活写真やプロフィール画像を写真ライブラリへ保存するために使用します。</string>
 	<key>NSPhotoLibraryUsageDescription</key>

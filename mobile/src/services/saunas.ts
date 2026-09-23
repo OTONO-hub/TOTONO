@@ -27,6 +27,13 @@ export type Sauna = {
   is_verified: boolean;
   created_at: string;
   updated_at: string;
+  distance_km?: number;
+};
+
+export type NearbySearchLocation = {
+  latitude: number;
+  longitude: number;
+  radiusKm: number;
 };
 
 const SEARCH_LIMIT = 20;
@@ -95,6 +102,55 @@ export async function searchSaunas(
   if (error) {
     throw new Error(
       `施設の検索に失敗しました: ${error.message}`
+    );
+  }
+
+  return (data ?? []) as Sauna[];
+}
+
+export async function searchNearbySaunas(
+  supabase: SupabaseClient,
+  keyword: string,
+  location: NearbySearchLocation
+): Promise<Sauna[]> {
+  const {
+    latitude,
+    longitude,
+    radiusKm,
+  } = location;
+
+  if (
+    !Number.isFinite(latitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    !Number.isFinite(longitude) ||
+    longitude < -180 ||
+    longitude > 180 ||
+    ![3, 10, 30].includes(radiusKm)
+  ) {
+    throw new Error(
+      "現在地検索の条件が正しくありません。"
+    );
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "search_saunas_nearby",
+    {
+      user_latitude: latitude,
+      user_longitude: longitude,
+      search_radius_km: radiusKm,
+      search_keyword: keyword.trim(),
+      search_features: [],
+      result_limit: SEARCH_LIMIT,
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      `現在地周辺の施設検索に失敗しました: ${error.message}`
     );
   }
 

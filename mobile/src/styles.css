@@ -371,6 +371,92 @@ h1 {
   font-weight: 800;
 }
 
+.nearby-search-button {
+  display: flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 12px;
+  border: 1px solid rgba(62, 58, 58, 0.1);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #3e3a3a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nearby-search-button.active {
+  border-color: rgba(0, 180, 182, 0.22);
+  background: rgba(0, 180, 182, 0.09);
+  color: #007f81;
+}
+
+.nearby-search-button:disabled {
+  opacity: 0.55;
+}
+
+.nearby-search-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nearby-search-panel {
+  display: grid;
+  gap: 13px;
+  margin-top: 12px;
+  border: 1px solid rgba(0, 180, 182, 0.13);
+  border-radius: 19px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 15px;
+}
+
+.nearby-search-panel > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.nearby-search-panel strong {
+  font-size: 13px;
+}
+
+.nearby-search-panel small {
+  color: rgba(62, 58, 58, 0.56);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.nearby-radius-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.nearby-radius-options button {
+  min-height: 38px;
+  border: 1px solid rgba(62, 58, 58, 0.08);
+  border-radius: 999px;
+  background: rgba(230, 229, 239, 0.58);
+  color: rgba(62, 58, 58, 0.66);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.nearby-radius-options button.active {
+  border-color: #3e3a3a;
+  background: #3e3a3a;
+  color: white;
+}
+
+.sauna-result-distance {
+  display: block;
+  margin-top: 5px;
+  color: #007f81;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .sauna-result-card {
   display: flex;
   width: 100%;
