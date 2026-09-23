@@ -160,5 +160,5 @@ export async function getNextSaunaRecommendation(
 
 export async function saveRecommendedSauna(userId: string, saunaId: string): Promise<void> {
   if (!supabase) throw new Error("Supabaseの設定が見つかりません。");
-  await addFavoriteSauna(supabase, userId, saunaId);
+  await addFavoriteSauna(supabase, userId, saunaId, "today");
 }
