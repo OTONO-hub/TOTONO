@@ -91,6 +91,12 @@ import {
   trackProductEvent,
 } from "./services/product-events";
 import {
+  getLaunchMinimumDuration,
+  getLaunchMode,
+  markLaunchExperienceSeen,
+  type LaunchMode,
+} from "./services/launch-experience";
+import {
   createManualPostSauna,
   createPostSaunaFromSauna,
   type PostSauna,
@@ -144,6 +150,21 @@ function getAnalyticsScreen(location: string | null): string | undefined {
 export function App() {
   const appOpenTracked = useRef(false);
   const previousLocation = useRef<string | null>(null);
+  const [
+    launchMode,
+  ] =
+    useState<LaunchMode>(
+      () =>
+        getLaunchMode()
+    );
+
+  const [
+    minimumLaunchComplete,
+    setMinimumLaunchComplete,
+  ] =
+    useState(
+      false
+    );
   const [
     session,
     setSession,
@@ -307,6 +328,29 @@ export function App() {
     useState(
       0
     );
+
+  useEffect(() => {
+    const timeoutId =
+      window.setTimeout(
+        () => {
+          markLaunchExperienceSeen();
+          setMinimumLaunchComplete(
+            true
+          );
+        },
+        getLaunchMinimumDuration(
+          launchMode
+        )
+      );
+
+    return () => {
+      window.clearTimeout(
+        timeoutId
+      );
+    };
+  }, [
+    launchMode,
+  ]);
 
   useEffect(() => {
     if (!supabase) {
@@ -563,9 +607,20 @@ export function App() {
     );
   }
 
-  if (!ready) {
+  if (
+    !ready ||
+    !minimumLaunchComplete
+  ) {
     return (
-      <LaunchScreen />
+      <LaunchScreen
+        mode={
+          launchMode
+        }
+        waitingForApp={
+          minimumLaunchComplete &&
+          !ready
+        }
+      />
     );
   }
 
@@ -1717,22 +1772,53 @@ export function App() {
   );
 }
 
-function LaunchScreen() {
+function LaunchScreen({
+  mode,
+  waitingForApp,
+}: {
+  mode: LaunchMode;
+  waitingForApp: boolean;
+}) {
   return (
-    <section className="center-screen">
-      <p className="eyebrow">
+    <section
+      className={`launch-screen ${
+        mode === "first"
+          ? "first-launch"
+          : "returning-launch"
+      }`}
+      role="status"
+      aria-live="polite"
+      aria-label="TOTONOを起動しています"
+    >
+      <div
+        className="launch-brand-mark"
+        aria-hidden="true"
+      >
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <p className="launch-wordmark">
         TOTONO
       </p>
 
-      <h1>
-        サウナへ行く前から、
-        整い始める。
-      </h1>
+      {mode === "first" ? (
+        <p className="launch-tagline">
+          サウナへ行く前から、
+          <br />
+          整い始める。
+        </p>
+      ) : null}
 
-      <p className="lead">
-        あなたのサウナライフを、
-        発見から記録までひとつに。
-      </p>
+      <span
+        className={
+          waitingForApp
+            ? "launch-pulse waiting"
+            : "launch-pulse"
+        }
+        aria-hidden="true"
+      />
     </section>
   );
 }
