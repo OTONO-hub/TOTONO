@@ -239,6 +239,8 @@ export async function getCommunityFeed(
   options?: {
     pageSize?: number;
     offset?: number;
+    saunaId?: string;
+    excludeCurrentUser?: boolean;
   }
 ): Promise<CommunityFeedPage> {
   const normalizedUserId =
@@ -296,6 +298,29 @@ export async function getCommunityFeed(
             false,
         }
       );
+
+  const saunaId =
+    options?.saunaId
+      ?.trim();
+
+  if (saunaId) {
+    postsQuery =
+      postsQuery.eq(
+        "sauna_id",
+        saunaId
+      );
+  }
+
+  if (
+    options
+      ?.excludeCurrentUser
+  ) {
+    postsQuery =
+      postsQuery.neq(
+        "user_id",
+        normalizedUserId
+      );
+  }
 
   if (
     blockedUserIds.size >

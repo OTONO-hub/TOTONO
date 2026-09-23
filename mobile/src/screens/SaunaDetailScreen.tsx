@@ -9,12 +9,15 @@ import {
   Car,
   ChevronRight,
   ExternalLink,
+  Flame,
   Heart,
   History,
   MapPin,
+  MessageCircle,
   Phone,
   Star,
   Utensils,
+  UserRound,
   Waves,
   Wind,
 } from "lucide-react";
@@ -27,6 +30,10 @@ import {
   isFavoriteSauna,
   removeFavoriteSauna,
 } from "../services/favorite-saunas";
+import {
+  getCommunityFeed,
+  type CommunityPost,
+} from "../services/community";
 import {
   getSaunaById,
   type Sauna,
@@ -48,6 +55,9 @@ type SaunaDetailScreenProps = {
     postId: string
   ) => void;
 };
+
+const SAUNA_LOG_LIMIT =
+  3;
 
 function formatVisitDate(
   value: string
@@ -223,6 +233,34 @@ export function SaunaDetailScreen({
       null
     );
 
+  const [
+    saunaLogs,
+    setSaunaLogs,
+  ] =
+    useState<
+      CommunityPost[]
+    >(
+      []
+    );
+
+  const [
+    saunaLogsLoading,
+    setSaunaLogsLoading,
+  ] =
+    useState(
+      false
+    );
+
+  const [
+    saunaLogsError,
+    setSaunaLogsError,
+  ] =
+    useState<
+      string | null
+    >(
+      null
+    );
+
   /*
    * 詳細画面を開いたときに、
    * 施設IDから完全な施設情報を再取得します。
@@ -366,6 +404,77 @@ export function SaunaDetailScreen({
     }
 
     void loadFavorite();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    sauna.id,
+    userId,
+  ]);
+
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    const client =
+      supabase;
+
+    let cancelled =
+      false;
+
+    setSaunaLogs([]);
+    setSaunaLogsError(
+      null
+    );
+    setSaunaLogsLoading(
+      true
+    );
+
+    async function loadSaunaLogs() {
+      try {
+        const result =
+          await getCommunityFeed(
+            client,
+            userId,
+            {
+              pageSize:
+                SAUNA_LOG_LIMIT,
+              saunaId:
+                sauna.id,
+              excludeCurrentUser:
+                true,
+            }
+          );
+
+        if (!cancelled) {
+          setSaunaLogs(
+            result.posts
+          );
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(
+          error
+        );
+        setSaunaLogsError(
+          "この施設のサ活を表示できませんでした。"
+        );
+      } finally {
+        if (!cancelled) {
+          setSaunaLogsLoading(
+            false
+          );
+        }
+      }
+    }
+
+    void loadSaunaLogs();
 
     return () => {
       cancelled =
@@ -809,6 +918,166 @@ export function SaunaDetailScreen({
           role="alert"
         >
           {historyError}
+        </p>
+      ) : null}
+
+      {saunaLogsLoading ? (
+        <div
+          className="detail-sauna-logs-loading"
+          role="status"
+        >
+          この施設のサ活を確認しています...
+        </div>
+      ) : null}
+
+      {saunaLogs.length > 0 ? (
+        <section
+          className="detail-section"
+          aria-labelledby="detail-sauna-logs-heading"
+        >
+          <p className="detail-section-label">
+            Sauna logs
+          </p>
+
+          <div className="detail-sauna-logs-heading">
+            <div>
+              <h2 id="detail-sauna-logs-heading">
+                この施設のサ活
+              </h2>
+
+              <p>
+                サウナ好きのリアルな体験
+              </p>
+            </div>
+
+            <Flame
+              aria-hidden="true"
+            />
+          </div>
+
+          <div className="detail-sauna-logs-list">
+            {saunaLogs.map(
+              (post) => {
+                const authorName =
+                  post.author.username
+                    ?.trim() ||
+                  "TOTONOユーザー";
+
+                const primaryImage =
+                  post.images[0]
+                    ?.imageUrl ??
+                  null;
+
+                return (
+                  <button
+                    key={
+                      post.id
+                    }
+                    type="button"
+                    className="detail-sauna-log-card"
+                    onClick={() => {
+                      onSelectPost(
+                        post.id
+                      );
+                    }}
+                  >
+                    <span className="detail-sauna-log-author">
+                      <span className="detail-sauna-log-avatar">
+                        {post.author.avatarUrl ? (
+                          <img
+                            src={
+                              post.author.avatarUrl
+                            }
+                            alt=""
+                            loading="lazy"
+                          />
+                        ) : (
+                          <UserRound
+                            aria-hidden="true"
+                          />
+                        )}
+                      </span>
+
+                      <span>
+                        <strong>
+                          {authorName}
+                        </strong>
+
+                        <small>
+                          {formatVisitDate(
+                            post.visitDate
+                          )}
+                        </small>
+                      </span>
+                    </span>
+
+                    {primaryImage ? (
+                      <span className="detail-sauna-log-image">
+                        <img
+                          src={
+                            primaryImage
+                          }
+                          alt=""
+                          loading="lazy"
+                        />
+                      </span>
+                    ) : null}
+
+                    <span className="detail-sauna-log-meta">
+                      <span>
+                        <Flame
+                          aria-hidden="true"
+                        />
+
+                        {post.setCount}セット
+                      </span>
+
+                      <span>
+                        <Star
+                          aria-hidden="true"
+                        />
+
+                        {post.rating.toFixed(
+                          1
+                        )}
+                      </span>
+
+                      <span>
+                        <MessageCircle
+                          aria-hidden="true"
+                        />
+
+                        {post.commentCount}
+                      </span>
+                    </span>
+
+                    {post.comment ? (
+                      <span className="detail-sauna-log-comment">
+                        {post.comment}
+                      </span>
+                    ) : null}
+
+                    <span className="detail-sauna-log-link">
+                      サ活を見る
+
+                      <ChevronRight
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </button>
+                );
+              }
+            )}
+          </div>
+        </section>
+      ) : null}
+
+      {saunaLogsError ? (
+        <p
+          className="detail-sauna-logs-error"
+          role="alert"
+        >
+          {saunaLogsError}
         </p>
       ) : null}
 
