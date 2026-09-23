@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 import {
@@ -27,6 +28,7 @@ import {
   saveRecommendedSauna,
   type NextSaunaRecommendation,
 } from "../services/recommendations";
+import { trackRecommendationEvent } from "../services/product-events";
 
 type TodayScreenProps = {
   userId: string;
@@ -606,6 +608,9 @@ function TodayRecommendationSection({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [sessionExcludedSaunaIds, setSessionExcludedSaunaIds] = useState<string[]>([]);
+  const trackedRecommendationViews = useRef(new Set<string>());
+  const trackedEmptyPositions = useRef(new Set<number>());
+  const sessionPosition = sessionExcludedSaunaIds.length + 1;
 
   useEffect(() => {
     let cancelled = false;
@@ -613,13 +618,45 @@ function TodayRecommendationSection({
     setError(null);
     void getNextSaunaRecommendation(userId, sessionExcludedSaunaIds)
       .then((result) => { if (!cancelled) setRecommendation(result); })
-      .catch(() => { if (!cancelled) setError("おすすめ施設を読み込めませんでした。"); })
+      .catch(() => {
+        if (!cancelled) {
+          setError("おすすめ施設を読み込めませんでした。");
+          trackRecommendationEvent(userId, { eventName: "recommendation_error", sessionPosition });
+        }
+      })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [userId, reloadKey, sessionExcludedSaunaIds]);
 
-  function showNextRecommendation() {
+  useEffect(() => {
     if (!recommendation) return;
+    const viewKey = `${recommendation.sauna.id}:${sessionPosition}`;
+    if (trackedRecommendationViews.current.has(viewKey)) return;
+    trackedRecommendationViews.current.add(viewKey);
+    trackRecommendationEvent(userId, {
+      eventName: "recommendation_view",
+      saunaId: recommendation.sauna.id,
+      recommendationReason: recommendation.reason,
+      sessionPosition,
+    });
+  }, [recommendation, sessionPosition, userId]);
+
+  useEffect(() => {
+    if (loading || error || recommendation || trackedEmptyPositions.current.has(sessionPosition)) return;
+    trackedEmptyPositions.current.add(sessionPosition);
+    trackRecommendationEvent(userId, { eventName: "recommendation_empty", sessionPosition });
+  }, [error, loading, recommendation, sessionPosition, userId]);
+
+  function showNextRecommendation(trackChange = true) {
+    if (!recommendation) return;
+    if (trackChange) {
+      trackRecommendationEvent(userId, {
+        eventName: "recommendation_change",
+        saunaId: recommendation.sauna.id,
+        recommendationReason: recommendation.reason,
+        sessionPosition,
+      });
+    }
     setRecommendation(null);
     setSaved(false);
     setSessionExcludedSaunaIds((saunaIds) =>
@@ -635,8 +672,14 @@ function TodayRecommendationSection({
     setError(null);
     try {
       await saveRecommendedSauna(userId, recommendation.sauna.id);
+      trackRecommendationEvent(userId, {
+        eventName: "recommendation_favorite_add",
+        saunaId: recommendation.sauna.id,
+        recommendationReason: recommendation.reason,
+        sessionPosition,
+      });
       setSaved(true);
-      showNextRecommendation();
+      showNextRecommendation(false);
     } catch {
       setError("行きたいに追加できませんでした。");
     } finally {
@@ -662,7 +705,15 @@ function TodayRecommendationSection({
 
       {!loading && recommendation ? (
         <div className="today-recommendation-card">
-          <button type="button" className="today-recommendation-main" onClick={() => { onSelectSauna(recommendation.sauna); }}>
+          <button type="button" className="today-recommendation-main" onClick={() => {
+            trackRecommendationEvent(userId, {
+              eventName: "recommendation_detail_view",
+              saunaId: recommendation.sauna.id,
+              recommendationReason: recommendation.reason,
+              sessionPosition,
+            });
+            onSelectSauna(recommendation.sauna);
+          }}>
             <div className="today-recommendation-image">
               {recommendation.sauna.image_url ? <img src={recommendation.sauna.image_url} alt="" /> : <Flame aria-hidden="true" />}
             </div>
@@ -675,7 +726,7 @@ function TodayRecommendationSection({
           <button type="button" className="today-recommendation-save" disabled={saving || saved} onClick={() => { void saveRecommendation(); }}>
             <Heart aria-hidden="true" />{saved ? "行きたいに追加済み" : saving ? "追加しています..." : "行きたいに追加"}
           </button>
-          <button type="button" className="today-recommendation-next" disabled={saving} onClick={showNextRecommendation}>
+          <button type="button" className="today-recommendation-next" disabled={saving} onClick={() => { showNextRecommendation(); }}>
             <RefreshCw aria-hidden="true" />別の候補を見る
           </button>
         </div>
