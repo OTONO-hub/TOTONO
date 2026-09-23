@@ -72,7 +72,10 @@ function getPrefecture(row: FavoriteRow): string | null {
   return sauna?.prefecture?.trim() || null;
 }
 
-export async function getNextSaunaRecommendation(userId: string): Promise<NextSaunaRecommendation | null> {
+export async function getNextSaunaRecommendation(
+  userId: string,
+  sessionExcludedSaunaIds: string[] = []
+): Promise<NextSaunaRecommendation | null> {
   if (!supabase) throw new Error("Supabaseの設定が見つかりません。");
   const client: SupabaseClient = supabase;
 
@@ -94,6 +97,7 @@ export async function getNextSaunaRecommendation(userId: string): Promise<NextSa
   const excluded = new Set([
     ...favorites.map((row) => row.sauna_id),
     ...visits.flatMap((row) => row.sauna_id ? [row.sauna_id] : []),
+    ...sessionExcludedSaunaIds,
   ]);
 
   const prefectureCounts = new Map<string, number>();

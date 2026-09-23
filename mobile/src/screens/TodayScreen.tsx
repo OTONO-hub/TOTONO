@@ -605,17 +605,29 @@ function TodayRecommendationSection({
   const [reloadKey, setReloadKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [sessionExcludedSaunaIds, setSessionExcludedSaunaIds] = useState<string[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    void getNextSaunaRecommendation(userId)
+    void getNextSaunaRecommendation(userId, sessionExcludedSaunaIds)
       .then((result) => { if (!cancelled) setRecommendation(result); })
       .catch(() => { if (!cancelled) setError("おすすめ施設を読み込めませんでした。"); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [userId, reloadKey]);
+  }, [userId, reloadKey, sessionExcludedSaunaIds]);
+
+  function showNextRecommendation() {
+    if (!recommendation) return;
+    setRecommendation(null);
+    setSaved(false);
+    setSessionExcludedSaunaIds((saunaIds) =>
+      saunaIds.includes(recommendation.sauna.id)
+        ? saunaIds
+        : [...saunaIds, recommendation.sauna.id]
+    );
+  }
 
   async function saveRecommendation() {
     if (!recommendation || saving || saved) return;
@@ -624,6 +636,7 @@ function TodayRecommendationSection({
     try {
       await saveRecommendedSauna(userId, recommendation.sauna.id);
       setSaved(true);
+      showNextRecommendation();
     } catch {
       setError("行きたいに追加できませんでした。");
     } finally {
@@ -661,6 +674,9 @@ function TodayRecommendationSection({
           </button>
           <button type="button" className="today-recommendation-save" disabled={saving || saved} onClick={() => { void saveRecommendation(); }}>
             <Heart aria-hidden="true" />{saved ? "行きたいに追加済み" : saving ? "追加しています..." : "行きたいに追加"}
+          </button>
+          <button type="button" className="today-recommendation-next" disabled={saving} onClick={showNextRecommendation}>
+            <RefreshCw aria-hidden="true" />別の候補を見る
           </button>
         </div>
       ) : null}
