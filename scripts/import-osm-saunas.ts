@@ -8,6 +8,11 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 
+import {
+  isNearbyDuplicate,
+  selectPreferredNearbySauna,
+} from "./sauna-import-dedupe";
+
 const DEFAULT_OVERPASS_API_URLS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
@@ -862,6 +867,47 @@ function processElements(
         source_url: sourceUrl,
         reason:
           "登録データへの変換に失敗しました",
+      });
+
+      continue;
+    }
+
+    const nearbyDuplicate = Array.from(
+      acceptedRowsBySourceId.values()
+    ).find((acceptedRow) =>
+      isNearbyDuplicate(
+        acceptedRow,
+        row
+      )
+    );
+
+    if (nearbyDuplicate) {
+      const preferredRow =
+        selectPreferredNearbySauna(
+          nearbyDuplicate,
+          row
+        );
+      const rejectedRow =
+        preferredRow === nearbyDuplicate
+          ? row
+          : nearbyDuplicate;
+
+      if (preferredRow === row) {
+        acceptedRowsBySourceId.delete(
+          nearbyDuplicate.source_id
+        );
+        acceptedRowsBySourceId.set(
+          row.source_id,
+          row
+        );
+      }
+
+      rejectedRows.push({
+        original_name: rejectedRow.name,
+        source_id: rejectedRow.source_id,
+        source_url: rejectedRow.source_url,
+        reason:
+          `近接する同名施設と重複（採用: ${preferredRow.source_id}）`,
       });
 
       continue;
