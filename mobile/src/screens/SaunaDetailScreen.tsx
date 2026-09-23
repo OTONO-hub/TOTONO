@@ -691,9 +691,6 @@ export function SaunaDetailScreen({
           <span>
             TOTONO
           </span>
-          <small>
-            施設写真を準備中
-          </small>
         </div>
       )}
 
