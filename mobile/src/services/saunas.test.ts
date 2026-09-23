@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { searchSaunas } from "./saunas";
+import {
+  searchNearbySaunas,
+  searchSaunas,
+} from "./saunas";
 
 describe("searchSaunas", () => {
   it("does not query when both search conditions are empty", async () => {
@@ -47,5 +50,49 @@ describe("searchSaunas", () => {
       ascending: true,
     });
     expect(limit).toHaveBeenCalledWith(20);
+  });
+});
+
+describe("searchNearbySaunas", () => {
+  it("passes validated location conditions to nearby search", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [{ id: "nearby", distance_km: 1.2 }],
+      error: null,
+    });
+    const supabase = { rpc } as unknown as SupabaseClient;
+
+    const result = await searchNearbySaunas(
+      supabase,
+      " 北欧 ",
+      {
+        latitude: 35.6812,
+        longitude: 139.7671,
+        radiusKm: 10,
+      }
+    );
+
+    expect(rpc).toHaveBeenCalledWith("search_saunas_nearby", {
+      user_latitude: 35.6812,
+      user_longitude: 139.7671,
+      search_radius_km: 10,
+      search_keyword: "北欧",
+      search_features: [],
+      result_limit: 20,
+    });
+    expect(result[0]).toMatchObject({ distance_km: 1.2 });
+  });
+
+  it("rejects unsupported radius values before querying", async () => {
+    const rpc = vi.fn();
+    const supabase = { rpc } as unknown as SupabaseClient;
+
+    await expect(
+      searchNearbySaunas(supabase, "", {
+        latitude: 35.6812,
+        longitude: 139.7671,
+        radiusKm: 100,
+      })
+    ).rejects.toThrow("現在地検索の条件が正しくありません。");
+    expect(rpc).not.toHaveBeenCalled();
   });
 });

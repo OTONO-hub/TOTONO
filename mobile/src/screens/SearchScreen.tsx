@@ -6,6 +6,7 @@ import {
   Clock3,
   ChevronDown,
   History,
+  LocateFixed,
   MapPin,
   Search,
   Trash2,
@@ -24,7 +25,13 @@ import {
   type RecentlyViewedSauna,
 } from "../services/recently-viewed-saunas";
 import {
+  CurrentLocationError,
+  getCurrentSearchLocation,
+  type CurrentSearchLocation,
+} from "../services/current-location";
+import {
   getSaunaById,
+  searchNearbySaunas,
   searchSaunas,
   type Sauna,
 } from "../services/saunas";
@@ -42,6 +49,12 @@ const MIN_SEARCH_LENGTH =
 
 const SEARCH_DELAY =
   300;
+
+const SEARCH_RADII = [
+  3,
+  10,
+  30,
+] as const;
 
 const PREFECTURES = [
   "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
@@ -72,6 +85,26 @@ export function SearchScreen({
     retryCount,
     setRetryCount,
   ] = useState(0);
+
+  const [
+    nearbyLocation,
+    setNearbyLocation,
+  ] = useState<CurrentSearchLocation | null>(null);
+
+  const [
+    radiusKm,
+    setRadiusKm,
+  ] = useState(10);
+
+  const [
+    locationLoading,
+    setLocationLoading,
+  ] = useState(false);
+
+  const [
+    locationError,
+    setLocationError,
+  ] = useState<string | null>(null);
 
   const [
     results,
@@ -120,7 +153,8 @@ export function SearchScreen({
 
     if (
       trimmedKeyword.length < MIN_SEARCH_LENGTH &&
-      !prefecture
+      !prefecture &&
+      !nearbyLocation
     ) {
       return;
     }
@@ -144,12 +178,20 @@ export function SearchScreen({
             );
 
             try {
-              const saunas =
-                await searchSaunas(
-                  authClient,
-                  trimmedKeyword,
-                  prefecture
-                );
+              const saunas = nearbyLocation
+                ? await searchNearbySaunas(
+                    authClient,
+                    trimmedKeyword,
+                    {
+                      ...nearbyLocation,
+                      radiusKm,
+                    }
+                  )
+                : await searchSaunas(
+                    authClient,
+                    trimmedKeyword,
+                    prefecture
+                  );
 
               if (
                 cancelled
@@ -202,7 +244,7 @@ export function SearchScreen({
         timeoutId
       );
     };
-  }, [keyword, prefecture, retryCount]);
+  }, [keyword, prefecture, retryCount, nearbyLocation, radiusKm]);
 
   function handleKeywordChange(
     value: string
@@ -213,7 +255,8 @@ export function SearchScreen({
 
     if (
       value.trim().length < MIN_SEARCH_LENGTH &&
-      !prefecture
+      !prefecture &&
+      !nearbyLocation
     ) {
       setResults(
         []
@@ -232,6 +275,8 @@ export function SearchScreen({
   function handlePrefectureChange(
     value: string
   ) {
+    setNearbyLocation(null);
+    setLocationError(null);
     setPrefecture(value);
     setError(null);
 
@@ -250,6 +295,51 @@ export function SearchScreen({
     setResults([]);
     setError(null);
     setLoading(false);
+    setNearbyLocation(null);
+    setRadiusKm(10);
+    setLocationError(null);
+  }
+
+  async function startNearbySearch() {
+    if (locationLoading) return;
+
+    setLocationLoading(true);
+    setLocationError(null);
+    setError(null);
+
+    try {
+      const location =
+        await getCurrentSearchLocation();
+
+      setPrefecture("");
+      setNearbyLocation(location);
+      setResults([]);
+    } catch (locationSearchError) {
+      setNearbyLocation(null);
+
+      if (
+        locationSearchError instanceof CurrentLocationError &&
+        locationSearchError.reason === "denied"
+      ) {
+        setLocationError(
+          "位置情報が許可されていません。施設名や都道府県から検索できます。"
+        );
+      } else {
+        setLocationError(
+          "現在地を取得できませんでした。通信状態を確認してもう一度お試しください。"
+        );
+      }
+    } finally {
+      setLocationLoading(false);
+    }
+  }
+
+  function stopNearbySearch() {
+    setNearbyLocation(null);
+    setRadiusKm(10);
+    setResults([]);
+    setError(null);
+    setLocationError(null);
   }
 
   async function openRecentlyViewedSauna(saunaId: string) {
@@ -279,10 +369,12 @@ export function SearchScreen({
 
   const showInitialState =
     trimmedKeyword.length === 0 &&
-    !prefecture;
+    !prefecture &&
+    !nearbyLocation &&
+    !locationLoading;
 
   const showNoResults =
-    (trimmedKeyword.length >= MIN_SEARCH_LENGTH || Boolean(prefecture)) &&
+    (trimmedKeyword.length >= MIN_SEARCH_LENGTH || Boolean(prefecture) || Boolean(nearbyLocation)) &&
     !loading &&
     !error &&
     results.length ===
@@ -356,6 +448,61 @@ export function SearchScreen({
           </button>
         ) : null}
       </div>
+
+      <button
+        type="button"
+        className={nearbyLocation
+          ? "nearby-search-button active"
+          : "nearby-search-button"}
+        disabled={locationLoading}
+        onClick={() => {
+          if (nearbyLocation) {
+            stopNearbySearch();
+          } else {
+            void startNearbySearch();
+          }
+        }}
+      >
+        <LocateFixed aria-hidden="true" />
+        <span>
+          {locationLoading
+            ? "現在地を取得しています..."
+            : nearbyLocation
+              ? "現在地検索を終了"
+              : "現在地から探す"}
+        </span>
+      </button>
+
+      {nearbyLocation ? (
+        <div className="nearby-search-panel">
+          <div>
+            <strong>現在地周辺</strong>
+            <small>位置情報は検索にのみ使用し、保存しません。</small>
+          </div>
+          <div className="nearby-radius-options" aria-label="検索半径">
+            {SEARCH_RADII.map((radius) => (
+              <button
+                key={radius}
+                type="button"
+                className={radiusKm === radius ? "active" : ""}
+                aria-pressed={radiusKm === radius}
+                onClick={() => { setRadiusKm(radius); }}
+              >
+                {radius}km
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {locationError ? (
+        <div className="search-error-card" role="alert">
+          <p>{locationError}</p>
+          <button type="button" onClick={() => { void startNearbySearch(); }}>
+            もう一度試す
+          </button>
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="search-status">
@@ -442,9 +589,20 @@ export function SearchScreen({
           </strong>
 
           <p>
-            検索条件を変えて
-            もう一度お試しください。
+            {nearbyLocation
+              ? `${radiusKm}km以内に該当する施設がありません。`
+              : "検索条件を変えてもう一度お試しください。"}
           </p>
+
+          {nearbyLocation && radiusKm < 30 ? (
+            <button
+              type="button"
+              className="search-empty-clear-button"
+              onClick={() => { setRadiusKm(30); }}
+            >
+              30kmまで広げる
+            </button>
+          ) : null}
 
           <button
             type="button"
@@ -516,6 +674,12 @@ export function SearchScreen({
                           sauna.address ||
                           "所在地未登録"}
                       </span>
+
+                      {nearbyLocation && typeof sauna.distance_km === "number" ? (
+                        <span className="sauna-result-distance">
+                          現在地から{formatDistance(sauna.distance_km)}
+                        </span>
+                      ) : null}
                     </div>
 
                     {sauna.image_url ? (
@@ -550,4 +714,12 @@ function formatViewedAt(value: string): string {
   if (days === 1) return "昨日";
   if (days < 7) return `${days}日前`;
   return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric" }).format(viewedAt);
+}
+
+function formatDistance(distanceKm: number): string {
+  if (distanceKm < 1) {
+    return `${Math.max(1, Math.round(distanceKm * 1000))}m`;
+  }
+
+  return `${distanceKm.toFixed(1)}km`;
 }
