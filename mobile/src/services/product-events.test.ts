@@ -80,4 +80,25 @@ describe("insertProductEvent", () => {
     }));
     expect(insert.mock.calls[0]?.[0]).not.toHaveProperty("keyword");
   });
+
+  it("records post completion without post content", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const client = { from: vi.fn().mockReturnValue({ insert }) } as unknown as SupabaseClient;
+
+    await insertProductEvent(client, "user-1", {
+      eventName: "post_complete",
+      source: "post_flow",
+      sourceScreen: "post_create",
+      saunaId: "sauna-1",
+    });
+
+    const payload = insert.mock.calls[0]?.[0];
+    expect(payload).toEqual(expect.objectContaining({
+      event_name: "post_complete",
+      sauna_id: "sauna-1",
+      source: "post_flow",
+    }));
+    expect(payload).not.toHaveProperty("comment");
+    expect(payload).not.toHaveProperty("rating");
+  });
 });

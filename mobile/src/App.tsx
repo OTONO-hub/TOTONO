@@ -813,6 +813,12 @@ export function App() {
   }
 
   function openCreatePostFlow() {
+    trackProductEvent(currentUserId, {
+      eventName: "post_start",
+      source: "post_flow",
+      sourceScreen: getAnalyticsScreen(`${tab}:${searchView}`),
+    });
+
     closePostDetail();
 
     resetProfileFlows();
@@ -1055,6 +1061,13 @@ export function App() {
       return;
     }
 
+    trackProductEvent(currentUserId, {
+      eventName: "post_start",
+      source: "post_flow",
+      sourceScreen: "sauna_detail",
+      saunaId: selectedSauna.id,
+    });
+
     setSelectedPostSauna(
       createPostSaunaFromSauna(
         selectedSauna
@@ -1103,6 +1116,13 @@ export function App() {
   function finishCreatedPost(
     post: Post
   ) {
+    trackProductEvent(currentUserId, {
+      eventName: "post_complete",
+      source: "post_flow",
+      sourceScreen: "post_create",
+      saunaId: post.sauna_id ?? undefined,
+    });
+
     setCreatedPost(
       post
     );

@@ -5,6 +5,7 @@ import type {
 import type {
   Sauna,
 } from "./saunas";
+import { trackProductEvent } from "./product-events";
 
 export async function isFavoriteSauna(
   supabase: SupabaseClient,
@@ -33,7 +34,8 @@ export async function isFavoriteSauna(
 export async function addFavoriteSauna(
   supabase: SupabaseClient,
   userId: string,
-  saunaId: string
+  saunaId: string,
+  sourceScreen?: string
 ): Promise<void> {
   const {
     error,
@@ -49,6 +51,13 @@ export async function addFavoriteSauna(
       `行きたいへの追加に失敗しました: ${error.message}`
     );
   }
+
+  trackProductEvent(userId, {
+    eventName: "favorite_add",
+    source: "favorite_action",
+    sourceScreen,
+    saunaId,
+  });
 }
 
 export async function removeFavoriteSauna(

@@ -8,6 +8,9 @@ export type ProductEventName =
   | "search_view"
   | "sauna_search"
   | "sauna_detail_view"
+  | "favorite_add"
+  | "post_start"
+  | "post_complete"
   | "recommendation_view"
   | "recommendation_change"
   | "recommendation_detail_view"
@@ -17,7 +20,13 @@ export type ProductEventName =
 
 export type ProductEvent = {
   eventName: ProductEventName;
-  source: "app_lifecycle" | "screen_view" | "sauna_search" | "today_next_sauna";
+  source:
+    | "app_lifecycle"
+    | "screen_view"
+    | "sauna_search"
+    | "favorite_action"
+    | "post_flow"
+    | "today_next_sauna";
   sourceScreen?: string;
   searchMethod?: "keyword" | "prefecture" | "current_location";
   saunaId?: string;

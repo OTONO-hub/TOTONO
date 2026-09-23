@@ -350,7 +350,8 @@ export function SaunaDetailScreen({
         await addFavoriteSauna(
           client,
           userId,
-          displaySauna.id
+          displaySauna.id,
+          "sauna_detail"
         );
       } else {
         await removeFavoriteSauna(
