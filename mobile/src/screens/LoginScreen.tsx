@@ -5,13 +5,29 @@ import {
   KeyRound,
   Mail,
   RefreshCw,
+  UserPlus,
 } from "lucide-react";
 
 import {
   hasSupabaseConfig,
   supabase,
 } from "../lib/supabase";
+import {
+  MAX_USERNAME_LENGTH,
+  isUsernameAvailable,
+  normalizeUsername,
+  validateRegistrationUsername,
+  wasCreatedDuringRegistration,
+} from "../services/auth-registration";
+import {
+  openPrivacyPolicy,
+  openTermsOfService,
+} from "../services/legal-links";
 import { trackProductEvent } from "../services/product-events";
+
+type AuthMode =
+  | "login"
+  | "register";
 
 type LoginStep =
   | "email"
@@ -32,6 +48,14 @@ function getErrorMessage(
 
 export function LoginScreen() {
   const [
+    mode,
+    setMode,
+  ] =
+    useState<AuthMode>(
+      "register"
+    );
+
+  const [
     step,
     setStep,
   ] =
@@ -44,6 +68,30 @@ export function LoginScreen() {
     setEmail,
   ] =
     useState("");
+
+  const [
+    username,
+    setUsername,
+  ] =
+    useState("");
+
+  const [
+    hasAgreed,
+    setHasAgreed,
+  ] =
+    useState(
+      false
+    );
+
+  const [
+    registrationStartedAt,
+    setRegistrationStartedAt,
+  ] =
+    useState<
+      number | null
+    >(
+      null
+    );
 
   const [
     otp,
@@ -94,6 +142,35 @@ export function LoginScreen() {
         .trim()
         .toLowerCase();
 
+    const normalizedUsername =
+      normalizeUsername(
+        username
+      );
+
+    if (
+      mode ===
+      "register"
+    ) {
+      const usernameError =
+        validateRegistrationUsername(
+          normalizedUsername
+        );
+
+      if (usernameError) {
+        setMessage(
+          usernameError
+        );
+        return;
+      }
+
+      if (!hasAgreed) {
+        setMessage(
+          "利用規約とプライバシーポリシーへの同意が必要です。"
+        );
+        return;
+      }
+    }
+
     setSending(
       true
     );
@@ -103,6 +180,32 @@ export function LoginScreen() {
     );
 
     try {
+      if (
+        mode ===
+        "register"
+      ) {
+        const available =
+          await isUsernameAvailable(
+            supabase,
+            normalizedUsername
+          );
+
+        if (!available) {
+          setMessage(
+            "このユーザー名はすでに使用されています。"
+          );
+          return;
+        }
+      }
+
+      const startedAt =
+        mode ===
+          "register" &&
+        registrationStartedAt !==
+          null
+          ? registrationStartedAt
+          : Date.now();
+
       const {
         error,
       } =
@@ -113,7 +216,18 @@ export function LoginScreen() {
 
             options: {
               shouldCreateUser:
-                false,
+                mode ===
+                "register",
+
+              ...(mode ===
+              "register"
+                ? {
+                    data: {
+                      username:
+                        normalizedUsername,
+                    },
+                  }
+                : {}),
             },
           });
 
@@ -125,6 +239,19 @@ export function LoginScreen() {
         normalizedEmail
       );
 
+      if (
+        mode ===
+        "register"
+      ) {
+        setUsername(
+          normalizedUsername
+        );
+
+        setRegistrationStartedAt(
+          startedAt
+        );
+      }
+
       setOtp("");
 
       setStep(
@@ -132,13 +259,23 @@ export function LoginScreen() {
       );
 
       setMessage(
-        "ログインコードをメールへ送信しました。届いた8桁のコードを入力してください。"
+        `${
+          mode ===
+          "register"
+            ? "登録確認"
+            : "ログイン"
+        }コードをメールへ送信しました。届いた8桁のコードを入力してください。`
       );
     } catch (
       sendError
     ) {
       setMessage(
-        `ログインコードを送信できませんでした: ${getErrorMessage(
+        `${
+          mode ===
+          "register"
+            ? "登録確認"
+            : "ログイン"
+        }コードを送信できませんでした: ${getErrorMessage(
           sendError
         )}`
       );
@@ -213,17 +350,39 @@ export function LoginScreen() {
         );
       }
 
+      const isNewAccount =
+        mode ===
+          "register" &&
+        registrationStartedAt !==
+          null &&
+        wasCreatedDuringRegistration(
+          data.session.user
+            .created_at,
+          registrationStartedAt
+        );
+
       trackProductEvent(data.session.user.id, {
-        eventName: "login",
+        eventName:
+          isNewAccount
+            ? "sign_up"
+            : "login",
         source: "auth",
-        sourceScreen: "login",
+        sourceScreen:
+          isNewAccount
+            ? "register"
+            : "login",
         authMethod: "email",
       });
     } catch (
       verificationError
     ) {
       setMessage(
-        `ログインできませんでした: ${getErrorMessage(
+        `${
+          mode ===
+          "register"
+            ? "登録を完了"
+            : "ログイン"
+        }できませんでした: ${getErrorMessage(
           verificationError
         )}`
       );
@@ -253,6 +412,36 @@ export function LoginScreen() {
     );
   }
 
+  function handleModeChange(
+    nextMode: AuthMode
+  ) {
+    if (
+      sending ||
+      verifying
+    ) {
+      return;
+    }
+
+    setMode(
+      nextMode
+    );
+    setStep(
+      "email"
+    );
+    setEmail("");
+    setOtp("");
+    setUsername("");
+    setHasAgreed(
+      false
+    );
+    setRegistrationStartedAt(
+      null
+    );
+    setMessage(
+      null
+    );
+  }
+
   if (
     step === "otp"
   ) {
@@ -269,7 +458,10 @@ export function LoginScreen() {
         </p>
 
         <h1>
-          ログインコードを入力
+          {mode ===
+          "register"
+            ? "登録コードを入力"
+            : "ログインコードを入力"}
         </h1>
 
         <p className="lead">
@@ -343,7 +535,10 @@ export function LoginScreen() {
           >
             {verifying
               ? "確認中..."
-              : "ログイン"}
+              : mode ===
+                  "register"
+                ? "アカウントを作成"
+                : "ログイン"}
           </button>
 
           <button
@@ -396,26 +591,77 @@ export function LoginScreen() {
   return (
     <section className="center-screen login-screen">
       <div className="login-icon">
-        <Mail
-          aria-hidden="true"
-        />
+        {mode ===
+        "register" ? (
+          <UserPlus
+            aria-hidden="true"
+          />
+        ) : (
+          <Mail
+            aria-hidden="true"
+          />
+        )}
       </div>
 
       <p className="eyebrow">
-        Welcome
+        {mode ===
+        "register"
+          ? "Create account"
+          : "Welcome back"}
       </p>
 
       <h1>
-        TOTONOへログイン
+        {mode ===
+        "register"
+          ? "TOTONOをはじめる"
+          : "TOTONOへログイン"}
       </h1>
 
       <p className="lead">
-        登録済みの
-        メールアドレスを
-        入力してください。
+        {mode ===
+        "register"
+          ? "サウナを探して、記録して、振り返る。最初のアカウントを作成します。"
+          : "登録済みのメールアドレスを入力してください。"}
       </p>
 
       <div className="card form-card">
+        {mode ===
+        "register" ? (
+          <>
+            <label htmlFor="register-username">
+              ユーザー名
+            </label>
+
+            <input
+              id="register-username"
+              type="text"
+              autoComplete="username"
+              value={
+                username
+              }
+              onChange={(
+                event
+              ) => {
+                setUsername(
+                  event.target
+                    .value
+                );
+              }}
+              placeholder="サウナ好き"
+              maxLength={
+                MAX_USERNAME_LENGTH
+              }
+              disabled={
+                sending
+              }
+            />
+
+            <p className="login-field-help">
+              2〜{MAX_USERNAME_LENGTH}文字・あとから変更できます
+            </p>
+          </>
+        ) : null}
+
         <label htmlFor="email">
           メールアドレス
         </label>
@@ -453,6 +699,57 @@ export function LoginScreen() {
           }
         />
 
+        {mode ===
+        "register" ? (
+          <div className="login-consent">
+            <input
+              id="register-consent"
+              type="checkbox"
+              aria-label="利用規約とプライバシーポリシーに同意する"
+              checked={
+                hasAgreed
+              }
+              onChange={(
+                event
+              ) => {
+                setHasAgreed(
+                  event.target
+                    .checked
+                );
+              }}
+              disabled={
+                sending
+              }
+            />
+
+            <span>
+              <button
+                className="login-inline-link"
+                type="button"
+                onClick={() => {
+                  void openTermsOfService();
+                }}
+              >
+                利用規約
+              </button>
+
+              と
+
+              <button
+                className="login-inline-link"
+                type="button"
+                onClick={() => {
+                  void openPrivacyPolicy();
+                }}
+              >
+                プライバシーポリシー
+              </button>
+
+              に同意します
+            </span>
+          </div>
+        ) : null}
+
         <button
           type="button"
           onClick={() => {
@@ -461,12 +758,49 @@ export function LoginScreen() {
           disabled={
             !hasSupabaseConfig ||
             !email.trim() ||
+            (mode ===
+              "register" &&
+              (!username.trim() ||
+                !hasAgreed)) ||
             sending
           }
         >
           {sending
             ? "送信中..."
-            : "ログインコードを送る"}
+            : mode ===
+                "register"
+              ? "登録コードを送る"
+              : "ログインコードを送る"}
+        </button>
+
+        <div className="login-mode-divider">
+          <span>
+            {mode ===
+            "register"
+              ? "すでにアカウントをお持ちですか？"
+              : "TOTONOを初めて使いますか？"}
+          </span>
+        </div>
+
+        <button
+          className="secondary login-mode-button"
+          type="button"
+          onClick={() => {
+            handleModeChange(
+              mode ===
+                "register"
+                ? "login"
+                : "register"
+            );
+          }}
+          disabled={
+            sending
+          }
+        >
+          {mode ===
+          "register"
+            ? "ログインへ"
+            : "新しいアカウントを作成"}
         </button>
 
         {message ? (

@@ -122,4 +122,25 @@ describe("insertProductEvent", () => {
     }));
     expect(payload).not.toHaveProperty("email");
   });
+
+  it("records completed registration without profile input", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const client = { from: vi.fn().mockReturnValue({ insert }) } as unknown as SupabaseClient;
+
+    await insertProductEvent(client, "new-user-1", {
+      eventName: "sign_up",
+      source: "auth",
+      sourceScreen: "register",
+      authMethod: "email",
+    });
+
+    const payload = insert.mock.calls[0]?.[0];
+    expect(payload).toEqual(expect.objectContaining({
+      event_name: "sign_up",
+      auth_method: "email",
+      source_screen: "register",
+    }));
+    expect(payload).not.toHaveProperty("email");
+    expect(payload).not.toHaveProperty("username");
+  });
 });
