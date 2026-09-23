@@ -5,11 +5,15 @@ import {
 } from "react";
 import {
   ArrowLeft,
+  CalendarDays,
   Car,
+  ChevronRight,
   ExternalLink,
   Heart,
+  History,
   MapPin,
   Phone,
+  Star,
   Utensils,
   Waves,
   Wind,
@@ -30,13 +34,43 @@ import {
 import {
   saveRecentlyViewedSauna,
 } from "../services/recently-viewed-saunas";
+import {
+  getSaunaVisitHistory,
+  type SaunaVisitHistory,
+} from "../services/sauna-visit-history";
 
 type SaunaDetailScreenProps = {
   sauna: Sauna;
   userId: string;
   onBack: () => void;
   onCreatePost: () => void;
+  onSelectPost: (
+    postId: string
+  ) => void;
 };
+
+function formatVisitDate(
+  value: string
+): string {
+  const [
+    year,
+    month,
+    day,
+  ] =
+    value.split(
+      "-"
+    );
+
+  if (
+    !year ||
+    !month ||
+    !day
+  ) {
+    return value;
+  }
+
+  return `${year}.${month}.${day}`;
+}
 
 /**
  * 都道府県・市区町村・住所の
@@ -97,6 +131,7 @@ export function SaunaDetailScreen({
   userId,
   onBack,
   onCreatePost,
+  onSelectPost,
 }: SaunaDetailScreenProps) {
   useEffect(() => {
     saveRecentlyViewedSauna({
@@ -157,6 +192,34 @@ export function SaunaDetailScreen({
     setFavoriteError,
   ] =
     useState<string | null>(
+      null
+    );
+
+  const [
+    visitHistory,
+    setVisitHistory,
+  ] =
+    useState<
+      SaunaVisitHistory | null
+    >(
+      null
+    );
+
+  const [
+    historyLoading,
+    setHistoryLoading,
+  ] =
+    useState(
+      false
+    );
+
+  const [
+    historyError,
+    setHistoryError,
+  ] =
+    useState<
+      string | null
+    >(
       null
     );
 
@@ -303,6 +366,72 @@ export function SaunaDetailScreen({
     }
 
     void loadFavorite();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    sauna.id,
+    userId,
+  ]);
+
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    const client =
+      supabase;
+
+    let cancelled =
+      false;
+
+    setVisitHistory(
+      null
+    );
+    setHistoryError(
+      null
+    );
+    setHistoryLoading(
+      true
+    );
+
+    async function loadVisitHistory() {
+      try {
+        const result =
+          await getSaunaVisitHistory(
+            client,
+            userId,
+            sauna.id
+          );
+
+        if (!cancelled) {
+          setVisitHistory(
+            result
+          );
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(
+          error
+        );
+        setHistoryError(
+          "訪問履歴を表示できませんでした。"
+        );
+      } finally {
+        if (!cancelled) {
+          setHistoryLoading(
+            false
+          );
+        }
+      }
+    }
+
+    void loadVisitHistory();
 
     return () => {
       cancelled =
@@ -586,6 +715,102 @@ export function SaunaDetailScreen({
           />
         </div>
       </div>
+
+      {historyLoading ? (
+        <div
+          className="detail-history-loading"
+          role="status"
+        >
+          訪問履歴を確認しています...
+        </div>
+      ) : null}
+
+      {visitHistory ? (
+        <section
+          className="detail-section"
+          aria-labelledby="detail-history-heading"
+        >
+          <p className="detail-section-label">
+            Your history
+          </p>
+
+          <div className="detail-history-card">
+            <div className="detail-history-summary">
+              <span className="detail-history-icon">
+                <History
+                  aria-hidden="true"
+                />
+              </span>
+
+              <div>
+                <h2 id="detail-history-heading">
+                  あなたは{visitHistory.visitCount}回訪れています
+                </h2>
+
+                <p>
+                  最終訪問 {formatVisitDate(
+                    visitHistory.latestVisitDate
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="detail-history-list">
+              {visitHistory.recentVisits.map(
+                (visit) => (
+                  <button
+                    key={
+                      visit.id
+                    }
+                    type="button"
+                    className="detail-history-entry"
+                    onClick={() => {
+                      onSelectPost(
+                        visit.id
+                      );
+                    }}
+                  >
+                    <span className="detail-history-date">
+                      <CalendarDays
+                        aria-hidden="true"
+                      />
+
+                      {formatVisitDate(
+                        visit.visitDate
+                      )}
+                    </span>
+
+                    <span className="detail-history-meta">
+                      {visit.setCount}セット
+
+                      <span>
+                        <Star
+                          aria-hidden="true"
+                        />
+
+                        {visit.rating}
+                      </span>
+                    </span>
+
+                    <ChevronRight
+                      aria-hidden="true"
+                    />
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {historyError ? (
+        <p
+          className="detail-history-error"
+          role="alert"
+        >
+          {historyError}
+        </p>
+      ) : null}
 
       <div className="detail-section">
         <p className="detail-section-label">
