@@ -10,6 +10,7 @@ import {
   MapPin,
   RefreshCw,
   Search,
+  Sparkles,
   Star,
 } from "lucide-react";
 
@@ -21,6 +22,11 @@ import {
   type TodayData,
   type TodayRecentActivity,
 } from "../services/today";
+import {
+  getNextSaunaRecommendation,
+  saveRecommendedSauna,
+  type NextSaunaRecommendation,
+} from "../services/recommendations";
 
 type TodayScreenProps = {
   userId: string;
@@ -583,18 +589,52 @@ function FavoriteSaunasSection({
   );
 }
 
-function TodayNextAction({
+function TodayRecommendationSection({
+  userId,
   onGoSearch,
+  onSelectSauna,
 }: {
+  userId: string;
   onGoSearch:
     () => void;
+  onSelectSauna: (sauna: Sauna) => void;
 }) {
+  const [recommendation, setRecommendation] = useState<NextSaunaRecommendation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    void getNextSaunaRecommendation(userId)
+      .then((result) => { if (!cancelled) setRecommendation(result); })
+      .catch(() => { if (!cancelled) setError("おすすめ施設を読み込めませんでした。"); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [userId, reloadKey]);
+
+  async function saveRecommendation() {
+    if (!recommendation || saving || saved) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await saveRecommendedSauna(userId, recommendation.sauna.id);
+      setSaved(true);
+    } catch {
+      setError("行きたいに追加できませんでした。");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <section className="today-next-action">
+    <section className="today-next-action" aria-labelledby="today-recommendation-heading">
       <div className="today-next-action-icon">
-        <Flame
-          aria-hidden="true"
-        />
+        <Sparkles aria-hidden="true" />
       </div>
 
       <div>
@@ -602,30 +642,34 @@ function TodayNextAction({
           Next Sauna
         </p>
 
-        <h2>
-          次の整いを、
-          見つけよう。
-        </h2>
-
-        <p>
-          全国のサウナ施設から、
-          今日の気分に合う場所を
-          探せます。
-        </p>
+        <h2 id="today-recommendation-heading">次に行きたいサウナ</h2>
       </div>
 
-      <button
-        type="button"
-        onClick={
-          onGoSearch
-        }
-      >
-        サウナを探す
+      {loading ? <div className="today-recommendation-loading" role="status">おすすめを選んでいます...</div> : null}
 
-        <ChevronRight
-          aria-hidden="true"
-        />
-      </button>
+      {!loading && recommendation ? (
+        <div className="today-recommendation-card">
+          <button type="button" className="today-recommendation-main" onClick={() => { onSelectSauna(recommendation.sauna); }}>
+            <div className="today-recommendation-image">
+              {recommendation.sauna.image_url ? <img src={recommendation.sauna.image_url} alt="" /> : <Flame aria-hidden="true" />}
+            </div>
+            <div>
+              <strong>{recommendation.sauna.name}</strong>
+              <span><MapPin aria-hidden="true" />{getSaunaLocation(recommendation.sauna)}</span>
+              <p>{recommendation.reason}</p>
+            </div>
+          </button>
+          <button type="button" className="today-recommendation-save" disabled={saving || saved} onClick={() => { void saveRecommendation(); }}>
+            <Heart aria-hidden="true" />{saved ? "行きたいに追加済み" : saving ? "追加しています..." : "行きたいに追加"}
+          </button>
+        </div>
+      ) : null}
+
+      {!loading && !recommendation && !error ? (
+        <div className="today-recommendation-empty"><p>新しい候補を見つけるには、検索から条件を変えて探してみましょう。</p><button type="button" onClick={onGoSearch}>サウナを探す<ChevronRight aria-hidden="true" /></button></div>
+      ) : null}
+
+      {error ? <div className="today-recommendation-error" role="alert"><p>{error}</p><button type="button" onClick={() => { setReloadKey((key) => key + 1); }}><RefreshCw aria-hidden="true" />もう一度試す</button></div> : null}
     </section>
   );
 }
@@ -806,6 +850,12 @@ export function TodayScreen({
         }
       />
 
+      <TodayRecommendationSection
+        userId={userId}
+        onGoSearch={onGoSearch}
+        onSelectSauna={onSelectSauna}
+      />
+
       <FavoriteSaunasSection
         saunas={
           todayData.favoriteSaunas
@@ -818,11 +868,6 @@ export function TodayScreen({
         }
       />
 
-      <TodayNextAction
-        onGoSearch={
-          onGoSearch
-        }
-      />
     </section>
   );
 }
