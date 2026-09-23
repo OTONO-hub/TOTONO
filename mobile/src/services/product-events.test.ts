@@ -28,6 +28,7 @@ describe("insertProductEvent", () => {
       source: "today_next_sauna",
       source_screen: null,
       search_method: null,
+      auth_method: null,
     });
   });
 
@@ -100,5 +101,25 @@ describe("insertProductEvent", () => {
     }));
     expect(payload).not.toHaveProperty("comment");
     expect(payload).not.toHaveProperty("rating");
+  });
+
+  it("records login success without an email address", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const client = { from: vi.fn().mockReturnValue({ insert }) } as unknown as SupabaseClient;
+
+    await insertProductEvent(client, "user-1", {
+      eventName: "login",
+      source: "auth",
+      sourceScreen: "login",
+      authMethod: "email",
+    });
+
+    const payload = insert.mock.calls[0]?.[0];
+    expect(payload).toEqual(expect.objectContaining({
+      event_name: "login",
+      auth_method: "email",
+      source_screen: "login",
+    }));
+    expect(payload).not.toHaveProperty("email");
   });
 });

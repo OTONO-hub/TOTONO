@@ -3,6 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
 export type ProductEventName =
+  | "sign_up"
+  | "login"
   | "app_open"
   | "today_view"
   | "search_view"
@@ -21,6 +23,7 @@ export type ProductEventName =
 export type ProductEvent = {
   eventName: ProductEventName;
   source:
+    | "auth"
     | "app_lifecycle"
     | "screen_view"
     | "sauna_search"
@@ -29,6 +32,7 @@ export type ProductEvent = {
     | "today_next_sauna";
   sourceScreen?: string;
   searchMethod?: "keyword" | "prefecture" | "current_location";
+  authMethod?: "email";
   saunaId?: string;
   recommendationReason?: string;
   sessionPosition?: number;
@@ -49,6 +53,7 @@ export async function insertProductEvent(
     source: event.source,
     source_screen: event.sourceScreen?.slice(0, 50) ?? null,
     search_method: event.searchMethod ?? null,
+    auth_method: event.authMethod ?? null,
   });
 
   if (error) {
