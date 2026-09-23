@@ -2,7 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { supabase } from "../lib/supabase";
 
-export type RecommendationEventName =
+export type ProductEventName =
+  | "app_open"
+  | "today_view"
+  | "search_view"
   | "recommendation_view"
   | "recommendation_change"
   | "recommendation_detail_view"
@@ -10,17 +13,19 @@ export type RecommendationEventName =
   | "recommendation_empty"
   | "recommendation_error";
 
-export type RecommendationEvent = {
-  eventName: RecommendationEventName;
+export type ProductEvent = {
+  eventName: ProductEventName;
+  source: "app_lifecycle" | "screen_view" | "today_next_sauna";
+  sourceScreen?: string;
   saunaId?: string;
   recommendationReason?: string;
   sessionPosition?: number;
 };
 
-export async function insertRecommendationEvent(
+export async function insertProductEvent(
   client: SupabaseClient,
   userId: string,
-  event: RecommendationEvent
+  event: ProductEvent
 ): Promise<void> {
   const { error } = await client.from("product_events").insert({
     user_id: userId,
@@ -29,20 +34,28 @@ export async function insertRecommendationEvent(
     sauna_id: event.saunaId ?? null,
     recommendation_reason: event.recommendationReason?.slice(0, 120) ?? null,
     session_position: event.sessionPosition ?? null,
-    source: "today_next_sauna",
+    source: event.source,
+    source_screen: event.sourceScreen?.slice(0, 50) ?? null,
   });
 
   if (error) {
-    console.warn("推薦イベントを記録できませんでした。", error.message);
+    console.warn("プロダクトイベントを記録できませんでした。", error.message);
   }
+}
+
+export function trackProductEvent(
+  userId: string,
+  event: ProductEvent
+): void {
+  if (!supabase) return;
+  void insertProductEvent(supabase, userId, event).catch((error: unknown) => {
+    console.warn("プロダクトイベントを記録できませんでした。", error);
+  });
 }
 
 export function trackRecommendationEvent(
   userId: string,
-  event: RecommendationEvent
+  event: Omit<ProductEvent, "source">
 ): void {
-  if (!supabase) return;
-  void insertRecommendationEvent(supabase, userId, event).catch((error: unknown) => {
-    console.warn("推薦イベントを記録できませんでした。", error);
-  });
+  trackProductEvent(userId, { ...event, source: "today_next_sauna" });
 }
