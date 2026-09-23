@@ -124,6 +124,14 @@ type SaunaDetailReturnTarget =
       tab: Tab;
     };
 
+function getAnalyticsScreen(location: string | null): string | undefined {
+  if (!location) return undefined;
+  const [locationTab, locationView] = location.split(":");
+  if (locationTab === "search" && locationView === "detail") return "sauna_detail";
+  if (locationTab === "create" && locationView === "create-post") return "post_create";
+  return locationTab;
+}
+
 export function App() {
   const appOpenTracked = useRef(false);
   const previousLocation = useRef<string | null>(null);
@@ -408,10 +416,10 @@ export function App() {
   useEffect(() => {
     if (!ready || !session) return;
 
-    const location = `${tab}:${searchView}`;
+    const location = `${tab}:${searchView}:${selectedSauna?.id ?? ""}`;
     if (previousLocation.current === location) return;
 
-    const sourceScreen = previousLocation.current?.split(":")[0];
+    const sourceScreen = getAnalyticsScreen(previousLocation.current);
     previousLocation.current = location;
 
     if (tab === "today") {
@@ -426,8 +434,15 @@ export function App() {
         source: "screen_view",
         sourceScreen,
       });
+    } else if (tab === "search" && searchView === "detail" && selectedSauna) {
+      trackProductEvent(session.user.id, {
+        eventName: "sauna_detail_view",
+        source: "screen_view",
+        sourceScreen,
+        saunaId: selectedSauna.id,
+      });
     }
-  }, [ready, searchView, session, tab]);
+  }, [ready, searchView, selectedSauna, session, tab]);
 
   useEffect(() => {
     window.scrollTo({

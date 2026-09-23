@@ -27,6 +27,7 @@ describe("insertProductEvent", () => {
       session_position: 2,
       source: "today_next_sauna",
       source_screen: null,
+      search_method: null,
     });
   });
 
@@ -59,5 +60,24 @@ describe("insertProductEvent", () => {
       source_screen: "today",
       sauna_id: null,
     }));
+  });
+
+  it("records only the search method and not the search text", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const client = { from: vi.fn().mockReturnValue({ insert }) } as unknown as SupabaseClient;
+
+    await insertProductEvent(client, "user-1", {
+      eventName: "sauna_search",
+      source: "sauna_search",
+      sourceScreen: "search",
+      searchMethod: "current_location",
+    });
+
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({
+      event_name: "sauna_search",
+      search_method: "current_location",
+      source_screen: "search",
+    }));
+    expect(insert.mock.calls[0]?.[0]).not.toHaveProperty("keyword");
   });
 });
