@@ -5,7 +5,7 @@ import {
   AdminAccessError,
   requireAdmin,
 } from "@/lib/admin/require-admin";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 type SaunaRow = {
   id: string;
@@ -14,8 +14,9 @@ type SaunaRow = {
   image_url: string | null;
 };
 
-async function getAllSaunas(): Promise<SaunaRow[]> {
-  const client = createAdminClient();
+async function getAllSaunas(
+  client: Awaited<ReturnType<typeof createClient>>
+): Promise<SaunaRow[]> {
   const rows: SaunaRow[] = [];
   const pageSize = 500;
 
@@ -44,9 +45,9 @@ export default async function FacilityPhotosAdminPage() {
     notFound();
   }
 
-  const client = createAdminClient();
+  const client = await createClient();
   const [saunas, photoResult, pilotResult] = await Promise.all([
-    getAllSaunas(),
+    getAllSaunas(client),
     client
       .from("facility_photos")
       .select(

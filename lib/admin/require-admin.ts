@@ -1,6 +1,5 @@
 import "server-only";
 
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export class AdminAccessError extends Error {
@@ -23,19 +22,10 @@ export async function requireAdmin() {
     throw new AdminAccessError(401, "ログインが必要です。");
   }
 
-  const appRole = user.app_metadata?.role;
-  if (appRole === "admin") {
-    return user;
-  }
+  const { data: isAdmin, error: adminError } =
+    await supabase.rpc("is_totono_admin");
 
-  const adminClient = createAdminClient();
-  const { data, error: adminError } = await adminClient
-    .from("admin_users")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (adminError || !data) {
+  if (adminError || !isAdmin) {
     throw new AdminAccessError(403, "管理者権限が必要です。");
   }
 
