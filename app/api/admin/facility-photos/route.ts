@@ -6,7 +6,7 @@ import {
   AdminAccessError,
   requireAdmin,
 } from "@/lib/admin/require-admin";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
   createSafeExtension,
   FACILITY_PHOTO_BUCKET,
@@ -88,8 +88,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const adminClient = createAdminClient();
-    const { data: sauna, error: saunaError } = await adminClient
+    const client = await createClient();
+    const { data: sauna, error: saunaError } = await client
       .from("saunas")
       .select("id")
       .eq("id", saunaId)
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     const photoPath = `${saunaId}/${photoId}.${createSafeExtension(photo)}`;
     let evidencePath: string | null = null;
 
-    const { error: uploadError } = await adminClient.storage
+    const { error: uploadError } = await client.storage
       .from(FACILITY_PHOTO_BUCKET)
       .upload(photoPath, photo, {
         contentType: photo.type,
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     try {
       if (evidence instanceof File && evidence.size > 0) {
         evidencePath = `${saunaId}/${photoId}.${createSafeExtension(evidence)}`;
-        const { error: evidenceUploadError } = await adminClient.storage
+        const { error: evidenceUploadError } = await client.storage
           .from(FACILITY_PHOTO_EVIDENCE_BUCKET)
           .upload(evidencePath, evidence, {
             contentType: evidence.type,
@@ -127,11 +127,11 @@ export async function POST(request: Request) {
         if (evidenceUploadError) throw evidenceUploadError;
       }
 
-      const { data: publicUrlData } = adminClient.storage
+      const { data: publicUrlData } = client.storage
         .from(FACILITY_PHOTO_BUCKET)
         .getPublicUrl(photoPath);
 
-      const { error: insertError } = await adminClient
+      const { error: insertError } = await client
         .from("facility_photos")
         .insert({
           id: photoId,
@@ -158,7 +158,7 @@ export async function POST(request: Request) {
         });
       if (insertError) throw insertError;
 
-      const { error: heroError } = await adminClient.rpc(
+      const { error: heroError } = await client.rpc(
         "set_facility_photo_hero",
         { target_photo_id: photoId }
       );
@@ -170,15 +170,15 @@ export async function POST(request: Request) {
 
       return Response.json({ id: photoId }, { status: 201 });
     } catch (error) {
-      await adminClient
+      await client
         .from("facility_photos")
         .delete()
         .eq("id", photoId);
-      await adminClient.storage
+      await client.storage
         .from(FACILITY_PHOTO_BUCKET)
         .remove([photoPath]);
       if (evidencePath) {
-        await adminClient.storage
+        await client.storage
           .from(FACILITY_PHOTO_EVIDENCE_BUCKET)
           .remove([evidencePath]);
       }

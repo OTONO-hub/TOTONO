@@ -4,7 +4,7 @@ import {
   AdminAccessError,
   requireAdmin,
 } from "@/lib/admin/require-admin";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
   FACILITY_PHOTO_BUCKET,
   FACILITY_PHOTO_EVIDENCE_BUCKET,
@@ -30,8 +30,8 @@ export async function DELETE(
       );
     }
 
-    const adminClient = createAdminClient();
-    const { data: photo, error } = await adminClient
+    const client = await createClient();
+    const { data: photo, error } = await client
       .from("facility_photos")
       .select(
         "id, sauna_id, storage_path, permission_evidence_path, public_url, is_hero"
@@ -47,20 +47,20 @@ export async function DELETE(
       );
     }
 
-    const { error: photoStorageError } = await adminClient.storage
+    const { error: photoStorageError } = await client.storage
       .from(FACILITY_PHOTO_BUCKET)
       .remove([photo.storage_path]);
     if (photoStorageError) throw photoStorageError;
 
     if (photo.permission_evidence_path) {
-      const { error: evidenceError } = await adminClient.storage
+      const { error: evidenceError } = await client.storage
         .from(FACILITY_PHOTO_EVIDENCE_BUCKET)
         .remove([photo.permission_evidence_path]);
       if (evidenceError) throw evidenceError;
     }
 
     const removedAt = new Date().toISOString();
-    const { error: updateError } = await adminClient
+    const { error: updateError } = await client
       .from("facility_photos")
       .update({
         review_status: "removed",
@@ -73,7 +73,7 @@ export async function DELETE(
       .eq("id", id);
     if (updateError) throw updateError;
 
-    const { error: heroError } = await adminClient.rpc(
+    const { error: heroError } = await client.rpc(
       "refresh_facility_photo_hero",
       { target_sauna_id: photo.sauna_id }
     );
