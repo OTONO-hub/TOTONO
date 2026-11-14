@@ -35,7 +35,9 @@ import {
   type CommunityPost,
 } from "../services/community";
 import {
+  getFacilityPhotoAttribution,
   getSaunaById,
+  type FacilityPhotoAttribution,
   type Sauna,
 } from "../services/saunas";
 import {
@@ -184,6 +186,14 @@ export function SaunaDetailScreen({
     );
 
   const [
+    photoAttribution,
+    setPhotoAttribution,
+  ] =
+    useState<FacilityPhotoAttribution | null>(
+      null
+    );
+
+  const [
     favorite,
     setFavorite,
   ] =
@@ -294,11 +304,19 @@ export function SaunaDetailScreen({
       );
 
       try {
-        const latestSauna =
-          await getSaunaById(
+        const [
+          latestSauna,
+          latestPhotoAttribution,
+        ] = await Promise.all([
+          getSaunaById(
             client,
             sauna.id
-          );
+          ),
+          getFacilityPhotoAttribution(
+            client,
+            sauna.id
+          ),
+        ]);
 
         if (cancelled) {
           return;
@@ -309,6 +327,10 @@ export function SaunaDetailScreen({
             latestSauna
           );
         }
+
+        setPhotoAttribution(
+          latestPhotoAttribution
+        );
       } catch (error) {
         if (cancelled) {
           return;
@@ -676,16 +698,49 @@ export function SaunaDetailScreen({
       </div>
 
       {displaySauna.image_url ? (
-        <div className="detail-hero-image">
-          <img
-            src={
-              displaySauna.image_url
-            }
-            alt={
-              displaySauna.name
-            }
-          />
-        </div>
+        <>
+          <div className="detail-hero-image">
+            <img
+              src={
+                displaySauna.image_url
+              }
+              alt={
+                displaySauna.name
+              }
+            />
+          </div>
+
+          {photoAttribution?.publicUrl ===
+          displaySauna.image_url ? (
+            <div className="detail-photo-attribution">
+              <span>
+                {photoAttribution.attributionText ??
+                  `写真: ${photoAttribution.photographerName}`}
+              </span>
+
+              {photoAttribution.sourceUrl ? (
+                <a
+                  href={photoAttribution.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  出典
+                </a>
+              ) : null}
+
+              {photoAttribution.licenseName &&
+              photoAttribution.licenseUrl ? (
+                <a
+                  href={photoAttribution.licenseUrl}
+                  target="_blank"
+                  rel="license noreferrer"
+                >
+                  ライセンス
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+        </>
       ) : (
         <div className="detail-hero-placeholder">
           <span>

@@ -21,7 +21,9 @@ Google検索・Google Maps・公式サイトからの無断転載、既存投稿
 ## 初回セットアップ
 
 1. `20260924090000_create_facility_photos.sql` をSupabaseへ適用する。
-2. 管理者ユーザーを登録する（メールアドレスは実際の管理者へ置換）。
+2. `20260927090000_allow_admin_facility_photo_cleanup.sql` をSupabaseへ適用する。
+3. `20261114090000_public_facility_photo_attribution.sql` をSupabaseへ適用する。
+4. 管理者ユーザーを登録する（メールアドレスは実際の管理者へ置換）。
 
 ```sql
 insert into public.admin_users (user_id)
@@ -31,8 +33,43 @@ where email = 'ADMIN_EMAIL@example.com'
 on conflict (user_id) do nothing;
 ```
 
-3. `/admin/facility-photos` を開く。
-4. 「検証」と表示される15施設へ、権利確認済みの外観写真を登録する。
+5. `/admin/facility-photos` を開く。
+6. 「検証」と表示される施設へ、権利確認済みの外観写真を登録する。
+
+## オープンライセンス10施設の初回取込
+
+`data/open-license-facility-photo-pilot.ts` には、Wikimedia Commonsの
+ファイルページで施設一致・撮影者・ライセンスを確認した10施設だけを登録する。
+公式サイトや検索結果の画像URLは追加しない。
+
+最初にターミナルでドライランする。施設名・都道府県・市区町村が一致しない場合は
+エラーになり、DBとStorageは変更されない。
+
+```bash
+npm run import:facility-photos
+```
+
+10件すべてが `ready` または `already_registered` になったことを確認してから登録する。
+
+```bash
+npm run import:facility-photos:write
+```
+
+管理者が複数いる環境では、`.env.local` に登録担当者を明示する。
+
+```bash
+FACILITY_PHOTO_ADMIN_USER_ID=管理者のUUID
+```
+
+取込処理は次を保証する。
+
+- 同じ施設・同じ出典URLは二重登録しない。
+- 削除済み・却下済みの写真は自動で復活させない。
+- 最大1920px、10MB以下のJPEG・PNG・WebPだけを公開Storageへ保存する。
+- 撮影者、出典、ライセンス、確認日、取得画像のSHA-256を写真台帳へ保存する。
+- 承認済みHeroとして `saunas.image_url` へ同期する。
+- Web・iOS施設詳細には撮影者・出典・ライセンスを表示する。
+- 許諾証拠メモ、審査メモ、削除履歴は公開APIから返さない。
 
 ## 登録時チェック
 
