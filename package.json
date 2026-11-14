@@ -12,7 +12,9 @@
     "import:saunas": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts",
     "import:saunas:write": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --write",
     "import:saunas:all": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --all",
-    "import:saunas:all:write": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --all --write"
+    "import:saunas:all:write": "node --env-file=.env.local --import tsx scripts/import-osm-saunas.ts --all --write",
+    "import:facility-photos": "node --env-file=.env.local --import tsx scripts/import-open-license-facility-photos.ts",
+    "import:facility-photos:write": "node --env-file=.env.local --import tsx scripts/import-open-license-facility-photos.ts --write"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { SaunaHero } from "@/components/saunas/SaunaHero";
 import { SaunaOverview } from "@/components/saunas/SaunaOverview";
+import type { FacilityPhotoAttribution } from "@/services/facility-photo-attributions";
 
 type SaunaDetailHeaderCardProps = {
   saunaId: string;
@@ -22,6 +23,7 @@ type SaunaDetailHeaderCardProps = {
   phoneNumber: string | null;
   websiteUrl: string | null;
   postalCode: string | null;
+  photoAttribution: FacilityPhotoAttribution | null;
 };
 
 export function SaunaDetailHeaderCard({
@@ -42,6 +44,7 @@ export function SaunaDetailHeaderCard({
   phoneNumber,
   websiteUrl,
   postalCode,
+  photoAttribution,
 }: SaunaDetailHeaderCardProps) {
   return (
     <>
@@ -104,6 +107,7 @@ export function SaunaDetailHeaderCard({
             locationText={locationText}
             averageRating={averageRating}
             ratingCount={ratingCount}
+            photoAttribution={photoAttribution}
           />
 
           <SaunaOverview

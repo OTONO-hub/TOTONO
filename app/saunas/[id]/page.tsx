@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { RecentlyViewedSaunaTracker } from "@/components/saunas/RecentlyViewedSaunaTracker";
 import { SaunaDetailContent } from "@/components/saunas/SaunaDetailContent";
 import { createClient } from "@/lib/supabase/server";
+import { getFacilityPhotoAttribution } from "@/services/facility-photo-attributions";
 import { isFavoriteSauna } from "@/services/favorite-saunas";
 import { getPostImagesByPostIds } from "@/services/post-images";
 import { getPostsBySaunaId } from "@/services/posts";
@@ -124,6 +125,7 @@ export default async function SaunaDetailPage({
     initialFavorite,
     metricsBySaunaId,
     postImagesByPostId,
+    photoAttribution,
   ] = await Promise.all([
     user
       ? isFavoriteSauna(
@@ -141,6 +143,11 @@ export default async function SaunaDetailPage({
     getPostImagesByPostIds(
       supabase,
       postIds
+    ),
+
+    getFacilityPhotoAttribution(
+      supabase,
+      sauna.id
     ),
   ]);
 
@@ -287,6 +294,7 @@ export default async function SaunaDetailPage({
         postCount={postCount}
         favoriteCount={favoriteCount}
         ratingDistribution={ratingDistribution}
+        photoAttribution={photoAttribution}
       />
     </>
   );

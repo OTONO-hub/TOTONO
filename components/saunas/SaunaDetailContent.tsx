@@ -1,4 +1,5 @@
 import type { RatingDistribution } from "@/services/sauna-metrics";
+import type { FacilityPhotoAttribution } from "@/services/facility-photo-attributions";
 
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
@@ -52,6 +53,7 @@ type SaunaDetailContentProps = {
   postCount: number;
   favoriteCount: number;
   ratingDistribution: RatingDistribution;
+  photoAttribution: FacilityPhotoAttribution | null;
 };
 
 export function SaunaDetailContent({
@@ -64,6 +66,7 @@ export function SaunaDetailContent({
   postCount,
   favoriteCount,
   ratingDistribution,
+  photoAttribution,
 }: SaunaDetailContentProps) {
   const locationText = [
     sauna.prefecture,
@@ -169,6 +172,7 @@ export function SaunaDetailContent({
             phoneNumber={sauna.phone_number}
             websiteUrl={sauna.website_url}
             postalCode={sauna.postal_code}
+            photoAttribution={photoAttribution}
           />
         </FadeIn>
 

@@ -93,7 +93,7 @@ export default async function FacilityPhotosAdminPage() {
         <p className="text-xs font-bold tracking-[0.24em] text-black/45">TOTONO PRODUCT HQ</p>
         <h1 className="mt-3 text-3xl font-black sm:text-4xl">Facility Photo Coverage</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-black/60">
-          権利確認、施設一致、外観写真であることを審査してから公開します。最初の検証枠は15施設です。
+          権利確認、施設一致、外観写真であることを審査してから公開します。10〜20施設ずつ検証して全国へ展開します。
         </p>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -126,7 +126,7 @@ export default async function FacilityPhotosAdminPage() {
 
         <section className="mt-10 rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold">写真未登録施設</h2>
-          <p className="mt-2 text-sm text-black/55">「検証」は初回15施設の対象です。権利確認前の画像URLは掲載済みに数えません。</p>
+          <p className="mt-2 text-sm text-black/55">「検証」は現在の段階的な確認対象です。権利確認前の画像URLは掲載済みに数えません。</p>
           <div className="mt-5 max-h-96 overflow-auto rounded-xl border border-black/10">
             <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="sticky top-0 bg-[#eeeae5]">

@@ -6,6 +6,8 @@ import {
   Waves,
 } from "lucide-react";
 
+import type { FacilityPhotoAttribution } from "@/services/facility-photo-attributions";
+
 type SaunaHeroProps = {
   name: string;
   imageUrl: string | null;
@@ -13,6 +15,7 @@ type SaunaHeroProps = {
   locationText: string;
   averageRating: number | null;
   ratingCount: number;
+  photoAttribution: FacilityPhotoAttribution | null;
 };
 
 const MAX_RATING = 5;
@@ -24,6 +27,7 @@ export function SaunaHero({
   locationText,
   averageRating,
   ratingCount,
+  photoAttribution,
 }: SaunaHeroProps) {
   const normalizedName =
     name.trim() || "サウナ施設";
@@ -59,6 +63,12 @@ export function SaunaHero({
     formattedAverageRating !== null
       ? `平均評価は5点満点中${formattedAverageRating}点です。${normalizedRatingCount}件の評価があります`
       : "この施設にはまだ評価がありません";
+
+  const displayedAttribution =
+    imageUrl &&
+    photoAttribution?.publicUrl === imageUrl
+      ? photoAttribution
+      : null;
 
   return (
     <div
@@ -417,6 +427,51 @@ export function SaunaHero({
               <span className="break-words">
                 {normalizedLocationText}
               </span>
+            </div>
+          ) : null}
+
+          {displayedAttribution ? (
+            <div
+              className="
+                mt-3
+                flex
+                flex-wrap
+                items-center
+                gap-x-2
+                gap-y-1
+                text-[0.68rem]
+                leading-5
+                text-white/60
+                sm:text-xs
+              "
+            >
+              <span>
+                {displayedAttribution.attributionText ??
+                  `写真: ${displayedAttribution.photographerName}`}
+              </span>
+
+              {displayedAttribution.sourceUrl ? (
+                <a
+                  href={displayedAttribution.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline underline-offset-2 transition hover:text-white focus-visible:text-white focus-visible:outline-none"
+                >
+                  出典
+                </a>
+              ) : null}
+
+              {displayedAttribution.licenseName &&
+              displayedAttribution.licenseUrl ? (
+                <a
+                  href={displayedAttribution.licenseUrl}
+                  target="_blank"
+                  rel="license noreferrer"
+                  className="underline underline-offset-2 transition hover:text-white focus-visible:text-white focus-visible:outline-none"
+                >
+                  ライセンス
+                </a>
+              ) : null}
             </div>
           ) : null}
         </div>
